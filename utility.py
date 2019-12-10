@@ -12,13 +12,18 @@ def load_conf() -> Dict:
 		"imageUploadPath": "../../../../images",
 		"logging": {
 			"file": "log.txt",
-			"level": "WARNING",
+			"level": "WARNING"
 		},
 		"database": {
-			"host": "localhost",
-			"database": "beecologydb",
-			"user": "root",
-			"password": ""
+			"pool_max": 16,
+			"pool_min": 1,
+			"connection": {
+				"host": "localhost",
+				"dbname": "beecologydb",
+				"user": "root",
+				"password": "",
+				"port": 5432
+			}
 		}
 	}
 	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.json"
