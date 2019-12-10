@@ -12,7 +12,7 @@ def load_conf() -> Dict:
 		"imageUploadPath": "../../../../images",
 		"logging": {
 			"file": "log.txt",
-			"level": "warning",
+			"level": "WARNING",
 		},
 		"database": {
 			"host": "localhost",
@@ -21,7 +21,7 @@ def load_conf() -> Dict:
 			"password": ""
 		}
 	}
-	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ.keys() else "conf.json"
+	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.json"
 	try:
 		with open(conf_file_name, "r") as conf_file:
 			conf = json.load(conf_file)
