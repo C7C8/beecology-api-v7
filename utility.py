@@ -4,6 +4,8 @@ import sys
 from logging.config import dictConfig
 from typing import Dict
 
+from api_services import Config
+
 
 def load_conf() -> Dict:
 	# Load configuration file, fall back to default config if not available.
@@ -33,6 +35,7 @@ def load_conf() -> Dict:
 	except IOError:
 		print("Failed to load config file \"{}\" falling back to local default. THIS IS ALMOST GUARANTEED TO FAIL!"
 		      .format(conf_file_name), file=sys.stderr)
+	Config.config = conf
 	return conf
 
 
