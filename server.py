@@ -34,6 +34,7 @@ ns.add_resource(Root, "/")
 
 # Bee data
 ns.add_resource(Beedex, "/BeeDex/<int:id>")
+ns.add_resource(Beedex, "/BeeDex")
 ns.add_resource(BeeRecord, "/beerecord/<int:id>")
 ns.add_resource(BeeRecordsList, "/beerecords/<int:page>")
 ns.add_resource(BeeVisRecords, "/beevisrecords")

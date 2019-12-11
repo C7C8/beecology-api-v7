@@ -8,6 +8,8 @@ def test_root(client: FlaskClient):
 	res = client.get("/api_v7/api/")
 	assert res.status_code == 200
 	assert res.content_type == "application/json"
-	assert json.loads(res.data) == "Welcome! The api is working!"
+	loaded = json.loads(res.data)
+	assert type(loaded) == dict
+	assert loaded["message"] == "Welcome! The api is working!"
 
 

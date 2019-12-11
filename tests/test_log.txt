@@ -1,0 +1,16 @@
+[2019-12-10 19:28:38,549] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:31:50,481] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:32:01,733] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:34:24,605] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:34:24,606] DEBUG in database: Instantiating thread pool
+[2019-12-10 19:34:24,617] INFO in bee_record: Got a database connection!
+[2019-12-10 19:36:10,779] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:36:10,779] DEBUG in database: Instantiating thread pool
+[2019-12-10 19:36:30,712] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:36:30,712] DEBUG in database: Instantiating thread pool
+[2019-12-10 19:36:30,712] INFO in database: Connecting to root@localhost:5432/beecologydb
+[2019-12-10 19:36:30,714] INFO in bee_record: Got a database connection!
+[2019-12-10 19:36:44,964] INFO in bee_record: Getting beedex ID 5
+[2019-12-10 19:36:44,964] DEBUG in database: Instantiating thread pool
+[2019-12-10 19:36:44,964] INFO in database: Connecting to root@localhost:5432/beecologydb
+[2019-12-10 19:36:44,966] INFO in bee_record: Got a database connection!
