@@ -4,7 +4,6 @@ from flask_restplus import Resource
 
 from api_services.util import response
 from .database import DatabaseService
-import psycopg2
 
 log = getLogger()
 

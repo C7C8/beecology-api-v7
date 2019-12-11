@@ -38,5 +38,5 @@ def test_beedex_all(client: FlaskClient):
 	assert len(data["data"]) > 0
 
 def test_beedex_none(client: FlaskClient):
-	res = client.get("/api_v7/api/BeeDex/-9999")
+	res = client.get("/api_v7/api/BeeDex/999999")
 	assert res.status_code == 404
