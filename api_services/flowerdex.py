@@ -51,7 +51,14 @@ class FlowerShapes(Resource):
 	@staticmethod
 	def get():
 		"""Get all flower shapes"""
-		return "Placeholder"
+		with Database() as engine:
+			features = Database.features
+			results = engine.execute(sql.select([features]).where(features.c.feature_id.like("fc%")))
+			data = [dict(r) for r in results]
+			if len(data) == 0:
+				return response("false", "Flower shapes not found!", True)
+			return response("success", "Retrieve the flower shapes success!", False, data=data)
+
 
 class FlowerColors(Resource):
 	@staticmethod

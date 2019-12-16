@@ -20,6 +20,7 @@ class Database:
 	beerecord: sqlalchemy.Table = None
 	flower: sqlalchemy.Table = None
 	flowerdict: sqlalchemy.Table = None
+	features: sqlalchemy.Table = None
 
 	@staticmethod
 	def get_connection():
@@ -45,6 +46,7 @@ class Database:
 			Database.beerecord = sqlalchemy.Table("beerecord", metadata, autoload=True, autoload_with=Database.pool)
 			Database.flower = sqlalchemy.Table("flower", metadata, autoload=True, autoload_with=Database.pool)
 			Database.flowerdict = sqlalchemy.Table("flowerdict", metadata, autoload=True, autoload_with=Database.pool)
+			Database.features = sqlalchemy.Table("feature", metadata, autoload=True, autoload_with=Database.pool)
 
 		return self.pool
 
