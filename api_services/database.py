@@ -1,6 +1,8 @@
 from logging import getLogger
 
-from psycopg2.pool import ThreadedConnectionPool
+import psycopg2
+import sqlalchemy.pool
+from sqlalchemy import create_engine
 
 from .config import Config
 
@@ -8,22 +10,28 @@ log = getLogger()
 
 class DatabaseService:
 	"""Service that wraps PostgreSQL connection pooling"""
-	pool: ThreadedConnectionPool = None
+	engine: sqlalchemy.pool.Pool = None
+
+	@staticmethod
+	def get_connection():
+		dbconfig = Config.config["database"]
+		log.info("Connecting to database {user}@{host}:{port}/{dbname}".format(**dbconfig["connection"]))
+		return psycopg2.connect(**dbconfig["connection"])
 
 	def __enter__(self):
 		"""Get a connection object"""
-		if DatabaseService.pool is None:
-			log.debug("Instantiating thread pool")
+		if DatabaseService.engine is None:
+			log.debug("Starting SQLAlchemy engine")
 			dbconfig = Config.config["database"]
-			log.info("Connecting to database {user}@{host}:{port}/{dbname}".format(**dbconfig["connection"]))
 
 			try:
-				DatabaseService.pool = ThreadedConnectionPool(dbconfig["pool_min"], dbconfig["pool_max"], **dbconfig["connection"])
+				DatabaseService.engine = create_engine("postgresql+psycopg2://", creator=DatabaseService.get_connection,
+				                                       pool_size=dbconfig["pool_size"])
 			except Exception as e:
 				log.critical("Failed to connect to database: {}".format(e))
 				raise e
 
-		self.conn = DatabaseService.pool.getconn()
+		self.conn = DatabaseService.get_connection()
 		return self.conn.cursor()
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
@@ -31,4 +39,4 @@ class DatabaseService:
 		if exc_type is not None:
 			log.warning("Error re-pooling connection: {}, {}, {}".format(exc_type, exc_val, exc_tb))
 			return
-		DatabaseService.pool.putconn(self.conn)
+		self.conn.close()

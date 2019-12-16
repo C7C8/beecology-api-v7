@@ -17,8 +17,7 @@ def load_conf() -> Dict:
 			"level": "WARNING"
 		},
 		"database": {
-			"pool_max": 16,
-			"pool_min": 1,
+			"pool_size": 16,
 			"connection": {
 				"host": "localhost",
 				"dbname": "beecologydb",
