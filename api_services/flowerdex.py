@@ -1,8 +1,10 @@
 from logging import getLogger
 
 from flask_restplus import Resource
+import sqlalchemy as sql
+from sqlalchemy.sql import label
 
-from api_services.database import DatabaseService
+from api_services.database import Database
 from api_services.util import response
 
 log = getLogger()
@@ -12,17 +14,21 @@ class Flowerdex(Resource):
 	def get(id: int = -1):
 		"""Get flower by ID"""
 		log.info("Getting flowerdex ID {}".format(id if id != -1 else "*"))
-		with DatabaseService() as cursor:
-			cursor.execute("SELECT * FROM flowerdict " + ("WHERE flower_id=%s" if id != -1 else ""), [id])
-			results = cursor.fetchall()
-			if len(results) == 0:
+		with Database() as engine:
+			# cursor.execute("SELECT * FROM flowerdict " + ("WHERE flower_id=%s" if id != -1 else ""), [id])
+			# results = cursor.fetchall()
+			fd = Database.flowerdict
+			query = sql.select([fd.c.flower_id,
+			                    fd.c.latin_name.label("flower_latin_name"),
+			                    fd.c.main_common_name.label("flower_common_name")])
+			if id != -1:
+				query = query.where(Database.flowerdict.c.flower_id == id)
+			results = engine.execute(query)
+
+			data = [dict(r) for r in results]
+			if len(data) == 0:
 				return response("false", "Flower not found!", True), 404
 
-			data = [{
-				"flower_id": result[0],
-				"flower_latin_name": result[1],
-				"flower_common_name": result[2]
-			} for result in results]
 			log.info("Returning {} flowerdex entries".format(len(data)))
 			return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
