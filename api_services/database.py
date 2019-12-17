@@ -3,7 +3,7 @@ from logging import getLogger
 import psycopg2
 import sqlalchemy.pool
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Engine
 
 from .config import Config
 
@@ -36,7 +36,7 @@ class Database:
 
 			try:
 				Database.pool = create_engine("postgresql+psycopg2://", creator=Database.get_connection,
-				                              pool_size=dbconfig["pool_size"])
+											  pool_size=dbconfig["pool_size"])
 			except Exception as e:
 				log.critical("Failed to connect to database: {}".format(e))
 				raise e

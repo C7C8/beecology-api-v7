@@ -36,8 +36,8 @@ def test_flowerdex_none(client: FlaskClient):
 	assert res.status_code == 404
 
 
-def test_flower_shapes(client: FlaskClient):
-	res = client.get("/api_v7/api/flowershapes")
+def test_flower_shapes(client: FlaskClient, url=None):
+	res = client.get("/api_v7/api/flowershapes" if url is None else url)
 	assert res.status_code == 200
 	data = json.loads(res.data)
 	assert data["status"] == "success"
@@ -51,3 +51,8 @@ def test_flower_shapes(client: FlaskClient):
 			assert field in datum
 			assert type(datum[field]) == str
 		assert datum["feature_id"].startswith("fc")
+
+
+def test_flower_colors(client: FlaskClient):
+	# Flower shapes and flower colors endpoints do the same. exact. thing.
+	test_flower_shapes(client, url="/api_v7/api/flowercolors")

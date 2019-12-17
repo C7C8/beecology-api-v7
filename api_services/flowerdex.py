@@ -1,8 +1,7 @@
 from logging import getLogger
 
-from flask_restplus import Resource
 import sqlalchemy as sql
-from sqlalchemy.sql import label
+from flask_restplus import Resource
 
 from api_services.database import Database
 from api_services.util import response
@@ -58,13 +57,6 @@ class FlowerShapes(Resource):
 			if len(data) == 0:
 				return response("false", "Flower shapes not found!", True)
 			return response("success", "Retrieve the flower shapes success!", False, data=data)
-
-
-class FlowerColors(Resource):
-	@staticmethod
-	def get():
-		"""Get all flower colors"""
-		return "Placeholder"
 
 class UnmatchedFlowers(Resource):
 	@staticmethod
