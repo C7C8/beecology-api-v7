@@ -1,9 +1,8 @@
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask import jsonify
 from flask_restplus import Resource
-from sqlalchemy import Date, case, func
+from sqlalchemy import case, func
 
 from api_services.util import response
 from .database import Database
@@ -28,7 +27,7 @@ class BeeRecord(Resource):
 
 class BeeRecordsList(Resource):
 	@staticmethod
-	def get(page):
+	def get(page: int):
 		"""Get bee records by page"""
 		with Database() as engine:
 			bee = Database.beerecord
@@ -117,7 +116,7 @@ class BeeUserRecords(Resource):
 
 class Beedex(Resource):
 	@staticmethod
-	def get(id=-1):
+	def get(id: int = -1):
 		"""Get an entry from the beedex by ID"""
 		log.info("Getting beedex ID {}".format(id if id != -1 else "*"))
 		with Database() as engine:

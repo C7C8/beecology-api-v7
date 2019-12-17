@@ -2,6 +2,7 @@ from logging import getLogger
 
 import sqlalchemy as sql
 from flask_restplus import Resource
+from sqlalchemy import and_, func
 
 from api_services.database import Database
 from api_services.util import response
@@ -62,4 +63,20 @@ class UnmatchedFlowers(Resource):
 	@staticmethod
 	def get():
 		"""Get unmatched flowers"""
-		return "Placeholder"
+		with Database() as engine:
+			bee = Database.beerecord
+			flower = Database.flowerdict
+			query = sql.select([
+				bee.c.flower_name,
+				func.count().label("count")
+			]).select_from(
+				bee.join(flower, bee.c.flower_name == flower.c.latin_name, isouter=True)
+			).where(
+				and_(flower.c.latin_name.is_(None), bee.c.flower_name.isnot(None))
+			).group_by(bee.c.flower_name).order_by(bee.c.flower_name)
+
+			results = engine.execute(query)
+			data = [dict(r) for r in results]
+			if len(data) == 0:
+				return response("false", "Bee records not found!", True), 404
+			return response("success", "Retrieve the Bee records success!", False, data=data), 200

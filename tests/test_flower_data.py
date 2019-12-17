@@ -56,3 +56,20 @@ def test_flower_shapes(client: FlaskClient, url=None):
 def test_flower_colors(client: FlaskClient):
 	# Flower shapes and flower colors endpoints do the same. exact. thing.
 	test_flower_shapes(client, url="/api_v7/api/flowercolors")
+
+
+def test_unmatched_flowers(client: FlaskClient):
+	res = client.get("/api_v7/api/unmatched_flowers")
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Retrieve the Bee records success!"  # TODO This... is not the right response.
+	assert not data["error"]
+	assert len(data["data"]) > 0
+
+	for datum in data["data"]:
+		for field in ["flower_name", "count"]:
+			assert field in datum
+			assert type(field) == str
+
+		int(datum["count"])  # Will throw an exception if the field can't be parsed into an int
