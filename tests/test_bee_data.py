@@ -1,4 +1,5 @@
 import json
+import re
 
 from flask.testing import FlaskClient
 from datetime import datetime
@@ -64,3 +65,37 @@ def test_beevisrecords(client: FlaskClient):
 			datetime.strptime(datum["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 		except ValueError:
 			assert False
+
+def test_beerecords(client: FlaskClient):
+	res = client.get("/api_v7/api/beerecords/1")
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Retrieve the Bee records success!"
+	assert not data["error"]
+	assert 0 < len(data["data"]) <= 50
+
+	# Verify all needed fields are present in every object in the data list
+	version_matcher = re.compile("^\d+\.\d+\.\d+$")
+	for datum in data["data"]:
+		# Strings:
+		for field in ["bee_name", "coloration_abdomen", "coloration_thorax", "coloration_head", "flower_shape", "flower_color",
+		              "time", "loc_info", "user_id", "record_pic_path", "record_video_path", "flower_name", "city_name",
+		              "gender", "bee_behavior", "common_name", "app_version", "elevation"]:
+			assert field in datum
+			assert type(datum[field]) == str or datum[field] is None
+
+		# Numbers
+		for field in ["beerecord_id", "bee_dict_id"]:
+			assert field in datum
+			assert type(datum[field]) == int or datum[field] is None
+
+		# Date must follow specific format
+		try:
+			datetime.strptime(datum["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+		except ValueError:
+			assert False
+
+		# App version must follow specific format
+		assert len(version_matcher.findall(datum["app_version"])) == 1
+
