@@ -42,7 +42,7 @@ ns.add_resource(BeeUserRecords, "/beerecorduser")
 
 # Flower data
 ns.add_resource(Flowerdex, "/flowerdex")            # POST new flower
-ns.add_resource(Flowerdex, "/flowerdex/<int:id>")   # GET flower entry
+ns.add_resource(Flowerdex, "/flowerdex/<int:id>")   # GET or DELETE flower entry
 ns.add_resource(FlowerShapes, "/flowershapes")
 ns.add_resource(FlowerShapes, "/flowercolors")      # Not a typo, these seriously have the same handler...
 ns.add_resource(UnmatchedFlowers, "/unmatched_flowers")

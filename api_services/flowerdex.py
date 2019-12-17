@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource
+from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services.database import Database
@@ -15,12 +15,10 @@ class Flowerdex(Resource):
 		"""Get flower by ID"""
 		log.info("Getting flowerdex ID {}".format(id if id != -1 else "*"))
 		with Database() as engine:
-			# cursor.execute("SELECT * FROM flowerdict " + ("WHERE flower_id=%s" if id != -1 else ""), [id])
-			# results = cursor.fetchall()
-			fd = Database.flowerdict
-			query = sql.select([fd.c.flower_id,
-			                    fd.c.latin_name.label("flower_latin_name"),
-			                    fd.c.main_common_name.label("flower_common_name")])
+			flower = Database.flowerdict
+			query = sql.select([flower.c.flower_id,
+			                    flower.c.latin_name.label("flower_latin_name"),
+			                    flower.c.main_common_name.label("flower_common_name")])
 			if id != -1:
 				query = query.where(Database.flowerdict.c.flower_id == id)
 			results = engine.execute(query)
@@ -35,7 +33,22 @@ class Flowerdex(Resource):
 	@staticmethod
 	def post():
 		"""Create a new flower"""
-		return "Placeholder"
+		parser = reqparse.RequestParser()
+		parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name")
+		parser.add_argument("flowershapeid", required=True, type=str, dest="flower_shape")
+		parser.add_argument("flowercolorid", required=True, type=str, dest="flower_color"),
+		parser.add_argument("flowerspecies", required=True, type=str, dest="flower_species"),
+		parser.add_argument("flowergenus", required=True, type=str, dest="flower_genus")
+		args = parser.parse_args()
+		log.info("Adding flower {}".format(args))
+
+		with Database() as engine:
+			query = sql.insert(Database.flower).values(**args).returning(Database.flower.c.flower_id)
+			result = engine.execute(query)
+			id = dict(next(result))
+			if id is None:
+				return response("false", "Log a new flower failed", True), 405
+			return response("success", "Log a new flower success!", False, data=id), 200
 
 	@staticmethod
 	def put():
@@ -43,9 +56,15 @@ class Flowerdex(Resource):
 		return "Placeholder"
 
 	@staticmethod
-	def delete():
+	def delete(id: int):
 		"""Delete flower by ID"""
-		return "Placeholder"
+		log.info("Deleting flower {}".format(id))
+		with Database() as engine:
+			query = sql.delete(Database.flower).where(Database.flower.c.flower_id == id).returning(Database.flower.c.flower_id)
+			if next(engine.execute(query), None) is None:
+				return response("false", "flower id not found!", True), 404
+			return response("success", "Delete flower success!", False), 200
+
 
 class FlowerShapes(Resource):
 	@staticmethod
@@ -78,5 +97,5 @@ class UnmatchedFlowers(Resource):
 			results = engine.execute(query)
 			data = [dict(r) for r in results]
 			if len(data) == 0:
-				return response("false", "Bee records not found!", True), 404
+				return response("false", "Bee records not found!", True), 404  # TODO Change messages
 			return response("success", "Retrieve the Bee records success!", False, data=data), 200

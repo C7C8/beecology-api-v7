@@ -73,3 +73,37 @@ def test_unmatched_flowers(client: FlaskClient):
 			assert type(field) == str
 
 		int(datum["count"])  # Will throw an exception if the field can't be parsed into an int
+
+
+def test_insert_delete_flower(client: FlaskClient):
+	# Send a request and make sure the server reports success
+	res = client.post("/api_v7/api/flowerdex", data={
+		"flowercommonname": "Test Flower",
+		"flowershapeid": "fs2",
+		"flowercolorid": "fc6",
+		"flowerspecies": "Testificus",
+		"flowergenus": "Unit"
+	})
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Log a new flower success!"
+	assert not data["error"]
+	id = data["data"]["flower_id"]
+	assert id > 0
+
+	# Clean up -- delete the flower we just created
+	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Delete flower success!"
+	assert not data["error"]
+
+	# Try to delete the flower we just deleted, we should get an error
+	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
+	assert res.status_code == 404
+	data = json.loads(res.data)
+	assert data["status"] == "false"
+	assert data["message"] == "flower id not found!"
+	assert data["error"]
