@@ -86,6 +86,7 @@ class FlowerShapes(Resource):
 	@staticmethod
 	def get():
 		"""Get all flower shapes"""
+		log.info("Retrieving list of all flower shapes")
 		with Database() as engine:
 			features = Database.features
 			results = engine.execute(sql.select([features]).where(features.c.feature_id.like("fc%")))
@@ -98,6 +99,7 @@ class UnmatchedFlowers(Resource):
 	@staticmethod
 	def get():
 		"""Get unmatched flowers"""
+		log.info("Retrieving list of unmatched flowers")
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict

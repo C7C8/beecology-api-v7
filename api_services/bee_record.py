@@ -29,6 +29,7 @@ class BeeRecordsList(Resource):
 	@staticmethod
 	def get(page: int):
 		"""Get bee records by page"""
+		log.info("Getting page {} of bee records".format(page))
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict
@@ -75,10 +76,11 @@ class BeeVisRecords(Resource):
 	def get():
 		"""Get all bee records"""
 		# TODO Cache responses from this endpoint
+		log.info("Getting all bee records")
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict
-			# TODO Remove duplicate gender entry (requires external code modifications)
+			# TODO Remove duplicate gender entry (requires modifications to sites that rely on this endpoint)
 			query = sql.select([
 				bee.c.bee_name,
 				bee.c.time.label("date"),
@@ -118,7 +120,7 @@ class Beedex(Resource):
 	@staticmethod
 	def get(id: int = -1):
 		"""Get an entry from the beedex by ID"""
-		log.info("Getting beedex ID {}".format(id if id != -1 else "*"))
+		log.info("Getting beedex entry #{}".format(id if id != -1 else "*"))
 		with Database() as engine:
 			query = sql.select([Database.beedict])
 			if id != -1:
