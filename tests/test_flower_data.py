@@ -92,6 +92,18 @@ def test_insert_delete_flower(client: FlaskClient):
 	id = data["data"]["flower_id"]
 	assert id > 0
 
+	# Try updating the flower
+	# TODO Find a way to automate checking database contents, since the API doesn't expose
+	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
+		"fcommon": "Test flower update"
+	})
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Update the Folwer information success!"
+	assert not data["error"]
+	assert data["data"]["flower_id"] == id
+
 	# Clean up -- delete the flower we just created
 	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
 	assert res.status_code == 200
@@ -106,4 +118,14 @@ def test_insert_delete_flower(client: FlaskClient):
 	data = json.loads(res.data)
 	assert data["status"] == "false"
 	assert data["message"] == "flower id not found!"
+	assert data["error"]
+
+	# Try to update the flower we just deleted, we should get an error
+	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
+		"fcommon": "This flower doesn't exist"
+	})
+	assert res.status_code == 404
+	data = json.loads(res.data)
+	assert data["status"] == "false"
+	assert data["message"] == "Flower not found!"
 	assert data["error"]

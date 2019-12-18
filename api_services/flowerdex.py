@@ -51,9 +51,25 @@ class Flowerdex(Resource):
 			return response("success", "Log a new flower success!", False, data=id), 200
 
 	@staticmethod
-	def put():
+	def put(id: int):
 		"""Update a flower by ID"""
-		return "Placeholder"
+		parser = reqparse.RequestParser()
+		parser.add_argument("fcommon", required=False, type=str, dest="flower_common_name")
+		parser.add_argument("fshape", required=False, type=str, dest="flower_shape")
+		parser.add_argument("fcolor", required=False, type=str, dest="flower_color")
+		parser.add_argument("fspecies", required=False, type=str, dest="flower_species")
+		parser.add_argument("fgenus", required=False, type=str, dest="flower_genus")
+		args = parser.parse_args()
+		args = {k: v for k, v in args.items() if v is not None}
+
+		log.info("Updating flower {}".format(id))
+		with Database() as engine:
+			query = sql.update(Database.flower).values(**args).where(Database.flower.c.flower_id == id).returning(Database.flower.c.flower_id)
+			result = engine.execute(query)
+			id = dict(next(result, {}))
+			if len(id) == 0:
+				return response("false", "Flower not found!", True), 404
+			return response("success", "Update the Folwer information success!", False, data=id), 200  # TODO Fix typo
 
 	@staticmethod
 	def delete(id: int):
