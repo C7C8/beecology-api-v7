@@ -66,6 +66,7 @@ def test_beevisrecords(client: FlaskClient):
 		except ValueError:
 			assert False
 
+
 def test_beerecords(client: FlaskClient):
 	res = client.get("/api_v7/api/beerecords/1")
 	assert res.status_code == 200
@@ -99,3 +100,30 @@ def test_beerecords(client: FlaskClient):
 		# App version must follow specific format
 		assert len(version_matcher.findall(datum["app_version"])) == 1
 
+
+def test_beerecord(client: FlaskClient):
+	"""Test beerecord endpoint; yes, there's more than one..."""
+	res = client.get("/api_v7/api/beerecord/122")
+	assert res.status_code == 200
+	data = json.loads(res.data)
+	assert data["status"] == "success"
+	assert data["message"] == "Retrieve the Bee records success!"
+	assert not data["error"]
+	assert len(data["data"]) == 1
+	data = data["data"][0]
+
+	for field in ["user_id", "bee_name", "coloration_head", "coloration_abdomen", "coloration_thorax",
+	            "gender", "flower_name", "city_name", "flower_shape", "flower_color", "loc_info", "date", "bee_behavior",
+	            "record_pic_path", "record_video_path"]:
+		assert field in data
+		assert type(data[field]) == str
+
+	for field in ["beerecord_id", "bee_dict_id"]:
+		assert field in data
+		assert type(data[field]) == int
+
+	# Date must follow specific format
+	try:
+		datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
+	except ValueError:
+		assert False

@@ -7,19 +7,19 @@ class RecordData(Resource):
 		"""Record a new bee observation"""
 		return "Placeholder"
 
-class Register(Resource):
+class Enroll(Resource):
 	@staticmethod
 	def get():
 		"""Register"""
 		return "Placeholder"
 
-class Login(Resource):
+class Refresh(Resource):
 	@staticmethod
 	def get():
 		"""Login"""
 		return "Placeholder"
 
-class Deregister(Resource):
+class Unenroll(Resource):
 	@staticmethod
 	def get():
 		"""Deregister (delete login)"""

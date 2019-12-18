@@ -4,6 +4,7 @@ import sqlalchemy as sql
 from flask_restplus import Resource
 from sqlalchemy import case, func
 
+from api_services.auth import authenticate
 from api_services.util import response
 from .database import Database
 
@@ -11,16 +12,57 @@ log = getLogger()
 
 class BeeRecord(Resource):
 	@staticmethod
-	def get():
+	@authenticate
+	def get(id: int = -1, user=None):
 		"""Get a bee record by ID"""
-		return "Placeholder"
+		# Copied over from node server:
+		# TODO Ask if we should scope it down to the specific user ID
+		# TODO Any authenticated user can access any record ID
+		log.info("Getting bee record with ID")
+		with Database() as engine:
+			bee = Database.beerecord
+			if id == -1:
+				query = sql.select([bee.c.bee_dict_id, bee.c.bee_name, bee.c.loc_info, bee.c.time])
+			else:
+				query = sql.select([
+					bee.c.beerecord_id,
+					bee.c.user_id,
+					bee.c.bee_dict_id,
+					bee.c.bee_name,
+					bee.c.coloration_head,
+					bee.c.coloration_abdomen,
+					bee.c.coloration_thorax,
+					bee.c.gender,
+					bee.c.flower_name,
+					bee.c.city_name,
+					bee.c.flower_shape,
+					bee.c.flower_color,
+					bee.c.loc_info,
+					bee.c.time.label("date"),
+					bee.c.bee_behavior,
+					bee.c.record_pic_path,
+					bee.c.record_video_path
+				]).where(bee.c.beerecord_id == id)
+			
+			results = engine.execute(query)
+			data = [dict(r) for r in results]
+			if len(data) == 0:
+				log.warning("Failed to retrieve bee records for beerecord")
+				return response("false", "Bee Records not found!", True), 404
+
+			# Correct date format
+			for datum in data:
+				datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+			return response("success", "Retrieve the Bee records success!", False, data=data), 200
 
 	@staticmethod
+	@authenticate
 	def put():
 		"""Update a bee record by ID"""
 		return "Placeholder"
 
 	@staticmethod
+	@authenticate
 	def delete():
 		"""Delete a bee record by ID"""
 		return "Placeholder"
@@ -64,6 +106,7 @@ class BeeRecordsList(Resource):
 			results = engine.execute(query)
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.error("Failed to retrieve bee records for beerecords")
 				return response("false", "Bee records not found!", True), 404
 
 			# Correct date format
@@ -102,9 +145,10 @@ class BeeVisRecords(Resource):
 
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.error("Failed to retrieve bee records for beevisrecords")
 				return response("false", "Bee records not found!", True), 404
 
-			# Correct date format, gender format (yes, there's a duplicate, but this API conforms to the original)
+			# Correct date format
 			for datum in data:
 				datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -129,7 +173,7 @@ class Beedex(Resource):
 
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.warning("Failed to retrieve entry #{} from beedex".format(id))
 				return response("false", "Bee Dexes not found!", True), 404
 			log.info("Returning {} beedex entries".format(len(data)))
 			return response("success", "Retrieve the Bee information success!", False, data=data), 200
-

@@ -25,6 +25,7 @@ class Flowerdex(Resource):
 
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.warning("Failed to retrieve flower #{}".format(id))
 				return response("false", "Flower not found!", True), 404
 
 			log.info("Returning {} flowerdex entries".format(len(data)))
@@ -47,6 +48,7 @@ class Flowerdex(Resource):
 			result = engine.execute(query)
 			id = dict(next(result))
 			if id is None:
+				log.error("Failed to log new flower {}".format(args))
 				return response("false", "Log a new flower failed", True), 405
 			return response("success", "Log a new flower success!", False, data=id), 200
 
@@ -68,6 +70,7 @@ class Flowerdex(Resource):
 			result = engine.execute(query)
 			id = dict(next(result, {}))
 			if len(id) == 0:
+				log.warning("Failed to update unknown flower #{}".format(id))
 				return response("false", "Flower not found!", True), 404
 			return response("success", "Update the Folwer information success!", False, data=id), 200  # TODO Fix typo
 
@@ -78,6 +81,7 @@ class Flowerdex(Resource):
 		with Database() as engine:
 			query = sql.delete(Database.flower).where(Database.flower.c.flower_id == id).returning(Database.flower.c.flower_id)
 			if next(engine.execute(query), None) is None:
+				log.warning("Attempted to delete unknown flower #{}".format(id))
 				return response("false", "flower id not found!", True), 404
 			return response("success", "Delete flower success!", False), 200
 
@@ -92,6 +96,7 @@ class FlowerShapes(Resource):
 			results = engine.execute(sql.select([features]).where(features.c.feature_id.like("fc%")))
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.warning("Failed to retrieve list of flower shapes")
 				return response("false", "Flower shapes not found!", True)
 			return response("success", "Retrieve the flower shapes success!", False, data=data)
 
@@ -115,5 +120,6 @@ class UnmatchedFlowers(Resource):
 			results = engine.execute(query)
 			data = [dict(r) for r in results]
 			if len(data) == 0:
+				log.warning("Failed to retrieve list of unmatched flowers")
 				return response("false", "Bee records not found!", True), 404  # TODO Change messages
 			return response("success", "Retrieve the Bee records success!", False, data=data), 200

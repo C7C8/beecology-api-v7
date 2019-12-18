@@ -51,11 +51,11 @@ ns.add_resource(UnmatchedFlowers, "/unmatched_flowers")
 ns.add_resource(UploadImage, "/uploadImage64")
 ns.add_resource(UploadVideo, "/uploadVideo")
 
-# User interaction
+# User management
 ns.add_resource(RecordData, "/record")
-ns.add_resource(Register, "/enroll")
-ns.add_resource(Login, "/refresh")
-ns.add_resource(Deregister, "/unenroll")
+ns.add_resource(Enroll, "/enroll")
+ns.add_resource(Refresh, "/refresh")
+ns.add_resource(Unenroll, "/unenroll")
 #########################################################
 
 
