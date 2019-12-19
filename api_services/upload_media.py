@@ -1,7 +1,7 @@
 import base64
-from email import mime
 import hashlib
 from logging import getLogger
+import magic
 import uuid
 
 from flask_restplus import Resource, reqparse
@@ -30,6 +30,7 @@ class UploadImage(Resource):
 		args = parser.parse_args()
 
 		# Decode file from base64, then make sure it's actually an image
+		mime = magic.Magic(mime=True)
 		data = base64.standard_b64decode(args["recordImage"])
 		mime_type = mime.from_buffer(data)
 		if mime_type.find("image/") == -1:
@@ -41,11 +42,12 @@ class UploadImage(Resource):
 		# The node computation takes the SHA-1 of the username (similar to the original Node server) and
 		# uses it as the node value mod 2^48 (node values are 48 bits). This lets us embed user info in
 		# the filename, but not in a back-traceable way.
-		filename = "{dir}/{uuid}.{ext}".format(dir=Config.config,
-		                                       uuid=uuid.uuid1(node=None if user is None else int(hashlib.sha1(user), 16) % (1 << 48)),
+		node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
+		filename = "{dir}/{uuid}.{ext}".format(dir=Config.config["storage"]["imageUploadPath"],
+		                                       uuid=uuid.uuid1(node=node),
 		                                       ext=mime_type.split("/")[1])
 		log.info("Saving image to {}".format(filename))
-		with open(filename, "rb") as file:
+		with open(filename, "wb") as file:
 			file.write(data)
 
 		res = response("success", "upload image success", False)
