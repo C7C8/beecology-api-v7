@@ -4,7 +4,7 @@ from flask_restplus import Resource
 class RecordData(Resource):
 	@staticmethod
 	def post():
-		"""Record a new bee observation"""
+		"""Record a new bee log"""
 		return "Placeholder"
 
 class Enroll(Resource):

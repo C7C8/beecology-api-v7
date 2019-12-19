@@ -5,7 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
 from api_services.auth import authenticate
-from api_services.util import response
+from api_services.util import response, cache_response
 from .database import Database
 
 log = getLogger()
@@ -141,6 +141,7 @@ class BeeRecordsList(Resource):
 
 class BeeVisRecords(Resource):
 	@staticmethod
+	@cache_response
 	def get():
 		"""Get all bee records"""
 		# TODO Cache responses from this endpoint

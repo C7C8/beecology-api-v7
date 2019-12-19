@@ -5,7 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services.database import Database
-from api_services.util import response
+from api_services.util import response, cache_response
 
 log = getLogger()
 
@@ -85,9 +85,9 @@ class Flowerdex(Resource):
 				return response("false", "flower id not found!", True), 404
 			return response("success", "Delete flower success!", False), 200
 
-
 class FlowerShapes(Resource):
 	@staticmethod
+	@cache_response
 	def get():
 		"""Get all flower shapes"""
 		log.info("Retrieving list of all flower shapes")
@@ -102,6 +102,7 @@ class FlowerShapes(Resource):
 
 class UnmatchedFlowers(Resource):
 	@staticmethod
+	@cache_response
 	def get():
 		"""Get unmatched flowers"""
 		log.info("Retrieving list of unmatched flowers")
