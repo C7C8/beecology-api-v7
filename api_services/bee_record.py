@@ -92,7 +92,6 @@ class BeeRecord(Resource):
 			if len(id) == 0:
 				log.warning("Failed to delete bee record #{}".format(id))
 
-
 class BeeRecordsList(Resource):
 	@staticmethod
 	def get(page: int):
@@ -182,9 +181,38 @@ class BeeVisRecords(Resource):
 
 class BeeUserRecords(Resource):
 	@staticmethod
-	def get():
+	@authenticate
+	def get(user):
 		"""Get bee log records by user ID"""
-		return "Placeholder"
+		log.info("Getting all bee records for user {}".format(user))
+		with Database() as engine:
+			bee = Database.beerecord
+			query = sql.select([
+				bee.c.beerecord_id,
+				bee.c.user_id,
+				bee.c.bee_behavior,
+				bee.c.bee_dict_id,
+				bee.c.bee_name,
+				bee.c.coloration_head,
+				bee.c.coloration_abdomen,
+				bee.c.coloration_thorax,
+				bee.c.gender,
+				bee.c.flower_name,
+				bee.c.city_name,
+				bee.c.flower_shape,
+				bee.c.flower_color,
+				bee.c.loc_info,
+				bee.c.time.label("date"),
+				bee.c.record_pic_path,
+				bee.c.record_video_path
+			]).where(bee.c.user_id == user)
+			results = engine.execute(query)
+			data = [dict(r) for r in results]
+
+			if len(data) == 0:
+				log.warning("Failed to retrieve bee records for user {}".format(user))
+				return response("false", "Bee Records not found!", True), 404
+			return response("success", "Retrieve all bee records", False, data=data), 200
 
 class Beedex(Resource):
 	@staticmethod
