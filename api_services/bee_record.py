@@ -206,12 +206,16 @@ class BeeUserRecords(Resource):
 				bee.c.record_pic_path,
 				bee.c.record_video_path
 			]).where(bee.c.user_id == user)
+
 			results = engine.execute(query)
 			data = [dict(r) for r in results]
-
 			if len(data) == 0:
 				log.warning("Failed to retrieve bee records for user {}".format(user))
 				return response("false", "Bee Records not found!", True), 404
+
+			# Correct date format
+			for datum in data:
+				datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 			return response("success", "Retrieve all bee records", False, data=data), 200
 
 class Beedex(Resource):
