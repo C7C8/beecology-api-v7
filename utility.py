@@ -1,32 +1,57 @@
 import json
 import os
 import sys
-from logging.config import dictConfig
+import logging.config
 from typing import Dict
 
 from api_services import Config
+
+__default_conf = {
+	"storage": {
+		"imageUploadPath": "../../../../images",
+		"cache": "/tmp"
+	},
+	"database": {
+		"pool_size": 16,
+		"connection": {
+			"host": "localhost",
+			"dbname": "beecologydb",
+			"user": "root",
+			"password": "",
+			"port": 5432
+		}
+	},
+	"logging": {
+		"version": 1,
+		"formatters": {
+			"default": {
+				"format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+			}
+		},
+		"handlers": {
+			"wsgi": {
+				"class": "logging.StreamHandler",
+				"stream": "ext://flask.logging.wsgi_errors_stream",
+				"formatter": "default"
+			},
+			"file": {
+				"class": "logging.FileHandler",
+				"filename": "log.txt",
+				"formatter": "default"
+			}
+		},
+		"root": {
+			"level": "INFO",
+			"handlers": ["wsgi", "file"]
+		}
+	}
+}
 
 
 def load_conf() -> Dict:
 	# Load configuration file, fall back to default config if not available.
 	# Config file is given by environment variable BEE_API_CONF, or conf.json if variable not provided.
-	conf = {
-		"imageUploadPath": "../../../../images",
-		"logging": {
-			"file": "log.txt",
-			"level": "WARNING"
-		},
-		"database": {
-			"pool_size": 16,
-			"connection": {
-				"host": "localhost",
-				"dbname": "beecologydb",
-				"user": "root",
-				"password": "",
-				"port": 5432
-			}
-		}
-	}
+	conf = __default_conf
 	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.json"
 	try:
 		with open(conf_file_name, "r") as conf_file:
@@ -38,30 +63,6 @@ def load_conf() -> Dict:
 	return conf
 
 
-def setup_logging(level: str, filename: str):
+def setup_logging(config=None):
 	# Set up logging for Flask
-	# TODO Embed this config in the config file instead
-	dictConfig({
-		"version": 1,
-		"formatters": {
-			"default": {
-					"format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
-				}
-		},
-		"handlers": {
-			"wsgi": {
-				"class": "logging.StreamHandler",
-				"stream": "ext://flask.logging.wsgi_errors_stream",
-				"formatter": "default"
-			},
-			"file": {
-				"class": "logging.FileHandler",
-				"filename": filename,
-				"formatter": "default"
-			}
-		},
-		"root": {
-			"level": level,
-			"handlers": ["wsgi", "file"]
-		}
-	})
+	logging.config.dictConfig(__default_conf["logging"] if config is None else config)

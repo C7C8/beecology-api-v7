@@ -16,7 +16,7 @@ from api_services import *
 # BEE_API_CONF        Configuration file path ("conf.json" by default)
 
 conf = load_conf()
-setup_logging(conf["logging"]["level"], conf["logging"]["file"])
+setup_logging(conf["logging"])
 
 app = Flask(__name__)
 CORS(app)  # TODO: Holdover from node server, this may not be needed.
