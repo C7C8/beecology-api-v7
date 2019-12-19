@@ -3,15 +3,13 @@ import json
 from flask.testing import FlaskClient
 from client import client
 
+from tests.client import check_ok_response, check_err_response
+
 
 def test_flowerdex_one(client: FlaskClient):
 	# Base tests -- message must conform to expected response format
 	res = client.get("/api_v7/api/flowerdex/5")
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Retrieve the Flower information success!"
-	assert not data["error"]
+	data = check_ok_response(res, "Retrieve the Flower information success!")
 	assert len(data["data"]) > 0
 
 	# Data entry must have needed data
@@ -23,26 +21,18 @@ def test_flowerdex_one(client: FlaskClient):
 
 def test_flowerdex_all(client: FlaskClient):
 	res = client.get("/api_v7/api/flowerdex")
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Retrieve the Flower information success!"
-	assert not data["error"]
+	data = check_ok_response(res, "Retrieve the Flower information success!")
 	assert len(data["data"]) > 0
 
 
 def test_flowerdex_none(client: FlaskClient):
 	res = client.get("/api_v7/api/flowerdex/999999")
-	assert res.status_code == 404
+	check_err_response(res, "Flower not found!", 404)
 
 
 def test_flower_shapes(client: FlaskClient, url=None):
 	res = client.get("/api_v7/api/flowershapes" if url is None else url)
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Retrieve the flower shapes success!"
-	assert not data["error"]
+	data = check_ok_response(res, "Retrieve the flower shapes success!")
 	assert len(data["data"]) > 0
 
 	# All fields must be of the right type, must only return flower features
@@ -60,11 +50,7 @@ def test_flower_colors(client: FlaskClient):
 
 def test_unmatched_flowers(client: FlaskClient):
 	res = client.get("/api_v7/api/unmatched_flowers")
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Retrieve the Bee records success!"  # TODO This... is not the right response.
-	assert not data["error"]
+	data = check_ok_response(res, "Retrieve the Bee records success!")  # TODO This... is not the right response.
 	assert len(data["data"]) > 0
 
 	for datum in data["data"]:
@@ -84,11 +70,7 @@ def test_insert_delete_flower(client: FlaskClient):
 		"flowerspecies": "Testificus",
 		"flowergenus": "Unit"
 	})
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Log a new flower success!"
-	assert not data["error"]
+	data = check_ok_response(res, "Log a new flower success!")
 	id = data["data"]["flower_id"]
 	assert id > 0
 
@@ -97,35 +79,19 @@ def test_insert_delete_flower(client: FlaskClient):
 	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
 		"fcommon": "Test flower update"
 	})
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Update the Folwer information success!"
-	assert not data["error"]
+	data = check_ok_response(res, "Update the Folwer information success!")
 	assert data["data"]["flower_id"] == id
 
 	# Clean up -- delete the flower we just created
 	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
-	assert res.status_code == 200
-	data = json.loads(res.data)
-	assert data["status"] == "success"
-	assert data["message"] == "Delete flower success!"
-	assert not data["error"]
+	check_ok_response(res, "Delete flower success!")
 
 	# Try to delete the flower we just deleted, we should get an error
 	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
-	assert res.status_code == 404
-	data = json.loads(res.data)
-	assert data["status"] == "false"
-	assert data["message"] == "flower id not found!"
-	assert data["error"]
+	check_err_response(res, "flower id not found!", 404)
 
 	# Try to update the flower we just deleted, we should get an error
 	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
 		"fcommon": "This flower doesn't exist"
 	})
-	assert res.status_code == 404
-	data = json.loads(res.data)
-	assert data["status"] == "false"
-	assert data["message"] == "Flower not found!"
-	assert data["error"]
+	check_err_response(res, "Flower not found!", 404)

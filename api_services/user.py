@@ -6,7 +6,7 @@ from sqlalchemy import sql
 
 from api_services.auth import authenticate
 from api_services.database import Database
-from api_services.util import response
+from api_services.utility import response
 
 log = getLogger()
 
@@ -26,30 +26,33 @@ class RecordData(Resource):
 		parser.add_argument("fcolor", type=str, required=True, dest="flower_color")
 		parser.add_argument("beename", type=str, required=True, dest="bee_name"),
 		parser.add_argument("loc", type=str, required=True, dest="loc_info")
-		parser.add_argument("time", type=datetime, required=True, dest="time")
+		parser.add_argument("time", type=str, required=True, dest="time")
 		parser.add_argument("recordpicpath", type=str, required=True, dest="record_pic_path")
-		parser.add_argument("recordvideopath", type=str, required=True, dest="record_video_path")
-		parser.add_argument("beedictid", type=str, required=False, dest="bee_dict_id")
-		parser.add_argument("beebehavior", type=str, required=True, dest="bee_behavior")
+		parser.add_argument("recordvideopath", type=str, required=False, dest="record_video_path")
+		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
+		parser.add_argument("beebehavior", type=int, required=True, dest="bee_behavior")
+
+		# Optional params that aren't specified in the v5 API but are in the bee web app API interface
+		parser.add_argument("elevation", type=str, required=False)
+		parser.add_argument("appversion", type=str, required=False, dest="app_version")
+
 		args = parser.parse_args()
 		log.info("User {} logging new bee record {}".format(user, args))
 
-		# Validate bee_dict_id, convert bee_behavior
-		if "bee_dict_id" not in args:
-			args["bee_dict_id"] = -1
+		# Convert time, bee_behavior
 		try:
-			behavior = int(args["bee_behavior"])  # Will throw ValueError if not a string
-			if behavior > 2 or behavior < 0:
-				raise ValueError
+			args["time"] = datetime.strptime(args["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
 		except ValueError:
+			return response("false", "Invalid date", True), 400
+
+		if args["bee_behavior"] > 2 or args["bee_behavior"] < 0:
 			return response("false", "Invalid beebehavior", True), 400
-		args["bee_behavior"] = ["unknown", "nectar", "pollen"][behavior]
+		args["bee_behavior"] = ["unknown", "nectar", "pollen"][args["bee_behavior"]]
 
 		with Database() as engine:
 			query = sql.insert(Database.beerecord).values(**args).returning(Database.beerecord.c.beerecord_id)
 			results = engine.execute(query)
-			result = engine.execute(query)
-			id = dict(next(result))
+			id = [dict(r) for r in results]
 
 			if len(id) == 0:
 				log.error("User {} failed to log new bee record {}".format(user, args))

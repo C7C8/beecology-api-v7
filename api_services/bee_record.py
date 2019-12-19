@@ -5,7 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
 from api_services.auth import authenticate
-from api_services.util import response, cache_response
+from api_services.utility import response, cache_response
 from .database import Database
 
 log = getLogger()
@@ -41,7 +41,8 @@ class BeeRecord(Resource):
 					bee.c.time.label("date"),
 					bee.c.bee_behavior,
 					bee.c.record_pic_path,
-					bee.c.record_video_path
+					bee.c.record_video_path,
+					bee.c.elevation
 				]).where(bee.c.beerecord_id == id)
 			
 			results = engine.execute(query)
@@ -67,13 +68,14 @@ class BeeRecord(Resource):
 		parser.add_argument("beebehavior", type=str, required=False, dest="bee_behavior")
 		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
 		args = parser.parse_args()
+		args = {k: v for k, v in args.items() if v is not None}  # Eliminate "None" args
 		log.info("Updating bee record {}".format(id))
 
 		with Database() as engine:
 			query = sql.update(Database.beerecord).values(**args).where(Database.beerecord.c.beerecord_id == id)\
 				.returning(Database.beerecord.c.beerecord_id)
 			results = engine.execute(query)
-			id = dict(next(results, {}))
+			id = [dict(r) for r in results]
 			if len(id) == 0:
 				log.warning("Failed to update bee record #{}".format(id))
 				return response("false", "Bee Dexes not found!", True), 404
@@ -88,9 +90,11 @@ class BeeRecord(Resource):
 			query = sql.delete(Database.beerecord).where(Database.beerecord.c.beerecord_id == id)\
 				.returning(Database.beerecord.c.beerecord_id)
 			results = engine.execute(query)
-			id = dict(next(results, {}))
-			if len(id) == 0:
+			data = [dict(r) for r in results]
+			if len(data) == 0:
 				log.warning("Failed to delete bee record #{}".format(id))
+				return response("false", "Bee record id not found!", True), 404
+			return response("success", "Delete record success!", False, data=data), 200
 
 class BeeRecordsList(Resource):
 	@staticmethod

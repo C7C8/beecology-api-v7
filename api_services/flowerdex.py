@@ -5,7 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services.database import Database
-from api_services.util import response, cache_response
+from api_services.utility import response, cache_response
 
 log = getLogger()
 

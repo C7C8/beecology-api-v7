@@ -21,3 +21,4 @@ def cache_response(func):
 			log.info("Invalidating cache for {} and returning new result".format(func.__name__))
 		return func(*args, **kwargs)
 	return wrapper
+
