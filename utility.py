@@ -8,7 +8,7 @@ from api_services import Config
 
 __default_conf = {
 	"storage": {
-		"imageUploadPath": "../../../../images",
+		"imageUploadPath": "images",
 		"cache": "/tmp"
 	},
 	"database": {
