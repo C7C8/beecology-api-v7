@@ -40,6 +40,7 @@ def load_conf() -> Dict:
 
 def setup_logging(level: str, filename: str):
 	# Set up logging for Flask
+	# TODO Embed this config in the config file instead
 	dictConfig({
 		"version": 1,
 		"formatters": {

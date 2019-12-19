@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource
+from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
 from api_services.auth import authenticate
@@ -13,7 +13,7 @@ log = getLogger()
 class BeeRecord(Resource):
 	@staticmethod
 	@authenticate
-	def get(id: int = -1, user=None):
+	def get(id: int, user=None):
 		"""Get a bee record by ID"""
 		# Copied over from node server:
 		# TODO Ask if we should scope it down to the specific user ID
@@ -55,17 +55,43 @@ class BeeRecord(Resource):
 				datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 			return response("success", "Retrieve the Bee records success!", False, data=data), 200
 
+	# TODO This should *probably* have auth...
 	@staticmethod
-	@authenticate
-	def put():
+	def put(id: int, user=None):
 		"""Update a bee record by ID"""
-		return "Placeholder"
+		parser = reqparse.RequestParser()
+		parser.add_argument("gender", type=str, required=False)
+		parser.add_argument("fname", type=str, required=False, dest="flower_name")
+		parser.add_argument("fcolor", type=str, required=False, dest="flower_color")
+		parser.add_argument("beename", type=str, required=False, dest="bee_name")
+		parser.add_argument("beebehavior", type=str, required=False, dest="bee_behavior")
+		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
+		args = parser.parse_args()
+		log.info("Updating bee record {}".format(id))
+
+		with Database() as engine:
+			query = sql.update(Database.beerecord).values(**args).where(Database.beerecord.c.beerecord_id == id)\
+				.returning(Database.beerecord.c.beerecord_id)
+			results = engine.execute(query)
+			id = dict(next(results, {}))
+			if len(id) == 0:
+				log.warning("Failed to update bee record #{}".format(id))
+				return response("false", "Bee Dexes not found!", True), 404
+			return response("success", "Retrieve the Bee information success!", False, data=id), 200
 
 	@staticmethod
 	@authenticate
-	def delete():
+	def delete(id: int, user=None):
 		"""Delete a bee record by ID"""
-		return "Placeholder"
+		log.info("Deleting bee record #{}".format(id))
+		with Database() as engine:
+			query = sql.delete(Database.beerecord).where(Database.beerecord.c.beerecord_id == id)\
+				.returning(Database.beerecord.c.beerecord_id)
+			results = engine.execute(query)
+			id = dict(next(results, {}))
+			if len(id) == 0:
+				log.warning("Failed to delete bee record #{}".format(id))
+
 
 class BeeRecordsList(Resource):
 	@staticmethod

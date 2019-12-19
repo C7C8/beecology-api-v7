@@ -101,7 +101,7 @@ def test_beerecords(client: FlaskClient):
 		assert len(version_matcher.findall(datum["app_version"])) == 1
 
 
-def test_beerecord(client: FlaskClient):
+def test_beerecord_get(client: FlaskClient):
 	"""Test beerecord endpoint; yes, there's more than one..."""
 	res = client.get("/api_v7/api/beerecord/122")
 	assert res.status_code == 200
@@ -127,3 +127,9 @@ def test_beerecord(client: FlaskClient):
 		datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 	except ValueError:
 		assert False
+
+
+def test_beerecord_crud(client: FlaskClient):
+	"""Full test of beerecord CRUD abilities"""
+	# TODO implement once beerecord upload is enabled
+	pass
