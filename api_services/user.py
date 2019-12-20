@@ -73,7 +73,6 @@ class RecordData(Resource):
 				return response("false", "Log a new bee failed", True), 405
 			return response("success", "Log a new bee success!", False, data=id), 200
 
-
 class Enroll(Resource):
 	@staticmethod
 	def get():
@@ -110,7 +109,6 @@ class Enroll(Resource):
 			       "type": "Bearer"
 		       }, 200
 
-
 class Refresh(Resource):
 	@staticmethod
 	def get():
@@ -146,7 +144,6 @@ class Refresh(Resource):
 			       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
 			       "expiresAt": int(expiration.timestamp() * 1000)
 		       }, 200
-
 
 class Unenroll(Resource):
 	@staticmethod

@@ -14,7 +14,7 @@ __default_conf = {
 	},
 	"storage": {
 		"imageUploadPath": "images",
-		"cache": "/tmp"
+		"cache": "/tmp/beecology-cache"
 	},
 	"database": {
 		"pool_size": 16,

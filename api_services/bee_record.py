@@ -5,7 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
 from api_services.authentication import authenticate
-from api_services.utility import response, cache_response
+from api_services.utility import response, cache_response, invalidate_caches
 from .database import Database
 
 log = getLogger()
@@ -13,6 +13,7 @@ log = getLogger()
 class BeeRecord(Resource):
 	@staticmethod
 	@authenticate
+	@cache_response("beerecord")
 	def get(id: int, user=None):
 		"""Get a bee record by ID"""
 		# Copied over from node server:
@@ -58,6 +59,7 @@ class BeeRecord(Resource):
 
 	# TODO This should *probably* have auth...
 	@staticmethod
+	@invalidate_caches("beerecord")
 	def put(id: int, user=None):
 		"""Update a bee record by ID"""
 		parser = reqparse.RequestParser()
@@ -83,7 +85,8 @@ class BeeRecord(Resource):
 
 	@staticmethod
 	@authenticate
-	def delete(id: int, user=None):
+	@invalidate_caches("beerecord")
+	def delete(id: int, user):
 		"""Delete a bee record by ID"""
 		log.info("Deleting bee record #{}".format(id))
 		with Database() as engine:
@@ -98,6 +101,7 @@ class BeeRecord(Resource):
 
 class BeeRecordsList(Resource):
 	@staticmethod
+	@cache_response("beerecord", "flowerdict")
 	def get(page: int):
 		"""Get bee records by page"""
 		log.info("Getting page {} of bee records".format(page))
@@ -145,7 +149,7 @@ class BeeRecordsList(Resource):
 
 class BeeVisRecords(Resource):
 	@staticmethod
-	@cache_response
+	@cache_response("beerecord", "flowerdict")
 	def get():
 		"""Get all bee records"""
 		log.info("Getting all bee records")
@@ -224,6 +228,7 @@ class BeeUserRecords(Resource):
 
 class Beedex(Resource):
 	@staticmethod
+	@cache_response("beedict")
 	def get(id: int = -1):
 		"""Get an entry from the beedex by ID"""
 		log.info("Getting beedex entry #{}".format(id if id != -1 else "*"))

@@ -5,12 +5,13 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services.database import Database
-from api_services.utility import response, cache_response
+from api_services.utility import response, cache_response, invalidate_caches
 
 log = getLogger()
 
 class Flowerdex(Resource):
 	@staticmethod
+	@cache_response("flowerdict")
 	def get(id: int = -1):
 		"""Get flower by ID"""
 		log.info("Getting flowerdex ID {}".format(id if id != -1 else "*"))
@@ -32,6 +33,7 @@ class Flowerdex(Resource):
 			return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
 	@staticmethod
+	@invalidate_caches("flower")
 	def post():
 		"""Create a new flower"""
 		parser = reqparse.RequestParser()
@@ -53,6 +55,7 @@ class Flowerdex(Resource):
 			return response("success", "Log a new flower success!", False, data=id), 200
 
 	@staticmethod
+	@invalidate_caches("flower")
 	def put(id: int):
 		"""Update a flower by ID"""
 		parser = reqparse.RequestParser()
@@ -75,6 +78,7 @@ class Flowerdex(Resource):
 			return response("success", "Update the Folwer information success!", False, data=id), 200  # TODO Fix typo
 
 	@staticmethod
+	@invalidate_caches("flower")
 	def delete(id: int):
 		"""Delete flower by ID"""
 		log.info("Deleting flower {}".format(id))
@@ -87,7 +91,7 @@ class Flowerdex(Resource):
 
 class FlowerShapes(Resource):
 	@staticmethod
-	@cache_response
+	@cache_response("features")
 	def get():
 		"""Get all flower shapes"""
 		log.info("Retrieving list of all flower shapes")
@@ -102,7 +106,7 @@ class FlowerShapes(Resource):
 
 class UnmatchedFlowers(Resource):
 	@staticmethod
-	@cache_response
+	@cache_response("flowerdict", "beerecord")
 	def get():
 		"""Get unmatched flowers"""
 		log.info("Retrieving list of unmatched flowers")
@@ -127,7 +131,7 @@ class UnmatchedFlowers(Resource):
 
 class FlowerList(Resource):
 	@staticmethod
-	@cache_response
+	@cache_response("flowerdict")
 	def get():
 		"""Legacy flowerlist endpoint"""
 		log.info("Getting list of all flowers in the flowerdict")

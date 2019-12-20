@@ -26,7 +26,7 @@ class Database:
 	@staticmethod
 	def get_connection():
 		dbconfig = Config.config["database"]
-		log.info("Connecting to database {user}@{host}:{port}/{dbname}".format(**dbconfig["connection"]))
+		log.debug("Establishing new connection to database {user}@{host}:{port}/{dbname}".format(**dbconfig["connection"]))
 		return psycopg2.connect(**dbconfig["connection"])
 
 	def __enter__(self) -> Engine:
