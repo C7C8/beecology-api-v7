@@ -148,7 +148,6 @@ class BeeVisRecords(Resource):
 	@cache_response
 	def get():
 		"""Get all bee records"""
-		# TODO Cache responses from this endpoint
 		log.info("Getting all bee records")
 		with Database() as engine:
 			bee = Database.beerecord

@@ -124,3 +124,17 @@ class UnmatchedFlowers(Resource):
 				log.warning("Failed to retrieve list of unmatched flowers")
 				return response("false", "Bee records not found!", True), 404  # TODO Change messages
 			return response("success", "Retrieve the Bee records success!", False, data=data), 200
+
+class FlowerList(Resource):
+	@staticmethod
+	@cache_response
+	def get():
+		"""Legacy flowerlist endpoint"""
+		log.info("Getting list of all flowers in the flowerdict")
+		with Database() as engine:
+			results = engine.execute(sql.select([Database.flowerdict]))
+			data = [dict(r) for r in results]
+			if len(data) == 0:
+				log.error("Failed to retrieve list of flowers from the flowerdict")
+				return response("false", "Flower List not found!", True), 404
+			return response("success", "Retrieve the Flower List  success!", False, data=data), 200

@@ -19,7 +19,7 @@ log = getLogger()
 class RecordData(Resource):
 	@staticmethod
 	@authenticate
-	def post(user=None):
+	def post(user):
 		"""Record a new bee log"""
 		parser = reqparse.RequestParser()
 		parser.add_argument("chead", type=str, required=True, dest="coloration_head")
@@ -35,7 +35,7 @@ class RecordData(Resource):
 		parser.add_argument("time", type=str, required=True, dest="time")
 		parser.add_argument("recordpicpath", type=str, required=True, dest="record_pic_path")
 		parser.add_argument("recordvideopath", type=str, required=False, dest="record_video_path")
-		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
+		parser.add_argument("beedictid", type=str, required=False, dest="bee_dict_id")  # TODO revert to int type
 		parser.add_argument("beebehavior", type=int, required=True, dest="bee_behavior")
 
 		# Optional params that aren't specified in the v5 API but are in the bee web app API interface
@@ -43,6 +43,14 @@ class RecordData(Resource):
 		parser.add_argument("appversion", type=str, required=False, dest="app_version")
 
 		args = parser.parse_args()
+
+		# Terrible, terrible hack because the web app is broken and submits STRING DATES instead of beedictids
+		# The old API didn't parse it correctly (i.e. throw a hissy fit because of an incorrect data type) and just
+		# inserted the first number it could find in the date -- the year. This "workaround" makes this API mimic the
+		# behavior of the old one. GOD @$%!ING DAMNIT I HATE MY LIFE
+		# TODO UNFUCK BEEDICTID POSTING WHEN THE WEBAPP IS FIXED
+		args["bee_dict_id"] = datetime.now().year
+
 		log.info("User {} logging new bee record {}".format(user, args))
 
 		# Convert time, bee_behavior
@@ -56,7 +64,7 @@ class RecordData(Resource):
 		args["bee_behavior"] = ["unknown", "nectar", "pollen"][args["bee_behavior"]]
 
 		with Database() as engine:
-			query = sql.insert(Database.beerecord).values(**args).returning(Database.beerecord.c.beerecord_id)
+			query = sql.insert(Database.beerecord).values(**args, user_id=user).returning(Database.beerecord.c.beerecord_id)
 			results = engine.execute(query)
 			id = [dict(r) for r in results]
 

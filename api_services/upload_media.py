@@ -9,6 +9,7 @@ from flask_restplus import Resource, reqparse
 from .config import Config
 from api_services.authentication import authenticate
 from api_services.utility import response
+from flask import request
 
 log = getLogger()
 
