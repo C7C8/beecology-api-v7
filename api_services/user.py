@@ -75,7 +75,7 @@ class Enroll(Resource):
 		try:
 			uid = auth.verify_id_token(token)["uid"]
 		except Exception as e:
-			log.error("Firebase token {} failed validation: {}".format(token, e))
+			log.error("Firebase token failed validation: {}".format(e))
 			return response("false", "Firebase token failed validation", True), 403
 
 		# Generate token (1024 random bytes), expiration,
@@ -96,7 +96,7 @@ class Enroll(Resource):
 		return {
 			"accessToken": accessToken,
 			"refreshToken": refreshToken,
-			"expiresIn": Config.config["auth"]["token-expiration"] * 1000,
+			"expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
 			"expiresAt": int(expiration.timestamp() * 1000),
 			"type": "Bearer"
 		}, 200
@@ -104,8 +104,37 @@ class Enroll(Resource):
 class Refresh(Resource):
 	@staticmethod
 	def get():
-		"""Login"""
-		return "Placeholder"
+		"""Refresh a token"""
+		if "Authorization" not in request.headers or request.headers["Authorization"].find("Bearer") == -1:
+			return response("false", "Authorization required", True), 403
+		refresh_token, firebase_token = base64.standard_b64decode(request.headers["authorization"].split(" ")).split(":")
+		try:
+			uid = auth.verify_id_token(firebase_token)["uid"]
+		except Exception as e:
+			log.error("Firebase token failed validation".format(e))
+			return response("false", "Firebase token failed validation", True), 403
+
+		# Verify we have an entry in the auth table corresponding to this uid+token combo
+		with Database() as engine:
+			results = engine.execute(sql.select(Database.auth).where(Database.auth.c.user_id == uid
+			                                                         and Database.auth.c.refresh_token == refresh_token))
+			if len([dict(r) for r in results]) == 0:
+				log.info("Failed to validate UID + refresh token for UID {}".format(uid))
+				return response("false", "Failed to validate UID+refresh token", True), 403
+
+			# Generate a new access token and expiration time, update them in the database
+			access_token = secrets.token_hex(1024)
+			expiration = datetime.now() + timedelta(seconds=Config.config["auth"]["token-lifetime"])
+
+			engine.execute(sql.update(Database.auth).values(token_expiry=expiration.timestamp() * 1000, access_token=access_token)\
+			               .where(Database.auth.c.refresh_token == refresh_token and Database.auth.c.user_id == uid))
+
+		return {
+			"accessToken": access_token,
+			"expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
+			"expiresAt": int(expiration.timestamp() * 1000)
+		}, 200
+
 
 class Unenroll(Resource):
 	@staticmethod

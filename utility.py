@@ -10,7 +10,7 @@ __default_conf = {
 	"auth": {
 		"keyfile": "firebase.json",
 		"databaseURL": "https://some.url",
-		"token-expiration": 3600
+		"token-lifetime": 3600
 	},
 	"storage": {
 		"imageUploadPath": "images",
