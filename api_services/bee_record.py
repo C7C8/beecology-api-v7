@@ -4,7 +4,7 @@ import sqlalchemy as sql
 from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
-from api_services.auth import authenticate
+from api_services.authentication import authenticate
 from api_services.utility import response, cache_response
 from .database import Database
 

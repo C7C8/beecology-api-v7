@@ -7,7 +7,7 @@ import uuid
 from flask_restplus import Resource, reqparse
 
 from .config import Config
-from api_services.auth import authenticate
+from api_services.authentication import authenticate
 from api_services.utility import response
 
 log = getLogger()

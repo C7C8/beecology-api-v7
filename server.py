@@ -1,6 +1,8 @@
+import firebase_admin
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_restplus import Api
+from firebase_admin import credentials, auth as a
 
 from utility import load_conf, setup_logging
 from api_services import *
@@ -25,7 +27,8 @@ api = Api(apiV7, version="1.0.0", title="Beecology data API", description="Proce
                                                                           " beecology data")
 app.register_blueprint(apiV7)
 ns = api.namespace("api_v7/api", "Beecology API version 7")
-
+firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["firebase"]["key-file"]),
+                                             options=conf["firebase"])
 
 #########################################################
 #                      API ROUTES                       #

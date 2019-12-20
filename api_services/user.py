@@ -4,7 +4,7 @@ from logging import getLogger
 from flask_restplus import Resource, reqparse
 from sqlalchemy import sql
 
-from api_services.auth import authenticate
+from api_services.authentication import authenticate
 from api_services.database import Database
 from api_services.utility import response
 
