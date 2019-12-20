@@ -27,8 +27,8 @@ api = Api(apiV7, version="1.0.0", title="Beecology data API", description="Proce
                                                                           " beecology data")
 app.register_blueprint(apiV7)
 ns = api.namespace("api_v7/api", "Beecology API version 7")
-firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["firebase"]["key-file"]),
-                                             options=conf["firebase"])
+firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["auth"]["key-file"]),
+                                             options=conf["auth"])
 
 #########################################################
 #                      API ROUTES                       #

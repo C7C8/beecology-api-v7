@@ -7,9 +7,10 @@ from typing import Dict
 from api_services import Config
 
 __default_conf = {
-	"firebase": {
+	"auth": {
 		"keyfile": "firebase.json",
-		"databaseURL": "https://some.url"
+		"databaseURL": "https://some.url",
+		"token-expiration": 3600
 	},
 	"storage": {
 		"imageUploadPath": "images",

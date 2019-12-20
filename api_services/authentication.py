@@ -16,12 +16,12 @@ def authenticate(func):
 		decoded = base64.standard_b64decode(request.headers["Authorization"].split(" ")[1]).decode("utf-8")
 		tokens = decoded.split(":")
 		try:
-			uid = auth.verify_id_token(tokens[1])
+			uid = auth.verify_id_token(tokens[1])["uid"]
 		except Exception as e:
 			log.info("User ID {} failed authentication: ".format(tokens[0], e))
 			return response("false", "Failed to authenticate: {}".format(e), True), 403
 
-		log.info("Authenticated user \"{}\"".format(uid["uid"]))
-		return func(*args, **kwargs, user=uid["uid"])
+		log.info("Authenticated user \"{}\"".format(uid))
+		return func(*args, **kwargs, user=uid)
 
 	return wrapper
