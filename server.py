@@ -36,8 +36,8 @@ firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["auth"
 ns.add_resource(Root, "/")
 
 # Bee data
-ns.add_resource(Beedex, "/BeeDex/<int:id>")
-ns.add_resource(Beedex, "/BeeDex")
+ns.add_resource(Beedex, "/beedex/<int:id>")
+ns.add_resource(Beedex, "/beedex")
 ns.add_resource(BeeRecord, "/beerecord/<int:id>")
 ns.add_resource(BeeRecordsList, "/beerecords/<int:page>")
 ns.add_resource(BeeVisRecords, "/beevisrecords")

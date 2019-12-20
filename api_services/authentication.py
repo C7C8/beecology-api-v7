@@ -17,8 +17,8 @@ def authenticate(func):
 			return response("false", "Authorization required", True), 403
 		try:
 			decoded = base64.standard_b64decode(request.headers["Authorization"].split(" ")[1]).decode("utf-8")
-			firebase_token, access_token = decoded.split(":")
-			uid = auth.verify_id_token(access_token)["uid"]
+			access_token, firebase_token = decoded.split(":")
+			uid = auth.verify_id_token(firebase_token)["uid"]
 		except Exception as e:
 			log.info("User failed authentication: {}".format(e))
 			return response("false", "Failed to authenticate: {}".format(e), True), 403
