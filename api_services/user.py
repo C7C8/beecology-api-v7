@@ -78,6 +78,7 @@ class Enroll(Resource):
 	def get():
 		"""Enroll; uses a firebase token via basic auth to get a generate an access token"""
 		if "Authorization" not in request.headers or request.headers["Authorization"].find("Basic") == -1:
+			log.warning("User tried to enroll but didn't present a Firebase auth token")
 			return response("false", "Firebase authorization token required", True), 403
 		try:
 			token = base64.standard_b64decode(request.headers["Authorization"].split(" ")[1])
@@ -99,7 +100,7 @@ class Enroll(Resource):
 			                                                access_token=accessToken,
 			                                                refresh_token=refreshToken,
 			                                                token_expiry=expiration.timestamp() * 1000))
-		log.info("Enrolled user {}".format(uid))
+		log.debug("Enrolled user {}".format(uid))
 
 		return {
 			       "accessToken": accessToken,
@@ -128,7 +129,7 @@ class Refresh(Resource):
 			results = engine.execute(sql.select([Database.auth]).where(Database.auth.c.user_id == uid
 			                                                           and Database.auth.c.refresh_token == refresh_token))
 			if len([dict(r) for r in results]) == 0:
-				log.info("Failed to validate UID + refresh token for UID {}".format(uid))
+				log.warning("Failed to validate UID + refresh token for UID {}".format(uid))
 				return response("false", "Failed to validate UID+refresh token", True), 403
 
 			# Generate a new access token and expiration time, update them in the database

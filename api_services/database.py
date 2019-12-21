@@ -54,5 +54,6 @@ class Database:
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		"""Return the connection back to the pool"""
+		# TODO Delete
 		if exc_type is not None:
 			log.warning("Error re-pooling connection: {}, {}, {}".format(exc_type, exc_val, exc_tb))

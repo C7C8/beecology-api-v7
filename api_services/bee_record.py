@@ -5,7 +5,8 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func
 
 from api_services.authentication import authenticate
-from api_services.utility import response, cache_response, invalidate_caches
+from api_services.utility import response
+from api_services.cache import invalidate_caches, cache_response
 from .database import Database
 
 log = getLogger()
@@ -19,7 +20,7 @@ class BeeRecord(Resource):
 		# Copied over from node server:
 		# TODO Ask if we should scope it down to the specific user ID
 		# TODO Any authenticated user can access any record ID
-		log.info("Getting bee record with ID")
+		log.debug("Getting bee record with ID")
 		with Database() as engine:
 			bee = Database.beerecord
 			if id == -1:
@@ -71,7 +72,7 @@ class BeeRecord(Resource):
 		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
 		args = parser.parse_args()
 		args = {k: v for k, v in args.items() if v is not None}  # Eliminate "None" args
-		log.info("Updating bee record {}".format(id))
+		log.debug("Updating bee record {}".format(id))
 
 		with Database() as engine:
 			query = sql.update(Database.beerecord).values(**args).where(Database.beerecord.c.beerecord_id == id)\
@@ -88,7 +89,7 @@ class BeeRecord(Resource):
 	@invalidate_caches("beerecord")
 	def delete(id: int, user):
 		"""Delete a bee record by ID"""
-		log.info("Deleting bee record #{}".format(id))
+		log.debug("Deleting bee record #{}".format(id))
 		with Database() as engine:
 			query = sql.delete(Database.beerecord).where(Database.beerecord.c.beerecord_id == id)\
 				.returning(Database.beerecord.c.beerecord_id)
@@ -104,7 +105,7 @@ class BeeRecordsList(Resource):
 	@cache_response("beerecord", "flowerdict")
 	def get(page: int):
 		"""Get bee records by page"""
-		log.info("Getting page {} of bee records".format(page))
+		log.debug("Getting page {} of bee records".format(page))
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict
@@ -152,7 +153,7 @@ class BeeVisRecords(Resource):
 	@cache_response("beerecord", "flowerdict")
 	def get():
 		"""Get all bee records"""
-		log.info("Getting all bee records")
+		log.debug("Getting all bee records")
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict
@@ -192,7 +193,7 @@ class BeeUserRecords(Resource):
 	@authenticate
 	def get(user):
 		"""Get bee log records by user ID"""
-		log.info("Getting all bee records for user {}".format(user))
+		log.debug("Getting all bee records for user {}".format(user))
 		with Database() as engine:
 			bee = Database.beerecord
 			query = sql.select([
@@ -231,7 +232,7 @@ class Beedex(Resource):
 	@cache_response("beedict")
 	def get(id: int = -1):
 		"""Get an entry from the beedex by ID"""
-		log.info("Getting beedex entry #{}".format(id if id != -1 else "*"))
+		log.debug("Getting beedex entry #{}".format(id if id != -1 else "*"))
 		with Database() as engine:
 			query = sql.select([Database.beedict])
 			if id != -1:
@@ -242,5 +243,5 @@ class Beedex(Resource):
 			if len(data) == 0:
 				log.warning("Failed to retrieve entry #{} from beedex".format(id))
 				return response("false", "Bee Dexes not found!", True), 404
-			log.info("Returning {} beedex entries".format(len(data)))
+			log.debug("Returning {} beedex entries".format(len(data)))
 			return response("success", "Retrieve the Bee information success!", False, data=data), 200

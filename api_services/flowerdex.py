@@ -5,7 +5,8 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services.database import Database
-from api_services.utility import response, cache_response, invalidate_caches
+from api_services.utility import response
+from api_services.cache import invalidate_caches, cache_response
 
 log = getLogger()
 
@@ -14,7 +15,7 @@ class Flowerdex(Resource):
 	@cache_response("flowerdict")
 	def get(id: int = -1):
 		"""Get flower by ID"""
-		log.info("Getting flowerdex ID {}".format(id if id != -1 else "*"))
+		log.debug("Getting flowerdex ID {}".format(id if id != -1 else "*"))
 		with Database() as engine:
 			flower = Database.flowerdict
 			query = sql.select([flower.c.flower_id,
@@ -29,7 +30,7 @@ class Flowerdex(Resource):
 				log.warning("Failed to retrieve flower #{}".format(id))
 				return response("false", "Flower not found!", True), 404
 
-			log.info("Returning {} flowerdex entries".format(len(data)))
+			log.debug("Returning {} flowerdex entries".format(len(data)))
 			return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
 	@staticmethod
@@ -94,7 +95,7 @@ class FlowerShapes(Resource):
 	@cache_response("features")
 	def get():
 		"""Get all flower shapes"""
-		log.info("Retrieving list of all flower shapes")
+		log.debug("Retrieving list of all flower shapes")
 		with Database() as engine:
 			features = Database.features
 			results = engine.execute(sql.select([features]).where(features.c.feature_id.like("fc%")))
@@ -109,7 +110,7 @@ class UnmatchedFlowers(Resource):
 	@cache_response("flowerdict", "beerecord")
 	def get():
 		"""Get unmatched flowers"""
-		log.info("Retrieving list of unmatched flowers")
+		log.debug("Retrieving list of unmatched flowers")
 		with Database() as engine:
 			bee = Database.beerecord
 			flower = Database.flowerdict
@@ -134,7 +135,7 @@ class FlowerList(Resource):
 	@cache_response("flowerdict")
 	def get():
 		"""Legacy flowerlist endpoint"""
-		log.info("Getting list of all flowers in the flowerdict")
+		log.debug("Getting list of all flowers in the flowerdict")
 		with Database() as engine:
 			results = engine.execute(sql.select([Database.flowerdict]))
 			data = [dict(r) for r in results]
