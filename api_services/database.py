@@ -56,4 +56,4 @@ class Database:
 		"""Return the connection back to the pool"""
 		# TODO Delete
 		if exc_type is not None:
-			log.warning("Error re-pooling connection: {}, {}, {}".format(exc_type, exc_val, exc_tb))
+			log.critical("Error re-pooling connection: {}, {}, {}".format(exc_type, exc_val, exc_tb))

@@ -225,7 +225,7 @@ class BeeUserRecords(Resource):
 			# Correct date format
 			for datum in data:
 				datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-			return response("success", "Retrieve all bee records", False, data=data), 200
+			return response("success", "Retrieve all Bee Records", False, data=data), 200
 
 class Beedex(Resource):
 	@staticmethod

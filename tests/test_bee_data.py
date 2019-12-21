@@ -121,6 +121,12 @@ def test_beerecord_crud(client: FlaskClient):
 	assert len(data["data"]) == 1
 	assert data["data"][0]["beerecord_id"] == id
 
+	# Make sure getting all records for one user works
+	res = client.get("/api_v7/api/beerecorduser")
+	data = check_ok_response(res, "Retrieve all Bee Records")
+	assert len(data["data"]) == 1
+	assert data["data"][0]["beerecord_id"] == id
+
 	# Update the bee record with new data
 	res = client.put("/api_v7/api/beerecord/{}".format(id), data={"beename": "im another bee! BZZ"})
 	data = check_ok_response(res, "Retrieve the Bee information success!")

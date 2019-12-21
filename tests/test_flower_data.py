@@ -95,3 +95,17 @@ def test_insert_delete_flower(client: FlaskClient):
 		"fcommon": "This flower doesn't exist"
 	})
 	check_err_response(res, "Flower not found!", 404)
+
+
+def test_flower_list(client: FlaskClient):
+	res = client.get("/api_v7/api/flowerlist")
+	data = check_ok_response(res, "Retrieve the Flower List  success!")
+	data = data["data"]
+
+	for datum in data:
+		for field in ["latin_name", "main_common_name", "common_name", "main_color", "colors", "bloom_time", "shape", "image_src"]:
+			assert field in datum
+			assert type(datum[field]) == str or datum[field] is None
+
+		assert "flower_id" in datum
+		assert type(datum["flower_id"]) == int

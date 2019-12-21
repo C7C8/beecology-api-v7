@@ -49,6 +49,7 @@ class Flowerdex(Resource):
 		with Database() as engine:
 			query = sql.insert(Database.flower).values(**args).returning(Database.flower.c.flower_id)
 			result = engine.execute(query)
+
 			id = dict(next(result))
 			if id is None:
 				log.error("Failed to log new flower {}".format(args))
@@ -72,6 +73,7 @@ class Flowerdex(Resource):
 		with Database() as engine:
 			query = sql.update(Database.flower).values(**args).where(Database.flower.c.flower_id == id).returning(Database.flower.c.flower_id)
 			result = engine.execute(query)
+
 			id = dict(next(result, {}))
 			if len(id) == 0:
 				log.warning("Failed to update unknown flower #{}".format(id))
@@ -139,7 +141,8 @@ class FlowerList(Resource):
 		with Database() as engine:
 			results = engine.execute(sql.select([Database.flowerdict]))
 			data = [dict(r) for r in results]
+
 			if len(data) == 0:
 				log.error("Failed to retrieve list of flowers from the flowerdict")
 				return response("false", "Flower List not found!", True), 404
-			return response("success", "Retrieve the Flower List  success!", False, data=data), 200
+			return response("success", "Retrieve the Flower List  success!", False, data=data), 200  # TODO fix typos
