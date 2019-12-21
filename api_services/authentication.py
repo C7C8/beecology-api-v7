@@ -5,8 +5,8 @@ from firebase_admin import auth
 from flask import request
 from sqlalchemy import sql, and_
 
+from api_services import database
 from .config import Config
-from api_services.database import Database
 from api_services.utility import response
 
 log = getLogger()
@@ -28,14 +28,13 @@ def authenticate(func):
 			log.info("User failed authentication: {}".format(e))
 			return response("false", "Failed to authenticate: {}".format(e), True), 403
 
-		with Database() as engine:
-			query = sql.select([Database.auth]).where(and_(Database.auth.c.user_id == uid,
-			                                               Database.auth.c.access_token == access_token))
-			results = engine.execute(query)
-			if len(next(results, {})) == 0:
-				return response("false", "Authorization failed, please enroll first", True), 403
+		engine = database.get_engine()
+		query = sql.select([database.auth]).where(and_(database.auth.c.user_id == uid,
+		                                               database.auth.c.access_token == access_token))
+		results = engine.execute(query)
+		if len(next(results, {})) == 0:
+			return response("false", "Authorization failed, please enroll first", True), 403
 
 		log.debug("Authenticated user \"{}\"".format(uid))
 		return func(*args, **kwargs, user=uid)
-
 	return wrapper

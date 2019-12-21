@@ -1,15 +1,14 @@
 import base64
 import hashlib
-from logging import getLogger
-import magic
 import uuid
+from logging import getLogger
 
+import magic
 from flask_restplus import Resource, reqparse
 
+from .authentication import authenticate
+from .utility import response
 from .config import Config
-from api_services.authentication import authenticate
-from api_services.utility import response
-from flask import request
 
 log = getLogger()
 

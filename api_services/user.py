@@ -8,9 +8,9 @@ from flask import request
 from flask_restplus import Resource, reqparse
 from sqlalchemy import sql, and_
 
+from api_services import database
 from .config import Config
 from api_services.authentication import authenticate
-from api_services.database import Database
 from api_services.utility import response
 
 log = getLogger()
@@ -63,15 +63,15 @@ class RecordData(Resource):
 			return response("false", "Invalid beebehavior", True), 400
 		args["bee_behavior"] = ["unknown", "nectar", "pollen"][args["bee_behavior"]]
 
-		with Database() as engine:
-			query = sql.insert(Database.beerecord).values(**args, user_id=user).returning(Database.beerecord.c.beerecord_id)
-			results = engine.execute(query)
-			id = [dict(r) for r in results]
+		engine = database.get_engine()
+		query = sql.insert(database.beerecord).values(**args, user_id=user).returning(database.beerecord.c.beerecord_id)
+		results = engine.execute(query)
+		id = [dict(r) for r in results]
 
-			if len(id) == 0:
-				log.error("User {} failed to log new bee record {}".format(user, args))
-				return response("false", "Log a new bee failed", True), 405
-			return response("success", "Log a new bee success!", False, data=id), 200
+		if len(id) == 0:
+			log.error("User {} failed to log new bee record {}".format(user, args))
+			return response("false", "Log a new bee failed", True), 405
+		return response("success", "Log a new bee success!", False, data=id), 200
 
 class Enroll(Resource):
 	@staticmethod
@@ -94,21 +94,21 @@ class Enroll(Resource):
 
 		# Delete all other entries for this user and insert a new auth table entry. This effectively logs the user out
 		# of all other devices, and helps keep the auth table clean.
-		with Database() as engine:
-			engine.execute(sql.delete(Database.auth).where(Database.auth.c.user_id == uid))
-			engine.execute(sql.insert(Database.auth).values(user_id=uid,
-			                                                access_token=accessToken,
-			                                                refresh_token=refreshToken,
-			                                                token_expiry=expiration.timestamp() * 1000))
+		engine = database.get_engine()
+		engine.execute(sql.delete(database.auth).where(database.auth.c.user_id == uid))
+		engine.execute(sql.insert(database.auth).values(user_id=uid,
+		                                                access_token=accessToken,
+		                                                refresh_token=refreshToken,
+		                                                token_expiry=expiration.timestamp() * 1000))
 		log.debug("Enrolled user {}".format(uid))
 
 		return {
-			       "accessToken": accessToken,
-			       "refreshToken": refreshToken,
-			       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
-			       "expiresAt": int(expiration.timestamp() * 1000),
-			       "type": "Bearer"
-		       }, 200
+			"accessToken": accessToken,
+		    "refreshToken": refreshToken,
+			"expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
+			"expiresAt": int(expiration.timestamp() * 1000),
+			"type": "Bearer"
+		}, 200
 
 class Refresh(Resource):
 	@staticmethod
@@ -125,32 +125,32 @@ class Refresh(Resource):
 			return response("false", "Firebase token failed validation", True), 403
 
 		# Verify we have an entry in the auth table corresponding to this uid+token combo
-		with Database() as engine:
-			results = engine.execute(sql.select([Database.auth]).where(Database.auth.c.user_id == uid
-			                                                           and Database.auth.c.refresh_token == refresh_token))
-			if len([dict(r) for r in results]) == 0:
-				log.warning("Failed to validate UID + refresh token for UID {}".format(uid))
-				return response("false", "Failed to validate UID+refresh token", True), 403
+		engine = database.get_engine()
+		results = engine.execute(sql.select([database.auth]).where(database.auth.c.user_id == uid
+		                                                           and database.auth.c.refresh_token == refresh_token))
+		if len([dict(r) for r in results]) == 0:
+			log.warning("Failed to validate UID + refresh token for UID {}".format(uid))
+			return response("false", "Failed to validate UID+refresh token", True), 403
 
-			# Generate a new access token and expiration time, update them in the database
-			access_token = secrets.token_hex(1024)
-			expiration = datetime.now() + timedelta(seconds=Config.config["auth"]["token-lifetime"])
+		# Generate a new access token and expiration time, update them in the database
+		access_token = secrets.token_hex(1024)
+		expiration = datetime.now() + timedelta(seconds=Config.config["auth"]["token-lifetime"])
 
-			engine.execute(sql.update(Database.auth).values(token_expiry=expiration.timestamp() * 1000,
-			                                         access_token=access_token)\
-				.where(and_(Database.auth.c.refresh_token == refresh_token.decode("utf-8"), Database.auth.c.user_id == uid)))
+		engine.execute(sql.update(database.auth).values(token_expiry=expiration.timestamp() * 1000,
+		                                                access_token=access_token) \
+		               .where(and_(database.auth.c.refresh_token == refresh_token.decode("utf-8"), database.auth.c.user_id == uid)))
 
 		return {
-			       "accessToken": access_token,
-			       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
-			       "expiresAt": int(expiration.timestamp() * 1000)
-		       }, 200
+		       "accessToken": access_token,
+		       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
+		       "expiresAt": int(expiration.timestamp() * 1000)
+	    }, 200
 
 class Unenroll(Resource):
 	@staticmethod
 	@authenticate
 	def get(user):
 		"""Remove access+refresh token from auth database"""
-		with Database() as engine:
-			engine.execute(sql.delete(Database.auth).where(Database.auth.c.user_id == user))
+		engine = database.get_engine()
+		engine.execute(sql.delete(database.auth).where(database.auth.c.user_id == user))
 		return {"success", True}, 200
