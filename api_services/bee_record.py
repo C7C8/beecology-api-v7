@@ -269,7 +269,6 @@ class NoElevationData(Resource):
 class RecordData(Resource):
 	@staticmethod
 	@authenticate
-	@admin_required
 	def post(user):
 		"""Record a new bee log"""
 		parser = reqparse.RequestParser()
