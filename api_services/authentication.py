@@ -30,7 +30,7 @@ def authenticate(func):
 			if len(next(results, {})) == 0:
 				return response("false", "Authorization failed, please enroll first", True), 403
 
-		log.info("Authenticated user \"{}\"".format(uid))
+		log.debug("Authenticated user \"{}\"".format(uid))
 		return func(*args, **kwargs, user=uid)
 
 	return wrapper

@@ -25,6 +25,7 @@ def invalidate_caches(*cache_args):
 		def invalidates(*args, **kwargs):
 
 			for cache in cache_args:
+				log.debug("Invalidating cache name \"{}\"".format(cache))
 				if cache not in invalidate_caches.caches:
 					continue
 				for wrapper in invalidate_caches.caches[cache]:
@@ -46,6 +47,7 @@ class cache_response:
 		# If this cache has a defined cache name, add it to the global caches list.
 		if args is not None:
 			for cache_name in args:
+				log.debug("Registering cache name \"{}\"".format(cache_name))
 				if cache_name not in invalidate_caches.caches:
 					invalidate_caches.caches[cache_name] = [self]
 				else:
@@ -61,7 +63,7 @@ class cache_response:
 			# response from the function is stored on disk, the return code is stored in memory since it's so small.
 			if key in self.cache:
 				file_name, status_code = self.cache[key]
-				log.info("Returning cached response {}/{} for {}".format(file_name, status_code, func.__qualname__))
+				log.debug("Returning cached response {}/{} for {}".format(file_name, status_code, func.__qualname__))
 				with open(file_name, "r") as cached_file:
 					# Parsing from JSON is necessary so Flask will send this back as a JSON object and not a string
 					# TODO Remove JSON parsing step to improve cache performance if possible
@@ -88,6 +90,7 @@ class cache_response:
 	def invalidate(self):
 		"""Invalidate everything stored in this cache"""
 		for file_name, _ in self.cache.values():
+			log.debug("Deleting cached file {}".format(file_name))
 			try:
 				os.remove(file_name)
 			except IOError:
