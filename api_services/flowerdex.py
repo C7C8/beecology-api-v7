@@ -5,6 +5,7 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
 from api_services import database
+from .authentication import authenticate, admin_required
 from .utility import response
 from .cache import invalidate_caches, cache_response
 
@@ -34,8 +35,10 @@ class Flowerdex(Resource):
 		return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
 	@staticmethod
+	@authenticate
+	@admin_required
 	@invalidate_caches("flower")
-	def post():
+	def post(user=None):
 		"""Create a new flower"""
 		parser = reqparse.RequestParser()
 		parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name")

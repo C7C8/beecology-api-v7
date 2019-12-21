@@ -3,7 +3,8 @@ from logging import getLogger
 
 from flask_restplus import Resource, reqparse
 
-from api_services.utility import response
+from .authentication import authenticate, admin_required
+from .utility import response
 from .config import Config
 
 log = getLogger()
@@ -19,6 +20,8 @@ class News(Resource):
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
+	@authenticate
+	@admin_required
 	def put():
 		parser = reqparse.RequestParser()
 		parser.add_argument("code", type=str, required=True)
@@ -38,6 +41,8 @@ class BioCSNews(Resource):
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
+	@authenticate
+	@admin_required
 	def put():
 		"""Update Bio/CS news"""
 		parser = reqparse.RequestParser()

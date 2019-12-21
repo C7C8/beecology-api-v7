@@ -6,10 +6,8 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func, sql
 
 from api_services import database
-from api_services.authentication import authenticate
 from api_services.user import log
-from api_services.utility import response
-from .authentication import authenticate
+from .authentication import authenticate, admin_required
 from .cache import invalidate_caches, cache_response
 from .utility import response
 
@@ -106,8 +104,9 @@ class BeeRecord(Resource):
 
 class BeeRecordsList(Resource):
 	@staticmethod
-	@cache_response("beerecord", "flowerdict")
-	def get(page: int):
+	@authenticate
+	@admin_required
+	def get(page: int, user=None):
 		"""Get bee records by page"""
 		log.debug("Getting page {} of bee records".format(page))
 		engine = database.get_engine()
@@ -272,6 +271,7 @@ class NoElevationData(Resource):
 class RecordData(Resource):
 	@staticmethod
 	@authenticate
+	@admin_required
 	def post(user):
 		"""Record a new bee log"""
 		parser = reqparse.RequestParser()

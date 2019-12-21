@@ -48,6 +48,7 @@ ns.add_resource(NoElevationData, "/noelevationrecords")
 
 # Flower data -- don't look at me like that! I didn't write the API interface spec!
 ns.add_resource(Flowerdex, "/addflower")                # POST new flower.
+ns.add_resource(Flowerdex, "/flowerdex")                # GET or POST flower.
 ns.add_resource(Flowerdex, "/flowerdex/<int:id>")       # GET or DELETE flower entry
 ns.add_resource(Flowerdex, "/deleteflower/<int:id>")    # DELETE flower.
 ns.add_resource(FlowerList, "/flowerlist")              # Legacy support for flowerlist endpoint
@@ -69,6 +70,9 @@ ns.add_resource(BioCSNews, "/update_biocsnews")
 ns.add_resource(BioCSNews, "/biocsnews")
 ns.add_resource(News, "/update_news")
 ns.add_resource(News, "/news")
+
+# Admin
+ns.add_resource(VerifyAdmin, "/verifyAdmin")
 #########################################################
 
 

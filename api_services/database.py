@@ -16,6 +16,7 @@ flower: sqlalchemy.Table = None
 flowerdict: sqlalchemy.Table = None
 features: sqlalchemy.Table = None
 auth: sqlalchemy.Table = None
+admin: sqlalchemy.Table = None
 
 
 def __get_postgres_connection():
@@ -25,7 +26,7 @@ def __get_postgres_connection():
 
 def get_engine() -> Engine:
 	"""Get a SQLAlchemy engine object"""
-	global engine, beedict, beerecord, flower, flowerdict, features, auth
+	global engine, beedict, beerecord, flower, flowerdict, features, auth, admin
 	if engine is None:
 		log.debug("Starting SQLAlchemy engine")
 		dbconfig = Config.config["database"]
@@ -44,5 +45,6 @@ def get_engine() -> Engine:
 		flowerdict = sqlalchemy.Table("flowerdict", metadata, autoload=True, autoload_with=engine)
 		features = sqlalchemy.Table("feature", metadata, autoload=True, autoload_with=engine)
 		auth = sqlalchemy.Table("authtable", metadata, autoload=True, autoload_with=engine)
+		admin = sqlalchemy.Table("admintable", metadata, autoload=True, autoload_with=engine)
 
 	return engine
