@@ -7,7 +7,7 @@ from sqlalchemy import sql, and_
 
 from api_services import database
 from .config import Config
-from api_services.utility import response
+from .utility import response
 
 log = getLogger()
 

@@ -10,8 +10,8 @@ from sqlalchemy import sql, and_
 
 from api_services import database
 from .config import Config
-from api_services.authentication import authenticate
-from api_services.utility import response
+from .authentication import authenticate
+from .utility import response
 
 log = getLogger()
 

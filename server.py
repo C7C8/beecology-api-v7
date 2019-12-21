@@ -34,6 +34,7 @@ firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["auth"
 #                      API ROUTES                       #
 #########################################################
 ns.add_resource(Root, "/")
+ns.add_resource(Root, "/isConnected")
 
 # Bee data
 ns.add_resource(Beedex, "/beedex/<int:id>")
