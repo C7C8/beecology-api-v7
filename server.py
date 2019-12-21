@@ -46,12 +46,13 @@ ns.add_resource(BeeUserRecords, "/beerecorduser")
 ns.add_resource(RecordData, "/record")
 ns.add_resource(NoElevationData, "/noelevationrecords")
 
-# Flower data
-ns.add_resource(Flowerdex, "/flowerdex")            # POST new flower
-ns.add_resource(Flowerdex, "/flowerdex/<int:id>")   # GET or DELETE flower entry
-ns.add_resource(FlowerList, "/flowerlist")           # Legacy support for flowerlist endpoint
+# Flower data -- don't look at me like that! I didn't write the API interface spec!
+ns.add_resource(Flowerdex, "/addflower")                # POST new flower.
+ns.add_resource(Flowerdex, "/flowerdex/<int:id>")       # GET or DELETE flower entry
+ns.add_resource(Flowerdex, "/deleteflower/<int:id>")    # DELETE flower.
+ns.add_resource(FlowerList, "/flowerlist")              # Legacy support for flowerlist endpoint
 ns.add_resource(FlowerShapes, "/flowershapes")
-ns.add_resource(FlowerShapes, "/flowercolors")      # Not a typo, these seriously have the same handler...
+ns.add_resource(FlowerShapes, "/flowercolors")          # Not a typo, these seriously have the same handler...
 ns.add_resource(UnmatchedFlowers, "/unmatched_flowers")
 
 # Media upload
