@@ -4,6 +4,8 @@ import sys
 import logging.config
 from typing import Dict
 
+import yaml
+
 from api_services import Config
 
 __default_conf = {
@@ -31,7 +33,7 @@ __default_conf = {
 		"version": 1,
 		"formatters": {
 			"default": {
-				"format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+				"format": "[%(asctime)s] %(levelname)s in %(qualname): %(message)s",
 			}
 		},
 		"handlers": {
@@ -58,10 +60,14 @@ def load_conf() -> Dict:
 	# Load configuration file, fall back to default config if not available.
 	# Config file is given by environment variable BEE_API_CONF, or conf.json if variable not provided.
 	conf = __default_conf
-	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.json"
+	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.yml"
+
+	# Use YAML loader or JSON loader depending on file extension
+	load = json.load if ".json" in conf_file_name else yaml.load
+
 	try:
 		with open(conf_file_name, "r") as conf_file:
-			conf = json.load(conf_file)
+			conf = load(conf_file)
 	except IOError:
 		print("Failed to load config file \"{}\" falling back to local default. THIS IS ALMOST GUARANTEED TO FAIL!"
 		      .format(conf_file_name), file=sys.stderr)
