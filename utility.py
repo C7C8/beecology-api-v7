@@ -57,7 +57,7 @@ def load_conf() -> Dict:
 	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.yml"
 
 	# Use YAML loader or JSON loader depending on file extension
-	load = json.load if ".json" in conf_file_name else yaml.load
+	load = json.load if ".json" in conf_file_name else yaml.safe_load
 
 	try:
 		with open(conf_file_name, "r") as conf_file:
