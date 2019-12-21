@@ -13,6 +13,7 @@ from utility import setup_logging, load_conf
 def client():
 	os.environ["BEE_API_CONF"] = "conf.json"  # For conf loading
 	conf = load_conf()
+	conf["testing"] = True
 	setup_logging(conf["logging"])
 	app.config["TESTING"] = True
 

@@ -102,8 +102,8 @@ class FlowerShapes(Resource):
 			data = [dict(r) for r in results]
 			if len(data) == 0:
 				log.warning("Failed to retrieve list of flower shapes")
-				return response("false", "Flower shapes not found!", True)
-			return response("success", "Retrieve the flower shapes success!", False, data=data)
+				return response("false", "Flower shapes not found!", True), 404
+			return response("success", "Retrieve the flower shapes success!", False, data=data), 200
 
 class UnmatchedFlowers(Resource):
 	@staticmethod

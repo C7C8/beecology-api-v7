@@ -5,6 +5,7 @@ from firebase_admin import auth
 from flask import request
 from sqlalchemy import sql, and_
 
+from .config import Config
 from api_services.database import Database
 from api_services.utility import response
 
@@ -13,6 +14,10 @@ log = getLogger()
 def authenticate(func):
 	"""Decorator for user authentication"""
 	def wrapper(*args, **kwargs):
+		# Allow unit tests to skip authentication
+		if "testing" in Config.config and Config.config["testing"]:
+			return func(*args, **kwargs, user="UNIT TEST")
+
 		if "Authorization" not in request.headers:
 			return response("false", "Authorization required", True), 403
 		try:

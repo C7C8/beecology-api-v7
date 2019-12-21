@@ -10,7 +10,7 @@ from tests.client import check_ok_response, check_err_response
 
 def test_beedex_one(client: FlaskClient):
 	# Base tests -- message must conform to expected response format
-	res = client.get("/api_v7/api/BeeDex/5")
+	res = client.get("/api_v7/api/beedex/5")
 	data = check_ok_response(res, "Retrieve the Bee information success!")
 	assert len(data["data"]) > 0
 
@@ -29,13 +29,13 @@ def test_beedex_one(client: FlaskClient):
 
 
 def test_beedex_all(client: FlaskClient):
-	res = client.get("/api_v7/api/BeeDex")
+	res = client.get("/api_v7/api/beedex")
 	data = check_ok_response(res, "Retrieve the Bee information success!")
 	assert len(data["data"]) > 0
 
 
 def test_beedex_none(client: FlaskClient):
-	res = client.get("/api_v7/api/BeeDex/999999")
+	res = client.get("/api_v7/api/beedex/999999")
 	check_err_response(res, "Bee Dexes not found!", 404)
 
 
@@ -89,7 +89,7 @@ def test_beerecords(client: FlaskClient):
 
 def test_beerecord_crud(client: FlaskClient):
 	"""Full test of beerecord CRUD abilities"""
-	# Dummy bee record to experiemtna
+	# Dummy bee record
 	bee_record = {
 		"elevation": 30,
 		"chead": "test head",
@@ -111,7 +111,6 @@ def test_beerecord_crud(client: FlaskClient):
 
 	# Post a new bee record
 	res = client.post("/api_v7/api/record", data=bee_record)
-	assert res.status_code == 200
 	data = check_ok_response(res, "Log a new bee success!")
 	assert len(data["data"]) == 1
 	id = data["data"][0]["beerecord_id"]
