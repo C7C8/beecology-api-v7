@@ -2,7 +2,7 @@ import firebase_admin
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_restplus import Api
-from firebase_admin import credentials, auth as a
+from firebase_admin import credentials
 
 from utility import load_conf, setup_logging
 from api_services import *
@@ -43,6 +43,7 @@ ns.add_resource(BeeRecord, "/beerecord/<int:id>")
 ns.add_resource(BeeRecordsList, "/beerecords/<int:page>")
 ns.add_resource(BeeVisRecords, "/beevisrecords")
 ns.add_resource(BeeUserRecords, "/beerecorduser")
+ns.add_resource(RecordData, "/record")
 
 # Flower data
 ns.add_resource(Flowerdex, "/flowerdex")            # POST new flower
@@ -56,11 +57,16 @@ ns.add_resource(UnmatchedFlowers, "/unmatched_flowers")
 ns.add_resource(UploadImage, "/uploadImage64")
 ns.add_resource(UploadVideo, "/uploadVideo")
 
-# User management
-ns.add_resource(RecordData, "/record")
+# Login/refresh/logout
 ns.add_resource(Enroll, "/enroll")
 ns.add_resource(Refresh, "/refresh")
 ns.add_resource(Unenroll, "/unenroll")
+
+# News
+ns.add_resource(BioCSNews, "/update_biocsnews")
+ns.add_resource(BioCSNews, "/biocsnews")
+ns.add_resource(News, "/update_news")
+ns.add_resource(News, "/news")
 #########################################################
 
 

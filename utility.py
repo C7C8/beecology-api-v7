@@ -16,6 +16,10 @@ __default_conf = {
 		"imageUploadPath": "images",
 		"cache": "/tmp/beecology-cache"
 	},
+	"news": {
+		"update-code": "N7D67fiIHe",
+		"folder": "/tmp"
+	},
 	"database": {
 		"pool_size": 16,
 		"connection": {
