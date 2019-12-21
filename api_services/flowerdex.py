@@ -50,14 +50,13 @@ class Flowerdex(Resource):
 		log.info("Adding flower {}".format(args))
 
 		engine = database.get_engine()
-		query = sql.insert(database.flower).values(**args).returning(database.flower.c.flower_id)
-		result = engine.execute(query)
+		query = sql.insert(database.flower).values(**args)
+		id = engine.execute(query).inserted_primary_key[0]  # Not all SQL engines support RETURNING
 
-		id = dict(next(result))
 		if id is None:
 			log.error("Failed to log new flower {}".format(args))
 			return response("false", "Log a new flower failed", True), 405
-		return response("success", "Log a new flower success!", False, data=id), 200
+		return response("success", "Log a new flower success!", False, data=[{"flower_id": id}]), 200
 
 	@staticmethod
 	@invalidate_caches("flower")
@@ -74,14 +73,13 @@ class Flowerdex(Resource):
 
 		log.info("Updating flower {}".format(id))
 		engine = database.get_engine()
-		query = sql.update(database.flower).values(**args).where(database.flower.c.flower_id == id).returning(database.flower.c.flower_id)
-		result = engine.execute(query)
+		query = sql.update(database.flower).values(**args).where(database.flower.c.flower_id == id)
+		results = engine.execute(query)
 
-		id = dict(next(result, {}))
-		if len(id) == 0:
+		if results.rowcount == 0:
 			log.warning("Failed to update unknown flower #{}".format(id))
 			return response("false", "Flower not found!", True), 404
-		return response("success", "Update the Folwer information success!", False, data=id), 200  # TODO Fix typo
+		return response("success", "Update the Folwer information success!", False, data=[{"flower_id": id}]), 200  # TODO Fix typo
 
 	@staticmethod
 	@invalidate_caches("flower")
@@ -89,8 +87,10 @@ class Flowerdex(Resource):
 		"""Delete flower by ID"""
 		log.info("Deleting flower {}".format(id))
 		engine = database.get_engine()
-		query = sql.delete(database.flower).where(database.flower.c.flower_id == id).returning(database.flower.c.flower_id)
-		if next(engine.execute(query), None) is None:
+		query = sql.delete(database.flower).where(database.flower.c.flower_id == id)
+		results = engine.execute(query)
+
+		if results.rowcount == 0:
 			log.warning("Attempted to delete unknown flower #{}".format(id))
 			return response("false", "flower id not found!", True), 404
 		return response("success", "Delete flower success!", False), 200
@@ -104,6 +104,7 @@ class FlowerShapes(Resource):
 		engine = database.get_engine()
 		features = database.features
 		results = engine.execute(sql.select([features]).where(features.c.feature_id.like("fc%")))
+
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.warning("Failed to retrieve list of flower shapes")

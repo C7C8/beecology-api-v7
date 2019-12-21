@@ -77,14 +77,13 @@ class BeeRecord(Resource):
 		log.debug("Updating bee record {}".format(id))
 
 		engine = database.get_engine()
-		query = sql.update(database.beerecord).values(**args).where(database.beerecord.c.beerecord_id == id) \
-			.returning(database.beerecord.c.beerecord_id)
+		query = sql.update(database.beerecord).values(**args).where(database.beerecord.c.beerecord_id == id)
 		results = engine.execute(query)
-		id = [dict(r) for r in results]
-		if len(id) == 0:
+
+		if results.rowcount == 0:
 			log.warning("Failed to update bee record #{}".format(id))
 			return response("false", "Bee Dexes not found!", True), 404
-		return response("success", "Retrieve the Bee information success!", False, data=id), 200
+		return response("success", "Retrieve the Bee information success!", False, data=[{"beerecord_id": id}]), 200
 
 	@staticmethod
 	@authenticate
@@ -93,14 +92,13 @@ class BeeRecord(Resource):
 		"""Delete a bee record by ID"""
 		log.debug("Deleting bee record #{}".format(id))
 		engine = database.get_engine()
-		query = sql.delete(database.beerecord).where(database.beerecord.c.beerecord_id == id) \
-			.returning(database.beerecord.c.beerecord_id)
+		query = sql.delete(database.beerecord).where(database.beerecord.c.beerecord_id == id)
 		results = engine.execute(query)
-		data = [dict(r) for r in results]
-		if len(data) == 0:
+
+		if results.rowcount == 0:
 			log.warning("Failed to delete bee record #{}".format(id))
 			return response("false", "Bee record id not found!", True), 404
-		return response("success", "Delete record success!", False, data=data), 200
+		return response("success", "Delete record success!", False, data=[{"beerecord_id": id}]), 200
 
 class BeeRecordsList(Resource):
 	@staticmethod
@@ -317,11 +315,11 @@ class RecordData(Resource):
 		args["bee_behavior"] = ["unknown", "nectar", "pollen"][args["bee_behavior"]]
 
 		engine = database.get_engine()
-		query = sql.insert(database.beerecord).values(**args, user_id=user).returning(database.beerecord.c.beerecord_id)
-		results = engine.execute(query)
-		id = [dict(r) for r in results]
+		query = sql.insert(database.beerecord).values(**args, user_id=user)
+		results = engine.execute(query)  # Not all SQL engines support RETURNING
+		id = results.inserted_primary_key[0]
 
-		if len(id) == 0:
+		if id is None:
 			log.error("User {} failed to log new bee record {}".format(user, args))
 			return response("false", "Log a new bee failed", True), 405
-		return response("success", "Log a new bee success!", False, data=id), 200
+		return response("success", "Log a new bee success!", False, data=[{"beerecord_id": id}]), 200

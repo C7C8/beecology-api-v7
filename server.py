@@ -10,7 +10,7 @@ from api_services import *
 # Beecology API Server, Python edition!
 # #####################################
 #
-# Configuration file format is specified in utility.py, you can copy/paste it into a JSON file ("conf.json" by default),
+# Configuration file format is specified in utility.py, you can copy/paste it into a JSON file.
 # or you can use YML to configure the server, following the same layout.
 #
 # This server will automatically log to WSGI's logging output at the level specified in the config file, as well as to

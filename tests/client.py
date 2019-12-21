@@ -11,7 +11,7 @@ from utility import setup_logging, load_conf
 
 @pytest.fixture
 def client():
-	os.environ["BEE_API_CONF"] = "conf.json"  # For conf loading
+	os.environ["BEE_API_CONF"] = "conf.yml"  # For conf loading
 	conf = load_conf()
 	conf["testing"] = True
 	setup_logging(conf["logging"])

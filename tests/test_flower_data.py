@@ -71,7 +71,7 @@ def test_insert_delete_flower(client: FlaskClient):
 		"flowergenus": "Unit"
 	})
 	data = check_ok_response(res, "Log a new flower success!")
-	id = data["data"]["flower_id"]
+	id = data["data"][0]["flower_id"]
 	assert id > 0
 
 	# Try updating the flower
@@ -80,7 +80,7 @@ def test_insert_delete_flower(client: FlaskClient):
 		"fcommon": "Test flower update"
 	})
 	data = check_ok_response(res, "Update the Folwer information success!")
-	assert data["data"]["flower_id"] == id
+	assert data["data"][0]["flower_id"] == id
 
 	# Clean up -- delete the flower we just created
 	res = client.delete("/api_v7/api/flowerdex/{}".format(id))

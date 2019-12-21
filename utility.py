@@ -21,19 +21,13 @@ __default_conf = {
 	},
 	"database": {
 		"pool_size": 16,
-		"connection": {
-			"host": "localhost",
-			"dbname": "beecologydb",
-			"user": "root",
-			"password": "",
-			"port": 5432
-		}
+		"connection": "postgresql+psycopg2://root@localhost:5432/beecologydb"
 	},
 	"logging": {
 		"version": 1,
 		"formatters": {
 			"default": {
-				"format": "[%(asctime)s] %(levelname)s in %(qualname): %(message)s",
+				"format": "[%(asctime)s] %(levelname)s in %(module): %(message)s",
 			}
 		},
 		"handlers": {
@@ -58,7 +52,7 @@ __default_conf = {
 
 def load_conf() -> Dict:
 	# Load configuration file, fall back to default config if not available.
-	# Config file is given by environment variable BEE_API_CONF, or conf.json if variable not provided.
+	# Config file is given by environment variable BEE_API_CONF, or conf.yml if variable not provided.
 	conf = __default_conf
 	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.yml"
 
