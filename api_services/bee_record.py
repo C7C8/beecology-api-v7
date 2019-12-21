@@ -252,6 +252,22 @@ class Beedex(Resource):
 		log.debug("Returning {} beedex entries".format(len(data)))
 		return response("success", "Retrieve the Bee information success!", False, data=data), 200
 
+class NoElevationData(Resource):
+	@staticmethod
+	@cache_response("beerecord")
+	def get():
+		"""Get bee records for which there is no elevation info"""
+		engine = database.get_engine()
+		results = engine.execute(sql.select([database.beerecord]).where(database.beerecord.c.elevation.is_(None)))
+		data = [dict(r) for r in results]
+		if len(data) == 0:
+			log.info("Failed to find bee records without elevations. This may be intended, depending on data quality.")
+			return response("false", "No Elevation Records not found!", True), 404
+
+		# Correct date format
+		for datum in data:
+			datum["time"] = datum["time"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+		return response("success", "Retrieve the No Elevation Records success!", False, data=data), 200
 
 class RecordData(Resource):
 	@staticmethod

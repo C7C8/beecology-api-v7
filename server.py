@@ -44,6 +44,7 @@ ns.add_resource(BeeRecordsList, "/beerecords/<int:page>")
 ns.add_resource(BeeVisRecords, "/beevisrecords")
 ns.add_resource(BeeUserRecords, "/beerecorduser")
 ns.add_resource(RecordData, "/record")
+ns.add_resource(NoElevationData, "/noelevationrecords")
 
 # Flower data
 ns.add_resource(Flowerdex, "/flowerdex")            # POST new flower
