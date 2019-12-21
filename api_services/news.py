@@ -24,11 +24,10 @@ class News(Resource):
 	@admin_required
 	def put():
 		parser = reqparse.RequestParser()
-		parser.add_argument("code", type=str, required=True)
 		parser.add_argument("json", type=dict, required=True)
 		args = parser.parse_args()
 
-		return update_news_file(args["code"], args["json"], "news.json")
+		return update_news_file(args["json"], "news.json")
 
 class BioCSNews(Resource):
 	@staticmethod
@@ -46,18 +45,15 @@ class BioCSNews(Resource):
 	def put():
 		"""Update Bio/CS news"""
 		parser = reqparse.RequestParser()
-		parser.add_argument("code", type=str, required=True)
 		parser.add_argument("json", type=dict, required=True)
 		args = parser.parse_args()
 
-		return update_news_file(args["code"], args["json"], "biocsnews.json")
+		return update_news_file(args["json"], "biocsnews.json")
 
 
-def update_news_file(code, news, filename):
-	if code != Config.config["news"]["update-code"]:
-		return "Incorrect update code", 403
+def update_news_file(news, filename):
 	try:
-		with open("{}/{}".format(Config.config["news"]["folder"], filename), "w") as file:
+		with open("{}/{}".format(Config.config["storage"]["news-path"], filename), "w") as file:
 			json.dump(news, file)
 	except IOError as e:
 		log.error("Failed to save bio/cs news update to {}: {}".format(Config.config["news"]["folder"], e))

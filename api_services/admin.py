@@ -21,7 +21,7 @@ class VerifyAdmin(Resource):
 			return {"sucess": True}, 200  # TODO: Fix typo
 
 		# User is not an admin, check the activation code; if it matches, add them to the admins list
-		if "activationCode" in args and args["activationCode"] == Config.config["admin"]["activation-code"]:
+		if "activationCode" in args and args["activationCode"] == Config.config["admin-code"]:
 			engine.execute(sql.insert(database.admin).values(user_id=user))
 			return {"sucess": True}, 200  # TODO: Fix typo
 

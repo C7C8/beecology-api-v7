@@ -9,16 +9,13 @@ from api_services import Config
 __default_conf = {
 	"auth": {
 		"keyfile": "firebase.json",
-		"databaseURL": "https://some.url",
 		"token-lifetime": 3600
 	},
+	"admin-code": "SECRET_CODE",
 	"storage": {
 		"imageUploadPath": "images",
+		"news-path": "/tmp",
 		"cache": "/tmp/beecology-cache"
-	},
-	"news": {
-		"update-code": "N7D67fiIHe",
-		"folder": "/tmp"
 	},
 	"database": {
 		"pool_size": 16,
