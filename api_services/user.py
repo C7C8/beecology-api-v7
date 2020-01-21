@@ -53,6 +53,7 @@ class Enroll(Resource):
 			"type": "Bearer"
 		}, 200
 
+
 class Refresh(Resource):
 	@staticmethod
 	def get():
@@ -88,6 +89,7 @@ class Refresh(Resource):
 		       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
 		       "expiresAt": int(expiration.timestamp() * 1000)
 	    }, 200
+
 
 class Unenroll(Resource):
 	@staticmethod

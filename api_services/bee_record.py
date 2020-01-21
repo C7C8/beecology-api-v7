@@ -100,6 +100,7 @@ class BeeRecord(Resource):
 			return response("false", "Bee record id not found!", True), 404
 		return response("success", "Delete record success!", False, data=[{"beerecord_id": id}]), 200
 
+
 class BeeRecordsList(Resource):
 	@staticmethod
 	@authenticate
@@ -150,6 +151,7 @@ class BeeRecordsList(Resource):
 			datum["time"] = datum["time"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 		return response("success", "Retrieve the Bee records success!", False, data=data), 200
 
+
 class BeeVisRecords(Resource):
 	@staticmethod
 	@cache_response("beerecord", "flowerdict")
@@ -189,6 +191,7 @@ class BeeVisRecords(Resource):
 			datum["date"] = datum["date"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 		return response("success", "Retrieve the Bee records success!", False, data=data), 200
+
 
 class BeeUserRecords(Resource):
 	@staticmethod

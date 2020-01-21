@@ -13,6 +13,7 @@ log = getLogger()
 
 # TODO Clean this up a bit
 
+
 def authenticate(func):
 	"""Decorator for user authentication"""
 	def wrapper(*args, **kwargs):

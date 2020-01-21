@@ -9,6 +9,7 @@ from .config import Config
 
 log = getLogger()
 
+
 class News(Resource):
 	@staticmethod
 	def get():
@@ -28,6 +29,7 @@ class News(Resource):
 		args = parser.parse_args()
 
 		return update_news_file(args["json"], "news.json")
+
 
 class BioCSNews(Resource):
 	@staticmethod

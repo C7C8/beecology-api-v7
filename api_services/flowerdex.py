@@ -11,6 +11,7 @@ from .cache import invalidate_caches, cache_response
 
 log = getLogger()
 
+
 class Flowerdex(Resource):
 	@staticmethod
 	@cache_response("flowerdict")
@@ -95,6 +96,7 @@ class Flowerdex(Resource):
 			return response("false", "flower id not found!", True), 404
 		return response("success", "Delete flower success!", False), 200
 
+
 class FlowerShapes(Resource):
 	@staticmethod
 	@cache_response("features")
@@ -110,6 +112,7 @@ class FlowerShapes(Resource):
 			log.warning("Failed to retrieve list of flower shapes")
 			return response("false", "Flower shapes not found!", True), 404
 		return response("success", "Retrieve the flower shapes success!", False, data=data), 200
+
 
 class UnmatchedFlowers(Resource):
 	@staticmethod
@@ -135,6 +138,7 @@ class UnmatchedFlowers(Resource):
 			log.warning("Failed to retrieve list of unmatched flowers")
 			return response("false", "Bee records not found!", True), 404  # TODO Change messages
 		return response("success", "Retrieve the Bee records success!", False, data=data), 200
+
 
 class FlowerList(Resource):
 	@staticmethod

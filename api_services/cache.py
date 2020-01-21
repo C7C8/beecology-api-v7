@@ -26,6 +26,7 @@ def invalidate_caches(*cache_args):
 
 invalidate_caches.caches = {}
 
+
 class cache_response:
 	"""Decorator class for caching responses from a function. IMPORTANT: This must be the *first* decorator -- before
 	any others, so the results from the actual function get cached."""
