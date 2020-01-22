@@ -1,21 +1,26 @@
+import firebase_admin
 from flask import Flask, Blueprint
 from flask_cors import CORS
-from flask_restplus import Api, Resource
+from flask_restplus import Api
+from firebase_admin import credentials
 
 from utility import load_conf, setup_logging
+from api_services import *
 
 # Beecology API Server, Python edition!
-# =====================================
+# #####################################
 #
-# Configuration file format is specified in utility.py, you can copy/paste it into a json file ("conf.json" by default).
+# Configuration file format is specified in utility.py, you can copy/paste it into a JSON file.
+# or you can use YML to configure the server, following the same layout.
+#
 # This server will automatically log to WSGI's logging output at the level specified in the config file, as well as to
 # a dedicated log file named in the configuration.
 #
 # Environment variables:
-# BEE_API_CONF        Configuration file path ("conf.json" by default)
+# BEE_API_CONF        Configuration file path ("conf.yml" by default)
 
 conf = load_conf()
-setup_logging(conf["logging"]["level"], conf["logging"]["file"])
+setup_logging(conf["logging"])
 
 app = Flask(__name__)
 CORS(app)  # TODO: Holdover from node server, this may not be needed.
@@ -24,13 +29,53 @@ api = Api(apiV7, version="1.0.0", title="Beecology data API", description="Proce
                                                                           " beecology data")
 app.register_blueprint(apiV7)
 ns = api.namespace("api_v7/api", "Beecology API version 7")
+firebase_app = firebase_admin.initialize_app(credentials.Certificate(conf["auth"]["key-file"]),
+                                             options=conf["auth"])
 
+#########################################################
+#                      API ROUTES                       #
+#########################################################
+ns.add_resource(Root, "/")
+ns.add_resource(Root, "/isConnected")
 
-@ns.route("/")
-class Root(Resource):
-	def get(self):
-		"""Return a simple 'yes, the app is working'-style message"""
-		return "Welcome! The api is working!"
+# Bee data
+ns.add_resource(Beedex, "/beedex/<int:id>")
+ns.add_resource(Beedex, "/beedex")
+ns.add_resource(BeeRecord, "/beerecord/<int:id>")
+ns.add_resource(BeeRecordsList, "/beerecords/<int:page>")
+ns.add_resource(BeeVisRecords, "/beevisrecords")
+ns.add_resource(BeeUserRecords, "/beerecorduser")
+ns.add_resource(RecordData, "/record")
+ns.add_resource(NoElevationData, "/noelevationrecords")
+
+# Flower data -- don't look at me like that! I didn't write the API interface spec!
+ns.add_resource(Flowerdex, "/addflower")                # POST new flower.
+ns.add_resource(Flowerdex, "/flowerdex")                # GET or POST flower.
+ns.add_resource(Flowerdex, "/flowerdex/<int:id>")       # GET or DELETE flower entry
+ns.add_resource(Flowerdex, "/deleteflower/<int:id>")    # DELETE flower.
+ns.add_resource(FlowerList, "/flowerlist")              # Legacy support for flowerlist endpoint
+ns.add_resource(FlowerShapes, "/flowershapes")
+ns.add_resource(FlowerShapes, "/flowercolors")          # Not a typo, these seriously have the same handler...
+ns.add_resource(UnmatchedFlowers, "/unmatched_flowers")
+
+# Media upload
+ns.add_resource(UploadImage, "/uploadImage64")
+ns.add_resource(UploadVideo, "/uploadVideo")
+
+# Login/refresh/logout
+ns.add_resource(Enroll, "/enroll")
+ns.add_resource(Refresh, "/refresh")
+ns.add_resource(Unenroll, "/unenroll")
+
+# News
+ns.add_resource(BioCSNews, "/update_biocsnews")
+ns.add_resource(BioCSNews, "/biocsnews")
+ns.add_resource(News, "/update_news")
+ns.add_resource(News, "/news")
+
+# Admin
+ns.add_resource(VerifyAdmin, "/verifyAdmin")
+#########################################################
 
 
 if __name__ == '__main__':

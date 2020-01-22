@@ -1,44 +1,34 @@
 import json
 import os
 import sys
-from logging.config import dictConfig
+import logging.config
 from typing import Dict
 
+import yaml
 
-def load_conf() -> Dict:
-	# Load configuration file, fall back to default config if not available.
-	# Config file is given by environment variable BEE_API_CONF, or conf.json if variable not provided.
-	conf = {
-		"imageUploadPath": "../../../../images",
-		"logging": {
-			"file": "log.txt",
-			"level": "WARNING",
-		},
-		"database": {
-			"host": "localhost",
-			"database": "beecologydb",
-			"user": "root",
-			"password": ""
-		}
-	}
-	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.json"
-	try:
-		with open(conf_file_name, "r") as conf_file:
-			conf = json.load(conf_file)
-	except IOError:
-		print("Failed to load config file \"{}\" falling back to local default. THIS IS ALMOST GUARANTEED TO FAIL!"
-		      .format(conf_file_name), file=sys.stderr)
-	return conf
+from api_services import Config
 
-
-def setup_logging(level: str, filename: str):
-	# Set up logging for Flask
-	dictConfig({
+__default_conf = {
+	"auth": {
+		"keyfile": "firebase.json",
+		"token-lifetime": 3600
+	},
+	"admin-code": "SECRET_CODE",
+	"storage": {
+		"imageUploadPath": "images",
+		"news-path": "/tmp",
+		"cache": "/tmp/beecology-cache"
+	},
+	"database": {
+		"pool_size": 16,
+		"connection": "postgresql+psycopg2://root@localhost:5432/beecologydb"
+	},
+	"logging": {
 		"version": 1,
 		"formatters": {
 			"default": {
-					"format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
-				}
+				"format": "[%(asctime)s] %(levelname)s in %(module): %(message)s",
+			}
 		},
 		"handlers": {
 			"wsgi": {
@@ -48,12 +38,37 @@ def setup_logging(level: str, filename: str):
 			},
 			"file": {
 				"class": "logging.FileHandler",
-				"filename": filename,
+				"filename": "log.txt",
 				"formatter": "default"
 			}
 		},
 		"root": {
-			"level": level,
+			"level": "INFO",
 			"handlers": ["wsgi", "file"]
 		}
-	})
+	}
+}
+
+
+def load_conf() -> Dict:
+	# Load configuration file, fall back to default config if not available.
+	# Config file is given by environment variable BEE_API_CONF, or conf.yml if variable not provided.
+	conf = __default_conf
+	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.yml"
+
+	# Use YAML loader or JSON loader depending on file extension
+	load = json.load if ".json" in conf_file_name else yaml.safe_load
+
+	try:
+		with open(conf_file_name, "r") as conf_file:
+			conf = load(conf_file)
+	except IOError:
+		print("Failed to load config file \"{}\" falling back to local default. THIS IS ALMOST GUARANTEED TO FAIL!"
+		      .format(conf_file_name), file=sys.stderr)
+	Config.config = conf
+	return conf
+
+
+def setup_logging(config=None):
+	# Set up logging for Flask
+	logging.config.dictConfig(__default_conf["logging"] if config is None else config)
