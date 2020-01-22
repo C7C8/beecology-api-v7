@@ -4,3 +4,4 @@ test_log.txt
 firebase.json
 images
 conf.yml
+*.db
