@@ -1,8 +1,8 @@
 from flask_restplus import Resource, reqparse
 from sqlalchemy import sql
 
+from beecology_api import config
 from beecology_api.api import database
-from beecology_api.config import config
 from beecology_api.api.authentication import authenticate
 
 
@@ -21,7 +21,7 @@ class VerifyAdmin(Resource):
 			return {"sucess": True}, 200  # TODO: Fix typo
 
 		# User is not an admin, check the activation code; if it matches, add them to the admins list
-		if "activationCode" in args and args["activationCode"] == config["admin-code"]:
+		if "activationCode" in args and args["activationCode"] == config.config["admin-code"]:
 			engine.execute(sql.insert(database.admin).values(user_id=user))
 			return {"sucess": True}, 200  # TODO: Fix typo
 

@@ -8,7 +8,7 @@ from tests.client import check_ok_response, check_err_response
 
 def test_flowerdex_one(client: FlaskClient):
 	# Base tests -- message must conform to expected response format
-	res = client.get("/api_v7/api/flowerdex/5")
+	res = client.get("/flowerdex/5")
 	data = check_ok_response(res, "Retrieve the Flower information success!")
 	assert len(data["data"]) > 0
 
@@ -20,18 +20,18 @@ def test_flowerdex_one(client: FlaskClient):
 
 
 def test_flowerdex_all(client: FlaskClient):
-	res = client.get("/api_v7/api/flowerdex")
+	res = client.get("/flowerdex")
 	data = check_ok_response(res, "Retrieve the Flower information success!")
 	assert len(data["data"]) > 0
 
 
 def test_flowerdex_none(client: FlaskClient):
-	res = client.get("/api_v7/api/flowerdex/999999")
+	res = client.get("/flowerdex/999999")
 	check_err_response(res, "Flower not found!", 404)
 
 
 def test_flower_shapes(client: FlaskClient, url=None):
-	res = client.get("/api_v7/api/flowershapes" if url is None else url)
+	res = client.get("/flowershapes" if url is None else url)
 	data = check_ok_response(res, "Retrieve the flower shapes success!")
 	assert len(data["data"]) > 0
 
@@ -45,11 +45,11 @@ def test_flower_shapes(client: FlaskClient, url=None):
 
 def test_flower_colors(client: FlaskClient):
 	# Flower shapes and flower colors endpoints do the same. exact. thing.
-	test_flower_shapes(client, url="/api_v7/api/flowercolors")
+	test_flower_shapes(client, url="/flowercolors")
 
 
 def test_unmatched_flowers(client: FlaskClient):
-	res = client.get("/api_v7/api/unmatched_flowers")
+	res = client.get("/unmatched_flowers")
 	data = check_ok_response(res, "Retrieve the Bee records success!")  # TODO This... is not the right response.
 	assert len(data["data"]) > 0
 
@@ -63,7 +63,7 @@ def test_unmatched_flowers(client: FlaskClient):
 
 def test_insert_delete_flower(client: FlaskClient):
 	# Send a request and make sure the server reports success
-	res = client.post("/api_v7/api/flowerdex", data={
+	res = client.post("/flowerdex", data={
 		"flowercommonname": "Test Flower",
 		"flowershapeid": "fs2",
 		"flowercolorid": "fc6",
@@ -76,29 +76,29 @@ def test_insert_delete_flower(client: FlaskClient):
 
 	# Try updating the flower
 	# TODO Find a way to automate checking database contents, since the API doesn't expose
-	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
+	res = client.put("/flowerdex/{}".format(id), data={
 		"fcommon": "Test flower update"
 	})
 	data = check_ok_response(res, "Update the Folwer information success!")
 	assert data["data"][0]["flower_id"] == id
 
 	# Clean up -- delete the flower we just created
-	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
+	res = client.delete("/flowerdex/{}".format(id))
 	check_ok_response(res, "Delete flower success!")
 
 	# Try to delete the flower we just deleted, we should get an error
-	res = client.delete("/api_v7/api/flowerdex/{}".format(id))
+	res = client.delete("/flowerdex/{}".format(id))
 	check_err_response(res, "flower id not found!", 404)
 
 	# Try to update the flower we just deleted, we should get an error
-	res = client.put("/api_v7/api/flowerdex/{}".format(id), data={
+	res = client.put("/flowerdex/{}".format(id), data={
 		"fcommon": "This flower doesn't exist"
 	})
 	check_err_response(res, "Flower not found!", 404)
 
 
 def test_flower_list(client: FlaskClient):
-	res = client.get("/api_v7/api/flowerlist")
+	res = client.get("/flowerlist")
 	data = check_ok_response(res, "Retrieve the Flower List  success!")
 	data = data["data"]
 

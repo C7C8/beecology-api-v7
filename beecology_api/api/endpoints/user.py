@@ -8,8 +8,8 @@ from flask import request
 from flask_restplus import Resource
 from sqlalchemy import sql, and_
 
+from beecology_api import config
 from beecology_api.api import database
-from beecology_api.config import config
 from beecology_api.api.authentication import authenticate
 from beecology_api.api.response import response
 
@@ -33,7 +33,7 @@ class Enroll(Resource):
 		# Generate token (1024 random bytes), expiration,
 		accessToken = secrets.token_hex(1024)
 		refreshToken = secrets.token_hex(1024)
-		expiration = datetime.now() + timedelta(seconds=config["auth"]["token-lifetime"])
+		expiration = datetime.now() + timedelta(seconds=config.config["auth"]["token-lifetime"])
 
 		# Delete all other entries for this user and insert a new auth table entry. This effectively logs the user out
 		# of all other devices, and helps keep the auth table clean.
@@ -48,7 +48,7 @@ class Enroll(Resource):
 		return {
 			"accessToken": accessToken,
 		    "refreshToken": refreshToken,
-			"expiresIn": config["auth"]["token-lifetime"] * 1000,
+			"expiresIn": config.config.config["auth"]["token-lifetime"] * 1000,
 			"expiresAt": int(expiration.timestamp() * 1000),
 			"type": "Bearer"
 		}, 200
@@ -78,7 +78,7 @@ class Refresh(Resource):
 
 		# Generate a new access token and expiration time, update them in the database
 		access_token = secrets.token_hex(1024)
-		expiration = datetime.now() + timedelta(seconds=config["auth"]["token-lifetime"])
+		expiration = datetime.now() + timedelta(seconds=config.config["auth"]["token-lifetime"])
 
 		engine.execute(sql.update(database.auth).values(token_expiry=expiration.timestamp() * 1000,
 		                                                access_token=access_token) \
@@ -86,7 +86,7 @@ class Refresh(Resource):
 
 		return {
 		       "accessToken": access_token,
-		       "expiresIn": config["auth"]["token-lifetime"] * 1000,
+		       "expiresIn": config.config["auth"]["token-lifetime"] * 1000,
 		       "expiresAt": int(expiration.timestamp() * 1000)
 	    }, 200
 

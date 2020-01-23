@@ -3,7 +3,7 @@ import os
 import uuid
 from logging import getLogger
 
-from beecology_api.config import config
+from beecology_api import config
 
 log = getLogger()
 
@@ -58,7 +58,7 @@ class cache_response:
 					# TODO Remove JSON parsing step to improve cache performance if possible
 					result = json.load(cached_file)
 			else:
-				cache_dir = config["storage"]["cache"]
+				cache_dir = config.config["storage"]["cache"]
 				result, status_code = func(*args, **kwargs)
 				filename = "{cache_dir}/{qualname}-{uuid}.json".format(cache_dir=cache_dir,
 				                                                       qualname=func.__qualname__.lower(),

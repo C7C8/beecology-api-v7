@@ -7,7 +7,7 @@ import logging.config
 
 import beecology_api.api.endpoints as endpoints
 from beecology_api.api.api import api
-from beecology_api.config import config, load_config
+import beecology_api.config as config
 
 # Beecology API Server, Python edition!
 # #####################################
@@ -27,14 +27,16 @@ ns: Api = None
 
 def init_api():
 	global ns
-	load_config()
-	logging.config.dictConfig(config["logging"])
+	config.load_config()
+	logging.config.dictConfig(config.config["logging"])
 
 	CORS(app)  # TODO: Holdover from node server, this may not be needed.
 	blueprint = Blueprint("api", __name__)
 	api.init_app(blueprint)
+	app.register_blueprint(blueprint)
 	ns = api.namespace("/", "Beecology API version 7")
-	firebase_app = firebase_admin.initialize_app(credentials.Certificate(config["auth"]["key-file"]), options=config["auth"])
+	firebase_app = firebase_admin.initialize_app(credentials.Certificate(config.config["auth"]["key-file"]),
+	                                             options=config.config["auth"])
 	setup_routes()
 
 
@@ -85,6 +87,6 @@ def setup_routes():
 	#########################################################
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' or __name__ == "beecology_api.server":
 	init_api()
 	app.run()

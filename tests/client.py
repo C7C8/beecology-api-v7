@@ -5,15 +5,15 @@ from typing import Dict
 import pytest
 from flask import Response
 
+import beecology_api.config as config
 from beecology_api.server import app
-from beecology_api.config import load_config
 
 
 @pytest.fixture
 def client():
 	os.environ["BEE_API_CONF"] = "sample-conf.yml"  # For conf loading
-	conf = load_config()
-	conf["testing"] = True
+	config.load_config()
+	config.config["testing"] = True
 	app.config["TESTING"] = True
 
 	with app.test_client() as client:
