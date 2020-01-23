@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, Table, Column, Integer, String, Text, Smal
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoSuchTableError
 
-from .config import Config
+from beecology_api.config import config
 
 log = getLogger()
 
@@ -25,7 +25,7 @@ def get_engine() -> Engine:
 	global engine, beedict, beerecord, flower, flowerdict, features, auth, admin
 	if engine is None:
 		log.debug("Starting SQLAlchemy engine")
-		dbconfig = Config.config["database"]
+		dbconfig = config["database"]
 
 		try:
 			# Exact dialect+driver is specified by the config file

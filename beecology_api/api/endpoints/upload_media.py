@@ -6,9 +6,9 @@ from logging import getLogger
 import magic
 from flask_restplus import Resource, reqparse
 
+from beecology_api.config import config
 from .authentication import authenticate
 from .utility import response
-from .config import Config
 
 log = getLogger()
 
@@ -52,7 +52,7 @@ def process_media(b64, mime_type, user):
 	# uses it as the node value mod 2^48 (node values are 48 bits). This lets us embed user info in
 	# the filename, but not in a back-traceable way.
 	node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
-	filename = "{dir}/{uuid}.{ext}".format(dir=Config.config["storage"]["imageUploadPath"],
+	filename = "{dir}/{uuid}.{ext}".format(dir=config["storage"]["imageUploadPath"],
 	                                       uuid=uuid.uuid1(node=node),
 	                                       ext=file_type.split("/")[1])
 	log.info("Saving image to {}".format(filename))

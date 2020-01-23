@@ -4,10 +4,10 @@ import sqlalchemy as sql
 from flask_restplus import Resource, reqparse
 from sqlalchemy import and_, func
 
-from api_services import database
+from beecology_api.api import database
 from .authentication import authenticate, admin_required
 from .utility import response
-from .cache import invalidate_caches, cache_response
+from beecology_api.api.cache import invalidate_caches, cache_response
 
 log = getLogger()
 

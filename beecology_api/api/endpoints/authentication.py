@@ -5,8 +5,8 @@ from firebase_admin import auth
 from flask import request
 from sqlalchemy import sql, and_
 
-from api_services import database
-from .config import Config
+from beecology_api.api import database
+from beecology_api.config import config
 from .utility import response
 
 log = getLogger()
@@ -18,7 +18,7 @@ def authenticate(func):
 	"""Decorator for user authentication"""
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
-		if "testing" in Config.config and Config.config["testing"]:
+		if "testing" in config and config["testing"]:
 			return func(*args, **kwargs, user="UNIT TEST")
 
 		if "Authorization" not in request.headers:
@@ -47,7 +47,7 @@ def admin_required(func):
 	"""Decorator for requiring administrator access. IMPORTANT: This must come AFTER a user authentication check"""
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
-		if "testing" in Config.config and Config.config["testing"]:
+		if "testing" in config and config["testing"]:
 			return func(*args, **kwargs)
 
 		if "user" not in kwargs:

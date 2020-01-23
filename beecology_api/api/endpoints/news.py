@@ -3,9 +3,9 @@ from logging import getLogger
 
 from flask_restplus import Resource, reqparse
 
+from beecology_api.config import config
 from .authentication import authenticate, admin_required
 from .utility import response
-from .config import Config
 
 log = getLogger()
 
@@ -14,10 +14,10 @@ class News(Resource):
 	@staticmethod
 	def get():
 		try:
-			with open("{}/news.json".format(Config.config["news"]["folder"]), "r") as file:
+			with open("{}/news.json".format(config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the News information success!", True, data=json.load(file))
 		except IOError as e:
-			log.error("Failed to load news file {}/news.json: {}".format(Config.config["news"]["folder"], e))
+			log.error("Failed to load news file {}/news.json: {}".format(config["news"]["folder"], e))
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
@@ -35,10 +35,10 @@ class BioCSNews(Resource):
 	@staticmethod
 	def get():
 		try:
-			with open("{}/biocsnews.json".format(Config.config["news"]["folder"]), "r") as file:
+			with open("{}/biocsnews.json".format(config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the BIO-CS News information success!", True, data=json.load(file))
 		except IOError as e:
-			log.error("Failed to load news file {}/biocsnews.json: {}".format(Config.config["news"]["folder"], e))
+			log.error("Failed to load news file {}/biocsnews.json: {}".format(config["news"]["folder"], e))
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
@@ -55,9 +55,9 @@ class BioCSNews(Resource):
 
 def update_news_file(news, filename):
 	try:
-		with open("{}/{}".format(Config.config["storage"]["news-path"], filename), "w") as file:
+		with open("{}/{}".format(config["storage"]["news-path"], filename), "w") as file:
 			json.dump(news, file)
 	except IOError as e:
-		log.error("Failed to save bio/cs news update to {}: {}".format(Config.config["news"]["folder"], e))
+		log.error("Failed to save bio/cs news update to {}: {}".format(config["news"]["folder"], e))
 		return "Failed to save news update", 500
 	return response("success", "Updated news", False)
