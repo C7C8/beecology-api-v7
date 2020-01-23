@@ -7,8 +7,8 @@ import magic
 from flask_restplus import Resource, reqparse
 
 from beecology_api.config import config
-from .authentication import authenticate
-from .utility import response
+from beecology_api.api.authentication import authenticate
+from beecology_api.api.response import response
 
 log = getLogger()
 

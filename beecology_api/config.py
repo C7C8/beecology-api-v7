@@ -6,7 +6,8 @@ import yaml
 
 config = {
 	"auth": {
-		"keyfile": "firebase.json",
+		"key-file": "firebase.json",
+		"databaseURL": "https://someurl.firebaseio.com",
 		"token-lifetime": 3600
 	},
 	"admin-code": "SECRET_CODE",
