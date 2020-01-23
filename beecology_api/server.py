@@ -44,8 +44,7 @@ def setup_routes():
 	#########################################################
 	#                      API ROUTES                       #
 	#########################################################
-	ns.add_resource(endpoints.Root, "/")
-	ns.add_resource(endpoints.Root, "/isConnected")
+	ns.add_resource(endpoints.IsConnected, "/isConnected")
 
 	# Bee data
 	ns.add_resource(endpoints.Beedex, "/beedex/<int:id>")

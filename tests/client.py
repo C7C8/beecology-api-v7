@@ -11,7 +11,7 @@ from beecology_api.server import app
 
 @pytest.fixture
 def client():
-	os.environ["BEE_API_CONF"] = "sample-conf.yml"  # For conf loading
+	os.environ["BEE_API_CONF"] = "conf.yml"  # For conf loading
 	config.load_config()
 	config.config["testing"] = True
 	app.config["TESTING"] = True

@@ -1,7 +1,7 @@
 from flask_restplus import Resource
 
 
-class Root(Resource):
+class IsConnected(Resource):
 	@staticmethod
 	def get():
 		"""Return a simple 'yes, the app is working'-style message"""
