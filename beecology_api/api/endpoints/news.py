@@ -13,6 +13,7 @@ log = getLogger()
 class News(Resource):
 	@staticmethod
 	def get():
+		"""Get current news"""
 		try:
 			with open("{}/news.json".format(config.config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the News information success!", True, data=json.load(file))
@@ -24,6 +25,7 @@ class News(Resource):
 	@authenticate
 	@admin_required
 	def put():
+		"""Update news. Administrator access required."""
 		parser = reqparse.RequestParser()
 		parser.add_argument("json", type=dict, required=True)
 		args = parser.parse_args()
@@ -34,6 +36,7 @@ class News(Resource):
 class BioCSNews(Resource):
 	@staticmethod
 	def get():
+		"""Get Bio/CS news."""
 		try:
 			with open("{}/biocsnews.json".format(config.config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the BIO-CS News information success!", True, data=json.load(file))
@@ -45,7 +48,7 @@ class BioCSNews(Resource):
 	@authenticate
 	@admin_required
 	def put():
-		"""Update Bio/CS news"""
+		"""Update Bio/CS news. Administrator access required."""
 		parser = reqparse.RequestParser()
 		parser.add_argument("json", type=dict, required=True)
 		args = parser.parse_args()

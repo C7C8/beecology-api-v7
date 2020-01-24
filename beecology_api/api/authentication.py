@@ -1,5 +1,6 @@
 import base64
 from logging import getLogger
+from functools import wraps
 
 from firebase_admin import auth
 from flask import request
@@ -16,6 +17,7 @@ log = getLogger()
 
 def authenticate(func):
 	"""Decorator for user authentication"""
+	@wraps(func)
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
 		if "testing" in config and config["testing"]:
@@ -45,6 +47,7 @@ def authenticate(func):
 
 def admin_required(func):
 	"""Decorator for requiring administrator access. IMPORTANT: This must come AFTER a user authentication check"""
+	@wraps(func)
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
 		if "testing" in config and config["testing"]:

@@ -10,6 +10,7 @@ class VerifyAdmin(Resource):
 	@staticmethod
 	@authenticate
 	def post(user):
+		"""Activate self (logged in user) as an administrator by using a confidential activation code."""
 		parser = reqparse.RequestParser()
 		parser.add_argument("activationCode", type=str, required=False)
 		args = parser.parse_args()
