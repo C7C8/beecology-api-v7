@@ -39,6 +39,7 @@ class UploadImage(Resource):
 
 def process_media(b64, mime_type, user):
 	"""Process a media file from base64, validating its mime type in the process."""
+	b64 = b64.replace("-", "+").replace("/", "_") + "==="
 	data = base64.urlsafe_b64decode(b64)
 	mime = magic.Magic(mime=True)
 	file_type = mime.from_buffer(data)
@@ -52,13 +53,12 @@ def process_media(b64, mime_type, user):
 	# uses it as the node value mod 2^48 (node values are 48 bits). This lets us embed user info in
 	# the filename, but not in a back-traceable way.
 	node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
-	filename = "{dir}/{uuid}.{ext}".format(dir=config.config["storage"]["imageUploadPath"],
-	                                       uuid=uuid.uuid1(node=node),
-	                                       ext=file_type.split("/")[1])
+	file = "{uuid}.{ext}".format(uuid=uuid.uuid1(node=node), ext=file_type.split("/")[1])
+	filename = config.config["storage"]["imageUploadPath"] + file
 	log.info("Saving image to {}".format(filename))
 	with open(filename, "wb") as file:
 		file.write(data)
 
 	res = response("success", "upload image success", False)
-	res["imagePath"] = filename
+	res["imagePath"] = config.config["storage"]["imageBasePath"]
 	return res, 200

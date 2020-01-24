@@ -7,6 +7,7 @@ auth:
 
 storage:
   imageUploadPath: /datastorage/images
+  imageBasePath: images
   news-path: /var/www/html
   cache: /tmp/beecology-cache
 
