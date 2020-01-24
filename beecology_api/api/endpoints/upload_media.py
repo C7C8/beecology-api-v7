@@ -54,11 +54,11 @@ def process_media(b64, mime_type, user):
 	# the filename, but not in a back-traceable way.
 	node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
 	file = "{uuid}.{ext}".format(uuid=uuid.uuid1(node=node), ext=file_type.split("/")[1])
-	filename = config.config["storage"]["imageUploadPath"] + file
+	filename = config.config["storage"]["imageUploadPath"] + "/" + file
 	log.info("Saving image to {}".format(filename))
 	with open(filename, "wb") as file:
 		file.write(data)
 
 	res = response("success", "upload image success", False)
-	res["imagePath"] = config.config["storage"]["imageBasePath"]
+	res["imagePath"] = config.config["storage"]["imageBasePath"] + "/" + file
 	return res, 200
