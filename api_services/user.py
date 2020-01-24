@@ -98,4 +98,4 @@ class Unenroll(Resource):
 		"""Remove access+refresh token from auth database"""
 		engine = database.get_engine()
 		engine.execute(sql.delete(database.auth).where(database.auth.c.user_id == user))
-		return {"success", True}, 200
+		return {"success": True}, 200
