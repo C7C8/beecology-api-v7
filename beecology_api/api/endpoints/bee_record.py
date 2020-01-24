@@ -6,18 +6,23 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import case, func, sql
 
 from beecology_api.api import database
+from beecology_api.api.api import api
 from beecology_api.api.cache import cache_response, invalidate_caches
 from beecology_api.api.authentication import authenticate, admin_required
+from beecology_api.api.models import bee_record_update, response_model, bee_record_response, \
+	bee_record_by_page_response, bee_vis_record_response
 from beecology_api.api.response import response
 
 log = getLogger()
 
 
 class BeeRecord(Resource):
-	@staticmethod
+	@api.response(200, "Success", bee_record_response)
+	@api.response(404, "Bee record not found", response_model)
+	@api.response(403, "Invalid authorization", response_model)
 	@authenticate
 	@cache_response("beerecord")
-	def get(id: int, user=None):
+	def get(self, id: int, user=None):
 		"""Get a bee record by ID"""
 		# Copied over from node server:
 		# TODO Ask if we should scope it down to the specific user ID
@@ -61,18 +66,13 @@ class BeeRecord(Resource):
 		return response("success", "Retrieve the Bee records success!", False, data=data), 200
 
 	# TODO This should *probably* have auth...
-	@staticmethod
+	@api.response(200, "Update succeeded", response_model)
+	@api.response(404, "Bee record not found", response_model)
+	@api.expect(bee_record_update, validate=True)
 	@invalidate_caches("beerecord")
-	def put(id: int, user=None):
+	def put(self, id: int, user=None):
 		"""Update a bee record by ID"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("gender", type=str, required=False)
-		parser.add_argument("fname", type=str, required=False, dest="flower_name")
-		parser.add_argument("fcolor", type=str, required=False, dest="flower_color")
-		parser.add_argument("beename", type=str, required=False, dest="bee_name")
-		parser.add_argument("beebehavior", type=str, required=False, dest="bee_behavior")
-		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
-		args = parser.parse_args()
+		args = bee_record_update.parse_args()
 		args = {k: v for k, v in args.items() if v is not None}  # Eliminate "None" args
 		log.debug("Updating bee record {}".format(id))
 
@@ -85,10 +85,11 @@ class BeeRecord(Resource):
 			return response("false", "Bee Dexes not found!", True), 404
 		return response("success", "Retrieve the Bee information success!", False, data=[{"beerecord_id": id}]), 200
 
-	@staticmethod
+	@api.response(200, "Bee record deleted successfully", response_model)
+	@api.response(404, "Failed to find bee record", response_model)
 	@authenticate
 	@invalidate_caches("beerecord")
-	def delete(id: int, user):
+	def delete(self, id: int, user):
 		"""Delete a bee record by ID"""
 		log.debug("Deleting bee record #{}".format(id))
 		engine = database.get_engine()
@@ -102,11 +103,13 @@ class BeeRecord(Resource):
 
 
 class BeeRecordsList(Resource):
-	@staticmethod
+	@api.response(200, "Found bee records", bee_record_by_page_response)
+	@api.response(404, "Failed to find bee records", response_model)
+	@api.response(403, "Authentication or admin access failed")
 	@authenticate
 	@admin_required
-	def get(page: int, user=None):
-		"""Get bee records by page"""
+	def get(self, page: int, user=None):
+		"""Get bee records by page (segments of 50). Requires login and administrator permissions."""
 		log.debug("Getting page {} of bee records".format(page))
 		engine = database.get_engine()
 		bee = database.beerecord
@@ -153,10 +156,15 @@ class BeeRecordsList(Resource):
 
 
 class BeeVisRecords(Resource):
-	@staticmethod
+	@api.response(200, "Found bee records", bee_vis_record_response)
+	@api.response(404, "Failed to find bee records", response_model)
 	@cache_response("beerecord", "flowerdict")
-	def get():
-		"""Get all bee records"""
+	def get(self):
+		"""Get all bee records (reduced).
+
+		**Warning!** This returns an *extremely* large dataset, literally the entire contents of the database!
+		Historically this endpoint has responded with several *mega*bytes of data, so bee **careful!**
+		"""
 		log.debug("Getting all bee records")
 		engine = database.get_engine()
 		bee = database.beerecord
