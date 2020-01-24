@@ -8,8 +8,8 @@ from flask import request
 from flask_restplus import Resource
 from sqlalchemy import sql, and_
 
-from beecology_api import config
 from beecology_api.api import database
+from beecology_api import config
 from beecology_api.api.authentication import authenticate
 from beecology_api.api.response import response
 
@@ -48,7 +48,7 @@ class Enroll(Resource):
 		return {
 			"accessToken": accessToken,
 		    "refreshToken": refreshToken,
-			"expiresIn": config.config.config["auth"]["token-lifetime"] * 1000,
+			"expiresIn": config.config["auth"]["token-lifetime"] * 1000,
 			"expiresAt": int(expiration.timestamp() * 1000),
 			"type": "Bearer"
 		}, 200
