@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from functools import wraps, update_wrapper
 from logging import getLogger
 
 from beecology_api import config
@@ -12,6 +13,7 @@ def invalidate_caches(*cache_args):
 	"""Decorator for invalidating specified caches. Yes, the mess of functions below really is needed, this is how Python
 	does decorators with arguments..."""
 	def decorator_wrapper(func):
+		@wraps(func)
 		def invalidates(*args, **kwargs):
 			for cache in cache_args:
 				log.debug("Invalidating cache name \"{}\"".format(cache))
@@ -44,6 +46,7 @@ class cache_response:
 
 	def __call__(self, func, *args, **kwargs):
 		"""Return cached response if present, otherwise call function and store in cache"""
+
 		def cache(*args, **kwargs):
 			key = frozenset([*args, *tuple(kwargs.items())])
 
@@ -74,6 +77,7 @@ class cache_response:
 					log.error("Failed to write file {} to cache: {}".format(filename, e))
 
 			return result, status_code
+		update_wrapper(cache, func)
 		return cache
 
 	def invalidate(self):

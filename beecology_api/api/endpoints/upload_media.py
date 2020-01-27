@@ -7,33 +7,33 @@ import magic
 from flask_restplus import Resource, reqparse
 
 from beecology_api import config
+from beecology_api.api.api import api
 from beecology_api.api.authentication import authenticate
+from beecology_api.api.models import video_parser, image_parser, media_upload_response, response_wrapper
 from beecology_api.api.response import response
 
 log = getLogger()
 
 
 class UploadVideo(Resource):
-	@staticmethod
+	@api.expect(video_parser)
+	@api.response(200, "Video uploaded, path enclosed", media_upload_response)
+	@api.response(400, "Media received but had incorrect MIME type", response_wrapper)
 	@authenticate
-	def post(user):
-		"""Upload a video"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("recordVideo", type=str, required=True)
-		args = parser.parse_args()
-
+	def post(self, user):
+		"""Upload a video in base64 and save it. Returns file path."""
+		args = video_parser.parse_args()
 		return process_media(args["recordVideo"], "video", user)
 
 
 class UploadImage(Resource):
-	@staticmethod
+	@api.expect(image_parser)
+	@api.response(200, "Image uploaded, path enclosed", media_upload_response)
+	@api.response(400, "Media received but had incorrect MIME type", response_wrapper)
 	@authenticate
-	def post(user=None):
-		"""Upload an image in base64 and save it"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("recordImage", type=str, required=True)
-		args = parser.parse_args()
-
+	def post(self, user=None):
+		"""Upload an image in base64 and save it. Returns file path."""
+		args = image_parser.parse_args()
 		return process_media(args["recordImage"], "image", user)
 
 
@@ -44,7 +44,7 @@ def process_media(b64, mime_type, user):
 	file_type = mime.from_buffer(data)
 	if file_type.find(mime_type) == -1:
 		log.warning("User {} attempted to upload file with wrong MIME type, {}".format(user, file_type))
-		return response("false", "Received file but was of type {} instead of {}/*".format(file_type, mime_type), True)
+		return response("false", "Received file but was of type {} instead of {}/*".format(file_type, mime_type), True), 400
 
 	# Save image file to UUID-based name, with an extension determined by the file's MIME type
 	# Using a UUID allows us to guarantee unique filenames while embedding user and time information

@@ -5,7 +5,7 @@ from typing import Dict
 import pytest
 from flask import Response
 
-import beecology_api.config as config
+from beecology_api import config
 from beecology_api.server import app
 
 

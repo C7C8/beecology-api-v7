@@ -3,13 +3,16 @@ from sqlalchemy import sql
 
 from beecology_api import config
 from beecology_api.api import database
+from beecology_api.api.api import api
 from beecology_api.api.authentication import authenticate
 
 
 class VerifyAdmin(Resource):
-	@staticmethod
+	@api.param("activationCode", "Secret authentication code used to grant a user administrator access")
 	@authenticate
-	def post(user):
+	def post(self, user):
+		"""Activate self (logged in user) as an administrator by using a secret activation code. The
+		user ID is derived from the presented access token."""
 		parser = reqparse.RequestParser()
 		parser.add_argument("activationCode", type=str, required=False)
 		args = parser.parse_args()

@@ -57,13 +57,13 @@ def setup_routes():
 	ns.add_resource(endpoints.NoElevationData, "/noelevationrecords")
 
 	# Flower data -- don't look at me like that! I didn't write the API interface spec!
-	ns.add_resource(endpoints.Flowerdex, "/addflower")                # POST new flower.
-	ns.add_resource(endpoints.Flowerdex, "/flowerdex")                # GET or POST flower.
-	ns.add_resource(endpoints.Flowerdex, "/flowerdex/<int:id>")       # GET or DELETE flower entry
-	ns.add_resource(endpoints.Flowerdex, "/deleteflower/<int:id>")    # DELETE flower.
-	ns.add_resource(endpoints.FlowerList, "/flowerlist")              # Legacy support for flowerlist endpoint
+	ns.add_resource(endpoints.Flowerdex, "/addflower")  # POST new flower.
+	ns.add_resource(endpoints.Flowerdex, "/flowerdex")  # GET or POST flower.
+	ns.add_resource(endpoints.Flowerdex, "/flowerdex/<int:id>")  # GET or DELETE flower entry
+	ns.add_resource(endpoints.Flowerdex, "/deleteflower/<int:id>")  # DELETE flower.
+	ns.add_resource(endpoints.FlowerList, "/flowerlist")                # Legacy support for flowerlist endpoint
 	ns.add_resource(endpoints.FlowerShapes, "/flowershapes")
-	ns.add_resource(endpoints.FlowerShapes, "/flowercolors")          # Not a typo, these have the same handler...
+	ns.add_resource(endpoints.FlowerShapes, "/flowercolors")            # Not a typo, these have the same handler...
 	ns.add_resource(endpoints.UnmatchedFlowers, "/unmatched_flowers")
 
 	# Media upload
@@ -76,10 +76,10 @@ def setup_routes():
 	ns.add_resource(endpoints.Unenroll, "/unenroll")
 
 	# News
-	ns.add_resource(endpoints.BioCSNews, "/update_biocsnews")
-	ns.add_resource(endpoints.BioCSNews, "/biocsnews")
-	ns.add_resource(endpoints.News, "/update_news")
-	ns.add_resource(endpoints.News, "/news")
+	ns.add_resource(endpoints.UpdateBioCSNews, "/update_biocsnews")
+	ns.add_resource(endpoints.GetBioCSNews, "/biocsnews")
+	ns.add_resource(endpoints.UpdateNews, "/update_news")
+	ns.add_resource(endpoints.GetNews, "/news")
 
 	# Admin
 	ns.add_resource(endpoints.VerifyAdmin, "/verifyAdmin")
