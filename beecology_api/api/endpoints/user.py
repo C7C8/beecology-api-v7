@@ -19,13 +19,14 @@ log = getLogger()
 
 
 class Enroll(Resource):
-	@api.param("Authorization", "Basic authentication token from Firebase", _in="header")
+	@api.param("Authorization", "Basic authentication token from Firebase", _in="header", required=True)
 	@api.response(403, "Firebase authorization token not present or failed validation", response_wrapper)
 	@api.response(200, "Succeeded authentication, user token pair enclosed", user_token_pair)
 	def get(self):
-		"""Enroll; uses a firebase token via basic auth to get a generate an access token. Enrolling will result in
-		removal of all other enrollments from the authentication database, i.e. all other sessions for this user are
-		automatically logged out."""
+		"""Enroll; uses a firebase token via basic auth to get a generate an access token.
+
+		Enrolling will result in removal of all other enrollments from the authentication database, i.e. all other
+		sessions for this user are automatically logged out."""
 		if "Authorization" not in request.headers or request.headers["Authorization"].find("Basic") == -1:
 			log.warning("User tried to enroll but didn't present a Firebase auth token")
 			return response("false", "Firebase authorization token required", True), 403
@@ -61,7 +62,7 @@ class Enroll(Resource):
 
 
 class Refresh(Resource):
-	@api.param("Authorization", "User's refresh token as HTTP bearer token authorization", _in="header")
+	@api.param("Authorization", "User's refresh token as HTTP bearer token authorization", _in="header", required=True)
 	@api.response(403, "Firebase authorization token not present or failed validation", response_wrapper)
 	@api.response(200, "Refreshed access token enclosed", user_access_token)
 	def get(self):

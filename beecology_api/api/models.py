@@ -58,9 +58,9 @@ beedex_entry = api.model("BeeDex entry", {
     "active_months": fields.String(description="Range of months a bee species is active in", example="May - October"),
     "confused": fields.String(description="Comma-separated list of species the bee is often confused with", example="bimaculatus, affinis, impatiens"),
     "bee_pic_path": fields.String(description="File path under this server to a picture of the bee"),
-    "abdomen_list": fields.String(description="List of abdomens associated with this bee. Usually null.", example="{\"a3\", \"a13\"}"),
-    "thorax list": fields.String(description="List of thoraxes associated with this bee. Usually null.", example="{\"t1\", \"t1\"}"),
-    "head_list": fields.String(description="List of heads associated with this bee. Usually null.", example="{\"h2\", \"h3\"}")
+    "abdomen_list": fields.String(description="List of abdomens associated with this bee. Usually null.", example='{"a3", "a13"}'),
+    "thorax list": fields.String(description="List of thoraxes associated with this bee. Usually null.", example='{"t1", "t1"}'),
+    "head_list": fields.String(description="List of heads associated with this bee. Usually null.", example='{"h2", "h3"}')
 })
 
 user_access_token = api.model("Access token", {
@@ -74,6 +74,39 @@ user_token_pair = api.inherit("User token set", user_access_token, {
     "type": fields.String("Bearer", description="HTTP authorization token type")
 })
 
+flower_id = api.model("Flower ID", {  # WHY does this need to exist?!
+    "flower_id": fields.Integer(description="Flower ID")
+})
+
+flower_dict_entry = api.model("Flowerdex entry", {
+    "flower_id": fields.Integer(description="Flower ID"),
+    "flower_latin_name": fields.Integer(description="Latin genus+species flower designation"),
+    "flower_common_name": fields.String(description="Plain English flower name")
+})
+
+flower_shape = api.model("Flower shape", {
+    "feature_id": fields.String(description="3-character flower shape identifier, prefixed with `fs`", example="fs5"),
+    "feature_name": fields.String(description="Plain English description of the flower shape/feature", example="Tube with Spur"),
+    "feature_description": fields.String(description="Alterate/longer description of feature", example="spiked tube"),
+    "feature_pic_path": fields.String(description="File path under this server to image associated with the feature")
+})
+
+unmatched_flower = api.model("Unmatched flower", {
+    "flower_name": fields.String(description="Flower name as reported by the user"),
+    "count": fields.String(description="Count of times this flower occurs in the bee records database. Yes, this is an integer transmitted as a string.")
+})
+
+flower = api.model("Flower", {
+    "flower_id": fields.Integer(description="Flowerdex ID"),
+    "latin_name": fields.String(description="Latin genus+species flower designation"),
+    "main_common_name": fields.String(description="Plain English flower name"),
+    "common_name": fields.String(description="Alternate English name, what the flower is typically referred to as"),
+    "colors": fields.String(description="Comma-separated list of the flower's colors", example="White,Purple"),
+    "bloom_time": fields.String(description="Comma-separated list of month abbreviations for when the flower blooms. Often null.", example="Jun,Jul,Aug"),
+    "shape": fields.String("Flower shape (see flower shape model for information)"),
+    "img_src": fields.String(description="File path under this server to image associated with the flower. Usually null.")
+})
+
 ###################
 # RESPONSE MODELS #
 ###################
@@ -85,11 +118,11 @@ response_wrapper = api.model("Standard response wrapper", {
 })
 
 bee_record_no_elevation_response = api.inherit("Bee record (w/o elevation) response", response_wrapper, {
-    "data": fields.Nested(bee_record_no_elevation)
+    "data": fields.List(fields.Nested(bee_record_no_elevation))
 })
 
 bee_record_response = api.inherit("Bee record response", response_wrapper, {
-    "data": fields.Nested(bee_record)
+    "data": fields.List(fields.Nested(bee_record))
 })
 
 bee_record_by_page_response = api.inherit("Bee record list (extended) response", response_wrapper, {
@@ -102,6 +135,26 @@ bee_vis_record_response = api.inherit("Bee vis records response", response_wrapp
 
 beedex_response = api.inherit("Beedex entry response", response_wrapper, {
     "data": fields.List(fields.Nested(beedex_entry), description="Only ever contains one item.")
+})
+
+add_flower_response = api.inherit("Add flower response", response_wrapper, {
+    "data": fields.List(fields.Nested(flower_id), description="Only ever contains one item.")
+})
+
+flower_dict_response = api.inherit("Flowerdex response", response_wrapper, {
+    "data": fields.List(fields.Nested(flower_dict_entry))
+})
+
+flower_shape_response = api.inherit("Flower shape response", response_wrapper, {
+    "data": fields.List(fields.Nested(flower_shape))
+})
+
+unmatched_flowers_response = api.inherit("Unmatched flowers response", response_wrapper, {
+    "data": fields.List(fields.Nested(unmatched_flower))
+})
+
+flower_list_response = api.inherit("Flower list response", response_wrapper, {
+    "data": fields.List(fields.Nested(flower))
 })
 
 
@@ -133,3 +186,17 @@ bee_record_parser.add_argument("recordpicpath", type=str, required=True, dest="r
 bee_record_parser.add_argument("recordvideopath", type=str, required=False, dest="record_video_path", help="URL to video on this server")
 bee_record_parser.add_argument("beedictid", type=str, required=False, dest="bee_dict_id")
 bee_record_parser.add_argument("beebehavior", type=int, required=True, dest="bee_behavior", help="What the bee is collecting; 0: unknown; 1: nectar; 2: pollen")
+
+new_flower_parser = reqparse.RequestParser()
+new_flower_parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name")
+new_flower_parser.add_argument("flowershapeid", required=True, type=str, dest="flower_shape")
+new_flower_parser.add_argument("flowercolorid", required=True, type=str, dest="flower_color"),
+new_flower_parser.add_argument("flowerspecies", required=True, type=str, dest="flower_species"),
+new_flower_parser.add_argument("flowergenus", required=True, type=str, dest="flower_genus")
+
+update_flower_parser = reqparse.RequestParser()
+update_flower_parser.add_argument("fcommon", required=False, type=str, dest="flower_common_name")
+update_flower_parser.add_argument("fshape", required=False, type=str, dest="flower_shape")
+update_flower_parser.add_argument("fcolor", required=False, type=str, dest="flower_color")
+update_flower_parser.add_argument("fspecies", required=False, type=str, dest="flower_species")
+update_flower_parser.add_argument("fgenus", required=False, type=str, dest="flower_genus")
