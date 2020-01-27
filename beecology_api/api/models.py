@@ -63,6 +63,17 @@ beedex_entry = api.model("BeeDex entry", {
     "head_list": fields.String(description="List of heads associated with this bee. Usually null.", example="{\"h2\", \"h3\"}")
 })
 
+user_access_token = api.model("Access token", {
+    "accessToken": fields.String(description="Access token, a JWT used as bearer token for authentication."),
+    "expiresIn": fields.Integer(3600000, description="Milliseconds until token expiration"),
+    "expiresAt": fields.Integer(description="Timestamp of when the access token will expire, in milliseconds")
+})
+
+user_token_pair = api.inherit("User token set", user_access_token, {
+    "refreshToken": fields.String(description="Token presented to the server at any time to obtain a new access token."),
+    "type": fields.String("Bearer", description="HTTP authorization token type")
+})
+
 ###################
 # RESPONSE MODELS #
 ###################
