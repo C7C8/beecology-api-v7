@@ -1,4 +1,5 @@
 import json
+import os
 from logging import getLogger
 
 from flask_restplus import Resource, reqparse
@@ -13,12 +14,13 @@ log = getLogger()
 class News(Resource):
 	@staticmethod
 	def get():
+		data = {}
 		try:
 			with open("{}/news.json".format(config.config["storage"]["news-path"]), "r") as file:
-				return response("success", "Retrieve the News information success!", True, data=json.load(file))
+				data = json.load(file)
 		except IOError as e:
-			log.error("Failed to load news file {}/news.json: {}".format(config.config["storage"]["news-path"], e))
-			return response("false", "Failed to load news file", True), 500
+			log.warning("Failed to load news file {}/news.json, returning default response. Error: {}".format(config.config["storage"]["news-path"], e))
+		return response("success", "Retrieve the News information success!", True, data=data), 200
 
 	@staticmethod
 	@authenticate
@@ -34,12 +36,13 @@ class News(Resource):
 class BioCSNews(Resource):
 	@staticmethod
 	def get():
+		data = {}
 		try:
 			with open("{}/biocsnews.json".format(config.config["storage"]["news-path"]), "r") as file:
-				return response("success", "Retrieve the BIO-CS News information success!", True, data=json.load(file))
+				data = json.load(file)
 		except IOError as e:
-			log.error("Failed to load news file {}/biocsnews.json: {}".format(config.config["storage"]["news-path"], e))
-			return response("false", "Failed to load news file", True), 500
+			log.warning("Failed to load news file {}/biocsnews.json returning default response. Error: {}".format(config.config["storage"]["news-path"], e))
+		return response("success", "Retrieve the BIO-CS News information success!", True, data=data), 200
 
 	@staticmethod
 	@authenticate
