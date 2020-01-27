@@ -6,10 +6,10 @@ from firebase_admin import auth
 from flask import request
 from sqlalchemy import sql, and_
 
+from beecology_api import config
 from beecology_api.api import database
 from beecology_api.api.api import api
 from beecology_api.api.models import response_wrapper
-from beecology_api.config import config
 from beecology_api.api.response import response
 
 log = getLogger()
@@ -26,7 +26,7 @@ def authenticate(func):
 	@api.param("Authorization", "Bearer token authorization", _in="headers", required=True)
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
-		if "testing" in config and config["testing"]:
+		if "testing" in config.config and config.config["testing"]:
 			return func(*args, **kwargs, user="UNIT TEST")
 
 		if "Authorization" not in request.headers:
@@ -60,7 +60,7 @@ def admin_required(func):
 	@api.param("Authorization", "Bearer token authorization for user with admin access", _in="headers", required=True)
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
-		if "testing" in config and config["testing"]:
+		if "testing" in config.config and config.config["testing"]:
 			return func(*args, **kwargs)
 
 		if "user" not in kwargs:

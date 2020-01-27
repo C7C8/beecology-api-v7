@@ -15,7 +15,7 @@ from beecology_api.api.cache import invalidate_caches, cache_response
 log = getLogger()
 
 
-class AddFlower(Resource):
+class Flowerdex(Resource):
 	@api.expect(new_flower_parser)
 	@api.response(200, "New flower added", add_flower_response)
 	@api.response(405, "Failed to log new flower", response_wrapper)
@@ -36,8 +36,6 @@ class AddFlower(Resource):
 			return response("false", "Log a new flower failed", True), 405
 		return response("success", "Log a new flower success!", False, data=[{"flower_id": id}]), 200
 
-
-class GetFlower(Resource):
 	@api.param("id", "Optional flower ID; if not provided, all flowers are returned.", required=False)
 	@api.response(200, "Flower dict entry(/entries) enclosed", flower_dict_response)
 	@api.response(404, "Flower dict entry not found", response_wrapper)
@@ -62,15 +60,13 @@ class GetFlower(Resource):
 		log.debug("Returning {} flowerdex entries".format(len(data)))
 		return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
-
-class UpdateFlower(Resource):
 	@api.expect(update_flower_parser)
 	@api.response(200, "Updated flower", response_wrapper)
 	@api.response(404, "Flower not found")
 	@authenticate
 	@admin_required
 	@invalidate_caches("flower")
-	def put(self, id: int):
+	def put(self, id: int, user=None):
 		"""Update a flower by ID"""
 		args = update_flower_parser.parse_args()
 		args = {k: v for k, v in args.items() if v is not None}
@@ -85,14 +81,12 @@ class UpdateFlower(Resource):
 			return response("false", "Flower not found!", True), 404
 		return response("success", "Update the Folwer information success!", False, data=[{"flower_id": id}]), 200  # TODO Fix typo
 
-
-class DeleteFlower(Resource):
 	@api.response(200, "Deleted flower", response_wrapper)
 	@api.response(404, "Flower ID not found", response_wrapper)
 	@authenticate
 	@admin_required
 	@invalidate_caches("flower")
-	def delete(self, id: int):
+	def delete(self, id: int, user=None):
 		"""Delete flower by ID"""
 		log.info("Deleting flower {}".format(id))
 		engine = database.get_engine()
@@ -168,4 +162,4 @@ class FlowerList(Resource):
 		if len(data) == 0:
 			log.error("Failed to retrieve list of flowers from the flowerdict")
 			return response("false", "Flower List not found!", True), 404
-		return response("success", "Retrieve the Flower List success!", False, data=data), 200  # TODO fix typos
+		return response("success", "Retrieve the Flower List  success!", False, data=data), 200  # TODO fix typos

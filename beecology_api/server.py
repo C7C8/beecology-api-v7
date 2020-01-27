@@ -57,9 +57,10 @@ def setup_routes():
 	ns.add_resource(endpoints.NoElevationData, "/noelevationrecords")
 
 	# Flower data -- don't look at me like that! I didn't write the API interface spec!
-	ns.add_resource(endpoints.AddFlower, "/addflower")
-	ns.add_resource(endpoints.GetFlower, "/flowerdex/<int:id>")
-	ns.add_resource(endpoints.DeleteFlower, "/deleteflower/<int:id>")
+	ns.add_resource(endpoints.Flowerdex, "/addflower")  # POST new flower.
+	ns.add_resource(endpoints.Flowerdex, "/flowerdex")  # GET or POST flower.
+	ns.add_resource(endpoints.Flowerdex, "/flowerdex/<int:id>")  # GET or DELETE flower entry
+	ns.add_resource(endpoints.Flowerdex, "/deleteflower/<int:id>")  # DELETE flower.
 	ns.add_resource(endpoints.FlowerList, "/flowerlist")                # Legacy support for flowerlist endpoint
 	ns.add_resource(endpoints.FlowerShapes, "/flowershapes")
 	ns.add_resource(endpoints.FlowerShapes, "/flowercolors")            # Not a typo, these have the same handler...
