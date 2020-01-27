@@ -14,10 +14,10 @@ class News(Resource):
 	@staticmethod
 	def get():
 		try:
-			with open("{}/news.json".format(config.config["news"]["folder"]), "r") as file:
+			with open("{}/news.json".format(config.config["storage"]["news-path"]), "r") as file:
 				return response("success", "Retrieve the News information success!", True, data=json.load(file))
 		except IOError as e:
-			log.error("Failed to load news file {}/news.json: {}".format(config.config["news"]["folder"], e))
+			log.error("Failed to load news file {}/news.json: {}".format(config.config["storage"]["news-path"], e))
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
@@ -35,10 +35,10 @@ class BioCSNews(Resource):
 	@staticmethod
 	def get():
 		try:
-			with open("{}/biocsnews.json".format(config.config["news"]["folder"]), "r") as file:
+			with open("{}/biocsnews.json".format(config.config["storage"]["news-path"]), "r") as file:
 				return response("success", "Retrieve the BIO-CS News information success!", True, data=json.load(file))
 		except IOError as e:
-			log.error("Failed to load news file {}/biocsnews.json: {}".format(config.config["news"]["folder"], e))
+			log.error("Failed to load news file {}/biocsnews.json: {}".format(config.config["storage"]["news-path"], e))
 			return response("false", "Failed to load news file", True), 500
 
 	@staticmethod
@@ -58,6 +58,6 @@ def update_news_file(news, filename):
 		with open("{}/{}".format(config.config["storage"]["news-path"], filename), "w") as file:
 			json.dump(news, file)
 	except IOError as e:
-		log.error("Failed to save bio/cs news update to {}: {}".format(config.config["news"]["folder"], e))
+		log.error("Failed to save bio/cs news update to {}: {}".format(config.config["storage"]["news-path"], e))
 		return "Failed to save news update", 500
 	return response("success", "Updated news", False)
