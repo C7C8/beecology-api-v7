@@ -161,6 +161,10 @@ media_upload_response = api.inherit("Media upload response", response_wrapper, {
     "imagePath": fields.String(description="File path on this server that the uploaded media was stored at")
 })
 
+news_response = api.inherit("News response", response_wrapper, {
+    "data": fields.Raw(description="News object")
+})
+
 
 ###########
 # PARSERS #
@@ -210,3 +214,6 @@ video_parser.add_argument("recordVideo", type=str, required=True, help="URL-safe
 
 image_parser = reqparse.RequestParser()
 image_parser.add_argument("recordImage", type=str, required=True, help="URL-safe base64-encoded video. Must have MIME type `image/*`")
+
+news_parser = reqparse.RequestParser()
+news_parser.add_argument("json", type=dict, required=True, help="Any JSON (not a string)")
