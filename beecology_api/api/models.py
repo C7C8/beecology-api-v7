@@ -103,7 +103,7 @@ flower = api.model("Flower", {
     "common_name": fields.String(description="Alternate English name, what the flower is typically referred to as"),
     "colors": fields.String(description="Comma-separated list of the flower's colors", example="White,Purple"),
     "bloom_time": fields.String(description="Comma-separated list of month abbreviations for when the flower blooms. Often null.", example="Jun,Jul,Aug"),
-    "shape": fields.String("Flower shape (see flower shape model for information)"),
+    "shape": fields.String(description="Flower shape (see flower shape model for information)"),
     "img_src": fields.String(description="File path under this server to image associated with the flower. Usually null.")
 })
 
@@ -157,6 +157,10 @@ flower_list_response = api.inherit("Flower list response", response_wrapper, {
     "data": fields.List(fields.Nested(flower))
 })
 
+media_upload_response = api.inherit("Media upload response", response_wrapper, {
+    "imagePath": fields.String(description="File path on this server that the uploaded media was stored at")
+})
+
 
 ###########
 # PARSERS #
@@ -200,3 +204,9 @@ update_flower_parser.add_argument("fshape", required=False, type=str, dest="flow
 update_flower_parser.add_argument("fcolor", required=False, type=str, dest="flower_color")
 update_flower_parser.add_argument("fspecies", required=False, type=str, dest="flower_species")
 update_flower_parser.add_argument("fgenus", required=False, type=str, dest="flower_genus")
+
+video_parser = reqparse.RequestParser()
+video_parser.add_argument("recordVideo", type=str, required=True, help="URL-safe base64-encoded image. Must have MIME type `video/*`")
+
+image_parser = reqparse.RequestParser()
+image_parser.add_argument("recordImage", type=str, required=True, help="URL-safe base64-encoded video. Must have MIME type `image/*`")
