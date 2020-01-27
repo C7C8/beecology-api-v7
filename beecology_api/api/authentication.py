@@ -54,17 +54,15 @@ def authenticate(func):
 adminParser = api.parser()
 
 def admin_required(func):
-	"""Decorator for requiring administrator access. IMPORTANT: This must come AFTER a user authentication check"""
+	"""Decorator for requiring administrator access"""
 	@wraps(func)
 	@api.response(403, "Administrator access required")
 	@api.param("Authorization", "Bearer token authorization for user with admin access", _in="headers", required=True)
+	@authenticate
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
 		if "testing" in config.config and config.config["testing"]:
 			return func(*args, **kwargs)
-
-		if "user" not in kwargs:
-			return response("false", "Login required", True), 403
 
 		# Check administrator table to see if there's an entry for this user. If there isn't, return an error.
 		engine = database.get_engine()

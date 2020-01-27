@@ -19,7 +19,6 @@ class Flowerdex(Resource):
 	@api.expect(new_flower_parser)
 	@api.response(200, "New flower added", add_flower_response)
 	@api.response(405, "Failed to log new flower", response_wrapper)
-	@authenticate
 	@admin_required
 	@invalidate_caches("flower")
 	def post(self, user=None):
@@ -63,7 +62,6 @@ class Flowerdex(Resource):
 	@api.expect(update_flower_parser)
 	@api.response(200, "Updated flower", response_wrapper)
 	@api.response(404, "Flower not found")
-	@authenticate
 	@admin_required
 	@invalidate_caches("flower")
 	def put(self, id: int, user=None):
@@ -83,7 +81,6 @@ class Flowerdex(Resource):
 
 	@api.response(200, "Deleted flower", response_wrapper)
 	@api.response(404, "Flower ID not found", response_wrapper)
-	@authenticate
 	@admin_required
 	@invalidate_caches("flower")
 	def delete(self, id: int, user=None):

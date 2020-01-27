@@ -31,7 +31,6 @@ class GetNews(Resource):
 class UpdateNews(Resource):
 	@api.expect(news_parser)
 	@api.response(200, "Updated news", response_wrapper)
-	@authenticate
 	@admin_required
 	def put(self):
 		"""Update news. Administrator access required."""
@@ -55,7 +54,6 @@ class GetBioCSNews(Resource):
 class UpdateBioCSNews(Resource):
 	@api.expect(news_parser)
 	@api.response(200, "Updated news", response_wrapper)
-	@authenticate
 	@admin_required
 	def put(self):
 		"""Update Bio/CS news. Administrator access required."""

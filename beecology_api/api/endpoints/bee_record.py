@@ -105,7 +105,6 @@ class BeeRecord(Resource):
 class BeeRecordsList(Resource):
 	@api.response(200, "Found bee records", bee_record_by_page_response)
 	@api.response(404, "Failed to find bee records", response_wrapper)
-	@authenticate
 	@admin_required
 	def get(self, page: int, user=None):
 		"""Get bee records by page (segments of 50). Requires administrator access."""

@@ -34,7 +34,7 @@ def init_api():
 	blueprint = Blueprint("api", __name__)
 	api.init_app(blueprint)
 	app.register_blueprint(blueprint)
-	ns = api.namespace("/", "Beecology API version 7")
+	ns = api.namespace("/", "Main Beecology API")
 	firebase_app = firebase_admin.initialize_app(credentials.Certificate(config.config["auth"]["key-file"]),
 	                                             options=config.config["auth"])
 	setup_routes()
