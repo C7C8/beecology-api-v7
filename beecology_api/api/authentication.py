@@ -7,6 +7,8 @@ from flask import request
 from sqlalchemy import sql, and_
 
 from beecology_api.api import database
+from beecology_api.api.api import api
+from beecology_api.api.models import response_wrapper
 from beecology_api.config import config
 from beecology_api.api.response import response
 
@@ -14,10 +16,14 @@ log = getLogger()
 
 # TODO Clean this up a bit
 
+authParser = api.parser()
+authParser.add_argument("Authorization", location="headers", help="Bearer token authorization")
 
 def authenticate(func):
 	"""Decorator for user authentication"""
 	@wraps(func)
+	@api.response(403, "Authorization failed", response_wrapper)
+	@api.param("Authorization", "Bearer token authorization", _in="headers")
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
 		if "testing" in config and config["testing"]:
@@ -45,9 +51,13 @@ def authenticate(func):
 	return wrapper
 
 
+adminParser = api.parser()
+
 def admin_required(func):
 	"""Decorator for requiring administrator access. IMPORTANT: This must come AFTER a user authentication check"""
 	@wraps(func)
+	@api.response(403, "Administrator access required")
+	@api.param("Authorization", "Bearer token authorization for user with admin access", _in="headers")
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
 		if "testing" in config and config["testing"]:
