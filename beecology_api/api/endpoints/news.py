@@ -11,11 +11,13 @@ from beecology_api.api.response import response
 
 log = getLogger()
 
+# Multiple classes are required so that Swagger docs aren't generated for methods that aren't supposed to exist (e.g.
+# GET on /update_biocsnews
 
-class News(Resource):
+class GetNews(Resource):
 	@api.response(200, "News enclosed", news_response)
 	def get(self):
-		"""Get current news"""
+		"""Get current news. News is contained in the `data` field of the response."""
 		try:
 			with open("{}/news.json".format(config.config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the News information success!", True, data=json.load(file))
@@ -23,6 +25,8 @@ class News(Resource):
 			log.error("Failed to load news file {}/news.json: {}".format(config.config["news"]["folder"], e))
 			return response("false", "Failed to load news file", True), 500
 
+
+class UpdateNews(Resource):
 	@api.expect(news_parser)
 	@api.response(200, "Updated news", response_wrapper)
 	@authenticate
@@ -33,10 +37,10 @@ class News(Resource):
 		return update_news_file(args["json"], "news.json")
 
 
-class BioCSNews(Resource):
+class GetBioCSNews(Resource):
 	@api.response(200, "Bio/CS news enclosed", news_response)
 	def get(self):
-		"""Get Bio/CS news."""
+		"""Get Bio/CS news. News is contained in the `data` field of the response."""
 		try:
 			with open("{}/biocsnews.json".format(config.config["news"]["folder"]), "r") as file:
 				return response("success", "Retrieve the BIO-CS News information success!", True, data=json.load(file))
@@ -44,6 +48,8 @@ class BioCSNews(Resource):
 			log.error("Failed to load news file {}/biocsnews.json: {}".format(config.config["news"]["folder"], e))
 			return response("false", "Failed to load news file", True), 500
 
+
+class UpdateBioCSNews(Resource):
 	@api.expect(news_parser)
 	@api.response(200, "Updated news", response_wrapper)
 	@authenticate

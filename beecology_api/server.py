@@ -75,10 +75,10 @@ def setup_routes():
 	ns.add_resource(endpoints.Unenroll, "/unenroll")
 
 	# News
-	ns.add_resource(endpoints.BioCSNews, "/update_biocsnews")
-	ns.add_resource(endpoints.BioCSNews, "/biocsnews")
-	ns.add_resource(endpoints.News, "/update_news")
-	ns.add_resource(endpoints.News, "/news")
+	ns.add_resource(endpoints.UpdateBioCSNews, "/update_biocsnews")
+	ns.add_resource(endpoints.GetBioCSNews, "/biocsnews")
+	ns.add_resource(endpoints.UpdateNews, "/update_news")
+	ns.add_resource(endpoints.GetNews, "/news")
 
 	# Admin
 	ns.add_resource(endpoints.VerifyAdmin, "/verifyAdmin")

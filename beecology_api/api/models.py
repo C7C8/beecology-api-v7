@@ -196,18 +196,18 @@ bee_record_parser.add_argument("beedictid", type=str, required=False, dest="bee_
 bee_record_parser.add_argument("beebehavior", type=int, required=True, dest="bee_behavior", help="What the bee is collecting; 0: unknown; 1: nectar; 2: pollen")
 
 new_flower_parser = reqparse.RequestParser()
-new_flower_parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name")
-new_flower_parser.add_argument("flowershapeid", required=True, type=str, dest="flower_shape")
-new_flower_parser.add_argument("flowercolorid", required=True, type=str, dest="flower_color"),
-new_flower_parser.add_argument("flowerspecies", required=True, type=str, dest="flower_species"),
-new_flower_parser.add_argument("flowergenus", required=True, type=str, dest="flower_genus")
+new_flower_parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name", help="Flower plain English name")
+new_flower_parser.add_argument("flowershapeid", required=True, type=str, dest="flower_shape", help="Flower shape ID, usually something like `fs1`")
+new_flower_parser.add_argument("flowercolorid", required=True, type=str, dest="flower_color", help="Flower color. Can be a comma-separated list.")
+new_flower_parser.add_argument("flowerspecies", required=True, type=str, dest="flower_species", help="Latin flower species")
+new_flower_parser.add_argument("flowergenus", required=True, type=str, dest="flower_genus", help="Latin flower genus")
 
 update_flower_parser = reqparse.RequestParser()
-update_flower_parser.add_argument("fcommon", required=False, type=str, dest="flower_common_name")
-update_flower_parser.add_argument("fshape", required=False, type=str, dest="flower_shape")
-update_flower_parser.add_argument("fcolor", required=False, type=str, dest="flower_color")
-update_flower_parser.add_argument("fspecies", required=False, type=str, dest="flower_species")
-update_flower_parser.add_argument("fgenus", required=False, type=str, dest="flower_genus")
+update_flower_parser.add_argument("fcommon", required=False, type=str, dest="flower_common_name", help="Flower plain English name")
+update_flower_parser.add_argument("fshape", required=False, type=str, dest="flower_shape", help="Flower shape ID, usually something like `fs1`")
+update_flower_parser.add_argument("fcolor", required=False, type=str, dest="flower_color", help="Flower color. Can be a comma-separated list.")
+update_flower_parser.add_argument("fspecies", required=False, type=str, dest="flower_species", help="Latin flower genus")
+update_flower_parser.add_argument("fgenus", required=False, type=str, dest="flower_genus", help="Latin flower species")
 
 video_parser = reqparse.RequestParser()
 video_parser.add_argument("recordVideo", type=str, required=True, help="URL-safe base64-encoded image. Must have MIME type `video/*`")

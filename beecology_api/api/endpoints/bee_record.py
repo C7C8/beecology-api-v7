@@ -108,7 +108,7 @@ class BeeRecordsList(Resource):
 	@authenticate
 	@admin_required
 	def get(self, page: int, user=None):
-		"""Get bee records by page (segments of 50). Requires login and administrator permissions."""
+		"""Get bee records by page (segments of 50). Requires administrator access."""
 		log.debug("Getting page {} of bee records".format(page))
 		engine = database.get_engine()
 		bee = database.beerecord
@@ -205,7 +205,7 @@ class BeeUserRecords(Resource):
 	@api.response(404, "Failed to retrieve records for user", response_wrapper)
 	@authenticate
 	def get(self, user):
-		"""Get all bee logs for a user. Supplying the user ID is not required, it's extracted from the authorization."""
+		"""Get all bee logs for a user. Supplying the user ID is not required, it's extracted from the authorization token."""
 		log.debug("Getting all bee records for user {}".format(user))
 		engine = database.get_engine()
 
@@ -247,7 +247,7 @@ class Beedex(Resource):
 	@api.response(404, "Failed to retrieve BeeDex entry", response_wrapper)
 	@cache_response("beedict")
 	def get(id: int = -1):
-		"""Get an entry from the beedex by ID."""
+		"""Get an entry from the beedex by ID. If no ID is provided, all beedex entries are returned."""
 		log.debug("Getting beedex entry #{}".format(id if id != -1 else "*"))
 		engine = database.get_engine()
 		query = sql.select([database.beedict])
