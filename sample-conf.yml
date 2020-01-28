@@ -6,9 +6,9 @@ auth:
   token-lifetime: 3600
 
 storage:
-  imageUploadPath: /datastorage/images
+  imageUploadPath: images
   imageBasePath: images
-  news-path: /var/www/html
+  news-path: news/
   cache: /tmp/beecology-cache
 
 database:
@@ -28,7 +28,7 @@ logging:
       formatter: default
     file:
       class: logging.FileHandler
-      filename: /var/log/beecology-pyapi-log.txt
+      filename: log.txt
       formatter: default
   root:
     level: INFO
