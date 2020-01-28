@@ -7,10 +7,10 @@ from flask import request
 from sqlalchemy import sql, and_
 
 from beecology_api import config
-from beecology_api.api import database
-from beecology_api.api.api import api
-from beecology_api.api.models import response_wrapper
-from beecology_api.api.response import response
+from beecology_api import database
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.models import response_wrapper
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 

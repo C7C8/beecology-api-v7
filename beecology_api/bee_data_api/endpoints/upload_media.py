@@ -4,13 +4,13 @@ import uuid
 from logging import getLogger
 
 import magic
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource
 
 from beecology_api import config
-from beecology_api.api.api import api
-from beecology_api.api.authentication import authenticate
-from beecology_api.api.models import video_parser, image_parser, media_upload_response, response_wrapper
-from beecology_api.api.response import response
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import authenticate
+from beecology_api.bee_data_api.models import video_parser, image_parser, media_upload_response, response_wrapper
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 

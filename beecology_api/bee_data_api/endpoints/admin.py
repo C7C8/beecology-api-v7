@@ -2,9 +2,9 @@ from flask_restplus import Resource, reqparse
 from sqlalchemy import sql
 
 from beecology_api import config
-from beecology_api.api import database
-from beecology_api.api.api import api
-from beecology_api.api.authentication import authenticate
+from beecology_api import database
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import authenticate
 
 
 class VerifyAdmin(Resource):

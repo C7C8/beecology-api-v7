@@ -1,14 +1,13 @@
 import json
-import os
 from logging import getLogger
 
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource
 
 from beecology_api import config
-from beecology_api.api.api import api
-from beecology_api.api.authentication import authenticate, admin_required
-from beecology_api.api.models import news_response, news_parser, response_wrapper
-from beecology_api.api.response import response
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import admin_required
+from beecology_api.bee_data_api.models import news_response, news_parser, response_wrapper
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
