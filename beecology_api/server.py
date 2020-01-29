@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_restplus import Api
 
 import beecology_api.config as config
-from beecology_api import bee_data_api
+from beecology_api import bee_data_api, analysis_api
 
 # Beecology API Server, Python edition!
 # #####################################
@@ -41,6 +41,7 @@ def init_api():
 	          version="1.1.0",
 	          default_mediatype="application/json")
 	api.add_namespace(bee_data_api.api)
+	api.add_namespace(analysis_api.api, "/analysis")
 
 	app.register_blueprint(blueprint)
 
