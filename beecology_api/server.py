@@ -8,6 +8,7 @@ from flask_restx import Api
 
 import beecology_api.config as config
 from beecology_api import bee_data_api, analysis_api
+from beecology_api.bee_data_api.models import authorizations as bee_authorizations
 
 # Beecology API Server, Python edition!
 # #####################################
@@ -39,7 +40,8 @@ def init_api():
 	          description="The Beecology API, for uploading/downloading Beecology data or performing data analyses",
 	          contact_email="beecologyproject@wpi.edu",
 	          version="1.1.0",
-	          default_mediatype="application/json")
+	          default_mediatype="application/json",
+	          authorizations=bee_authorizations)
 	api.add_namespace(bee_data_api.api)
 	api.add_namespace(analysis_api.api, "/analysis")
 

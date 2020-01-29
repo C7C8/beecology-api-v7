@@ -165,6 +165,23 @@ news_response = api.inherit("News response", response_wrapper, {
     "data": fields.Raw(description="News object")
 })
 
+authorizations = {
+    "user": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
+    "admin": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
+    "firebase": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    }
+}
 
 ###########
 # PARSERS #

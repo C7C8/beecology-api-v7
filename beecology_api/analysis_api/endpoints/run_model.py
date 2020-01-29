@@ -27,6 +27,7 @@ class RunModel(Resource):
 		"nonlinear": NonlinearRegression.post
 	}
 
+	@api.deprecated
 	@api.expect(run_model_parser)
 	def post(self):
 		"""Run a selected model on given data.

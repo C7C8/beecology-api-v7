@@ -19,7 +19,7 @@ log = getLogger()
 
 
 class Enroll(Resource):
-	@api.param("Authorization", "Basic authentication token from Firebase", _in="header", required=True)
+	@api.doc(security="firebase")
 	@api.response(403, "Firebase authorization token not present or failed validation", response_wrapper)
 	@api.response(200, "Succeeded authentication, user token pair enclosed", user_token_pair)
 	def get(self):

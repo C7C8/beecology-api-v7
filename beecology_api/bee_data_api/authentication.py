@@ -23,7 +23,7 @@ def authenticate(func):
 	"""Decorator for user authentication"""
 	@wraps(func)
 	@api.response(403, "Authorization failed", response_wrapper)
-	@api.param("Authorization", "Bearer token authorization", _in="headers", required=True)
+	@api.doc(security="user")
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
 		if "testing" in config.config and config.config["testing"]:
@@ -57,7 +57,7 @@ def admin_required(func):
 	"""Decorator for requiring administrator access"""
 	@wraps(func)
 	@api.response(403, "Administrator access required")
-	@api.param("Authorization", "Bearer token authorization for user with admin access", _in="headers", required=True)
+	@api.doc(security="admin")
 	@authenticate
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
