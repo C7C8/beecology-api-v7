@@ -1,5 +1,5 @@
 from flask import url_for
-from flask_restplus import Resource
+from flask_restx import Resource
 from werkzeug.utils import redirect
 
 

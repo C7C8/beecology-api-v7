@@ -5,7 +5,7 @@ from logging import getLogger
 
 from firebase_admin import auth
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 from sqlalchemy import sql, and_
 
 from beecology_api import database

@@ -1,4 +1,4 @@
-from flask_restplus import reqparse, fields
+from flask_restx import reqparse, fields
 
 from beecology_api.bee_data_api.api import api
 

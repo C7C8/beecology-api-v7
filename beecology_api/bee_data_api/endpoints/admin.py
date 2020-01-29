@@ -1,4 +1,4 @@
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource, reqparse
 from sqlalchemy import sql
 
 from beecology_api import config

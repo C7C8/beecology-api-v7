@@ -4,7 +4,7 @@ import firebase_admin
 from firebase_admin import credentials
 from flask import Flask, Blueprint
 from flask_cors import CORS
-from flask_restplus import Api
+from flask_restx import Api
 
 import beecology_api.config as config
 from beecology_api import bee_data_api, analysis_api

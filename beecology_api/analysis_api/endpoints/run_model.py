@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from beecology_api.analysis_api import api
 from beecology_api.analysis_api.models import run_model_parser

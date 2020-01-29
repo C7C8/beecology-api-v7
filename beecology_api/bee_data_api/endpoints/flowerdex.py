@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource
+from flask_restx import Resource
 from sqlalchemy import and_, func
 
 from beecology_api import database

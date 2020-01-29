@@ -1,4 +1,4 @@
-from flask_restplus.reqparse import RequestParser
+from flask_restx.reqparse import RequestParser
 
 ###############
 # DATA MODELS #

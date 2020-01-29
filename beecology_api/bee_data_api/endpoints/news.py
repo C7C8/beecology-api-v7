@@ -1,7 +1,7 @@
 import json
 from logging import getLogger
 
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from beecology_api import config
 from beecology_api.bee_data_api.api import api

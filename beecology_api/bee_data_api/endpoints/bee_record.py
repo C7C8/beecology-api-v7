@@ -2,7 +2,7 @@ from datetime import datetime
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource
+from flask_restx import Resource
 from sqlalchemy import case, func, sql
 
 from beecology_api import database
