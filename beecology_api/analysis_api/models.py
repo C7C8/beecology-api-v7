@@ -28,10 +28,10 @@ trend_request = api.inherit("Trend analysis request", base_bee_data, {
 	}))
 })
 
-cross_tabulation_request = api.inherit("Cross tabulation analysis request", base_bee_data, {
-	"value": fields.Nested(api.model("Cross tabulation parameters", {
-		"firstTarget": fields.String(description="First variable for cross tabulation"),
-		"secondTarget": fields.String(description="Second variable for cross tabulation")
+bi_var_request = api.inherit("Bi-variate analysis request", base_bee_data, {
+	"value": fields.Nested(api.model("Variable pairs", {
+		"firstTarget": fields.String(description="First variable for analysis"),
+		"secondTarget": fields.String(description="Second variable analysis")
 	}))
 })
 

@@ -2,7 +2,7 @@ import pandas as pd
 from flask_restx import Resource
 
 from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import cross_tabulation_request
+from beecology_api.analysis_api.models import bi_var_request
 from beecology_api.analysis_api.utility import convert_to_dataframe
 
 
@@ -21,7 +21,7 @@ class CrossTabulation(Resource):
 	_beechar = pd.DataFrame(_beecharlist, columns=['bee_name', 'tongue_length'])
 
 	@staticmethod
-	@api.expect(cross_tabulation_request)
+	@api.expect(bi_var_request)
 	@api.response(200, "Cross-tabulation of two variables, given as a tab-separated table.")
 	@api.produces(["text/plain"])
 	def post():
