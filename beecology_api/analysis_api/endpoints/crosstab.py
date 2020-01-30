@@ -21,7 +21,7 @@ class CrossTabulation(Resource):
 	_beechar = pd.DataFrame(_beecharlist, columns=['bee_name', 'tongue_length'])
 
 	@staticmethod
-	@api.expect(bi_var_request)
+	@api.expect(bi_var_request, validate=True)
 	@api.response(200, "Cross-tabulation of two variables, given as a tab-separated table.")
 	@api.produces(["text/plain"])
 	def post():

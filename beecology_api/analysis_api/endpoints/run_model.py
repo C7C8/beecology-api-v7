@@ -28,7 +28,7 @@ class RunModel(Resource):
 	}
 
 	@api.deprecated
-	@api.expect(bee_data_analysis_request)
+	@api.expect(bee_data_analysis_request, validate=True)
 	def post(self):
 		"""Run a selected model on given data.
 

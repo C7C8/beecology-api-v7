@@ -14,7 +14,7 @@ from beecology_api.analysis_api.utility import convert_to_dataframe
 
 class RelativePercent(Resource):
 	@staticmethod
-	@api.expect(base_bee_data)
+	@api.expect(base_bee_data, validate=True)
 	@api.response(200, "Relative percent occurrence of bees line plot")
 	@api.produces(["image/png"])
 	def post():

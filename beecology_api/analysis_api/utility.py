@@ -26,3 +26,13 @@ def convert_to_dataframe(json_file):
 	df['day'] = df['date'].dt.day
 
 	return df
+
+
+def calc_x_y(df, x_var, x_var_range, y_var, y_var_range):
+    workingseries = df.groupby([x_var, y_var]).size()
+    workingdf = workingseries.reset_index()
+    workingdf.columns = [x_var, y_var, 'count']
+    workingdf_filtered1 = workingdf[(
+        workingdf[[x_var]].isin(x_var_range)).all(axis=1)]
+
+    return workingdf_filtered1

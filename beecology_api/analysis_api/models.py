@@ -44,3 +44,12 @@ k_means_request = api.inherit("K means analysis request", base_bee_data, {
 		"latLow": fields.String(description="Minimum latitude to include in K-means as an integer")
 	}))
 })
+
+regression_request = api.inherit("Regression request", {
+	"value": fields.Nested(api.model("Regression parameters", {
+		"targetName": fields.String(description="X variable"),
+		"secondTargetName": fields.String(description="Y variable"),
+		"targetRange": fields.List(fields.String, description="X variable range"),
+		"secondTargetRange": fields.List(fields.String, description="Y variable range")
+	}))
+})

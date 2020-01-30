@@ -12,7 +12,7 @@ from beecology_api.analysis_api.utility import convert_to_dataframe
 
 class Trend(Resource):
 	@staticmethod
-	@api.expect(trend_request)
+	@api.expect(trend_request, validate=True)
 	@api.response(200, "Trend line plot as PNG")
 	@api.produces(["image/png"])
 	def post():

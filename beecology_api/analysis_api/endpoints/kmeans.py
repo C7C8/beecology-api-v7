@@ -14,7 +14,7 @@ from beecology_api.analysis_api.utility import convert_to_dataframe
 
 class KMeans(Resource):
 	@staticmethod
-	@api.expect(k_means_request)
+	@api.expect(k_means_request, validate=True)
 	@api.response(200, "K-means plotted data")
 	@api.response(500, "Not enough data selected")
 	@api.produces(["image/png"])

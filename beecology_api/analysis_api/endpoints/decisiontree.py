@@ -28,7 +28,7 @@ class DecisionTree(Resource):
 	               ['Bombus vagans', 'long']]
 
 	@staticmethod
-	@api.expect(bi_var_request)
+	@api.expect(bi_var_request, validate=True)
 	@api.response(200, "Decision tree plot")
 	@api.produces(["image/png"])
 	def post():
