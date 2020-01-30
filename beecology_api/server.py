@@ -41,7 +41,8 @@ def init_api():
 	          contact_email="beecologyproject@wpi.edu",
 	          version="1.1.0",
 	          default_mediatype="application/json",
-	          authorizations=bee_authorizations)
+	          authorizations=bee_authorizations,
+	          validate=True)
 	api.add_namespace(bee_data_api.api)
 	api.add_namespace(analysis_api.api, "/analysis")
 

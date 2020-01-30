@@ -3,7 +3,7 @@ from logging import getLogger
 from flask_restx import Resource
 
 from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import run_model_parser
+from beecology_api.analysis_api.models import bee_data_analysis_request
 from .crosstab import CrossTabulation
 from .decisiontree import DecisionTree
 from .kmeans import KMeans
@@ -28,7 +28,7 @@ class RunModel(Resource):
 	}
 
 	@api.deprecated
-	@api.expect(run_model_parser)
+	@api.expect(bee_data_analysis_request)
 	def post(self):
 		"""Run a selected model on given data.
 
