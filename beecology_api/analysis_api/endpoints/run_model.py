@@ -51,8 +51,7 @@ class RunModel(Resource):
 
 		These endpoint docs also specify the returns and input validation messages you can expect.
 		"""
-		args = run_model_parser.parse_args()
-		model = args["model"]
+		model = api.payload["model"]
 
 		if model not in RunModel._model_routes:
 			log.warning("User requested invalid model {}".format(model))

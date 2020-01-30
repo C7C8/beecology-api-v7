@@ -18,8 +18,9 @@ class RelativePercent(Resource):
 	@api.response(200, "Relative percent occurrence of bees line plot")
 	@api.produces(["image/png"])
 	def post():
-		"""Get a graph of relative bee occurrence per by year, as percents. This endpoint endpoint does not
-		actually require any parameters beyond data, somehow."""
+		"""Get a graph of relative bee occurrence per by year, as percents.
+
+		This endpoint endpoint does not actually require any parameters beyond data, somehow."""
 
 		df = convert_to_dataframe(api.payload["beedata"])
 		y_var = "bee_name"
@@ -52,4 +53,4 @@ class RelativePercent(Resource):
 		img = io.BytesIO()
 		plt.savefig(img, format='png')
 		img.seek(0)
-		return send_file(img, mimetype='image/png')
+		return send_file(img, mimetype='image/png'), 200

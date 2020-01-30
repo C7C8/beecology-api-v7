@@ -36,5 +36,4 @@ class CrossTabulation(Resource):
 		cross: pd.DataFrame = pd.crosstab(data_new[choice1], data_new[choice2])
 
 		# return the crosstab
-		return cross.to_string()
-
+		return cross.to_string(), 200

@@ -43,4 +43,4 @@ class Trend(Resource):
 		fig = workingplot.get_figure()
 		fig.savefig(img, format='png')
 		img.seek(0)
-		return send_file(img, mimetype='image/png')
+		return send_file(img, mimetype='image/png'), 200

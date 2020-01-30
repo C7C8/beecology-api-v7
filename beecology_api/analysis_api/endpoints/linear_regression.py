@@ -66,4 +66,4 @@ class LinearRegression(Resource):
 		img = io.BytesIO()
 		plt.savefig(img, format='png')
 		img.seek(0)
-		return send_file(img, mimetype='image/png')
+		return send_file(img, mimetype='image/png'), 200
