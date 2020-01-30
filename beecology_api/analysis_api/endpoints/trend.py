@@ -1,21 +1,25 @@
 import io
 
+import matplotlib.pyplot as plt
+import seaborn as sns
 from flask import send_file
 from flask_restx import Resource
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-from beecology_api.analysis_api.utility import convert_to_dataframe
 from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import base_bee_data
+from beecology_api.analysis_api.models import trend_request
+from beecology_api.analysis_api.utility import convert_to_dataframe
 
 
 class Trend(Resource):
 	@staticmethod
-	@api.expect(base_bee_data)
+	@api.expect(trend_request)
 	@api.response(200, "Trend line plot as PNG")
+	@api.produces(["image/png"])
 	def post():
+		"""Get a trendline plot for a given variable over time"""
+
+		# TODO CLEAN THIS UP!
+
 		df = convert_to_dataframe(api.payload["beedata"])
 		y_var_range = api.payload["value"]["secondTargetRange"]
 		y_var = api.payload["value"]["secondTargetName"]
