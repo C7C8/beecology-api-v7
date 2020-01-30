@@ -20,7 +20,6 @@ class KMeans(Resource):
 	@api.produces(["image/png"])
 	def post():
 		"""Run k-means clustering on a given set of data"""
-		# TODO CLEAN THIS UP!
 		args = api.payload["value"]
 
 		df = convert_to_dataframe(api.payload["beedata"])
@@ -30,6 +29,8 @@ class KMeans(Resource):
 		long_low = int(args["longLow"])
 		long_high = int(args["longHigh"])
 		num_clusters = int(args["numClusters"])
+
+		# TODO CLEAN THIS UP!
 
 		colors = np.array(['deepskyblue', 'steelblue', 'cornflowerblue',
 		                   'royalblue', 'mediumblue', 'navy'])
