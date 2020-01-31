@@ -188,7 +188,7 @@ authorizations = {
 ###########
 
 bee_record_update_parser = reqparse.RequestParser()
-bee_record_update_parser.add_argument("gender", type=str, required=False, help="Bee gender", choices=["male", "female", "male/female", "unknown"])
+bee_record_update_parser.add_argument("gender", type=str, required=False, help="Bee gender")
 bee_record_update_parser.add_argument("fname", type=str, required=False, dest="flower_name", help="Flower name")
 bee_record_update_parser.add_argument("fcolor", type=str, required=False, dest="flower_color", help="Flower color")
 bee_record_update_parser.add_argument("beename", type=str, required=False, dest="bee_name", help="Bee name")
@@ -199,7 +199,7 @@ bee_record_parser = reqparse.RequestParser()
 bee_record_parser.add_argument("chead", type=str, required=True, dest="coloration_head", help="Head color")
 bee_record_parser.add_argument("cabdomen", type=str, required=True, dest="coloration_abdomen", help="Abdomen color")
 bee_record_parser.add_argument("cthorax", type=str, required=True, dest="coloration_thorax", help="Thorax color")
-bee_record_parser.add_argument("gender", type=str, required=True, help="Gender", choices=["male", "female", "other", "unknown"])
+bee_record_parser.add_argument("gender", type=str, required=True, help="Gender")
 bee_record_parser.add_argument("fname", type=str, required=True, dest="flower_name", help="Latin genus+species flower designation")
 bee_record_parser.add_argument("cityname", type=str, required=True, dest="city_name"),
 bee_record_parser.add_argument("fshape", type=str, required=True, dest="flower_shape", help="Flower color")

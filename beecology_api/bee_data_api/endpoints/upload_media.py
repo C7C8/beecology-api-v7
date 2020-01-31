@@ -55,8 +55,8 @@ def process_media(b64, mime_type, user):
 	file = "{uuid}.{ext}".format(uuid=uuid.uuid1(node=node), ext=file_type.split("/")[1])
 	filename = config.config["storage"]["imageUploadPath"] + "/" + file
 	log.info("Saving image to {}".format(filename))
-	with open(filename, "wb") as file:
-		file.write(data)
+	with open(filename, "wb") as out_file:
+		out_file.write(data)
 
 	res = response("success", "upload image success", False)
 	res["imagePath"] = config.config["storage"]["imageBasePath"] + "/" + file
