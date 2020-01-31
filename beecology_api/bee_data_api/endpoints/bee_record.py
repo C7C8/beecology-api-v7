@@ -2,22 +2,27 @@ from datetime import datetime
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource
 from sqlalchemy import case, func, sql
 
-from api_services import database
-from api_services.user import log
-from .authentication import authenticate, admin_required
-from .cache import invalidate_caches, cache_response
-from .utility import response
+from beecology_api import database
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import authenticate, admin_required
+from beecology_api.bee_data_api.cache import cache_response, invalidate_caches
+from beecology_api.bee_data_api.models import bee_record_update_parser, response_wrapper, bee_record_response, \
+	bee_record_by_page_response, bee_vis_record_response, bee_record_no_elevation_response, beedex_response, \
+	bee_record_parser
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
+
 class BeeRecord(Resource):
-	@staticmethod
+	@api.response(200, "Success", bee_record_response)
+	@api.response(404, "Bee record not found", response_wrapper)
 	@authenticate
 	@cache_response("beerecord")
-	def get(id: int, user=None):
+	def get(self, id: int, user=None):
 		"""Get a bee record by ID"""
 		# Copied over from node server:
 		# TODO Ask if we should scope it down to the specific user ID
@@ -53,7 +58,7 @@ class BeeRecord(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.warning("Failed to retrieve bee records for beerecord")
-			return response("false", "Bee Records not found!", True), 404
+			return response("false", "Bee Records not found!", True), 200
 
 		# Correct date format
 		for datum in data:
@@ -61,18 +66,13 @@ class BeeRecord(Resource):
 		return response("success", "Retrieve the Bee records success!", False, data=data), 200
 
 	# TODO This should *probably* have auth...
-	@staticmethod
+	@api.response(200, "Update succeeded", response_wrapper)
+	@api.response(404, "Bee record not found", response_wrapper)
+	@api.expect(bee_record_update_parser)
 	@invalidate_caches("beerecord")
-	def put(id: int, user=None):
+	def put(self, id: int, user=None):
 		"""Update a bee record by ID"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("gender", type=str, required=False)
-		parser.add_argument("fname", type=str, required=False, dest="flower_name")
-		parser.add_argument("fcolor", type=str, required=False, dest="flower_color")
-		parser.add_argument("beename", type=str, required=False, dest="bee_name")
-		parser.add_argument("beebehavior", type=str, required=False, dest="bee_behavior")
-		parser.add_argument("beedictid", type=int, required=False, dest="bee_dict_id")
-		args = parser.parse_args()
+		args = bee_record_update_parser.parse_args()
 		args = {k: v for k, v in args.items() if v is not None}  # Eliminate "None" args
 		log.debug("Updating bee record {}".format(id))
 
@@ -82,13 +82,14 @@ class BeeRecord(Resource):
 
 		if results.rowcount == 0:
 			log.warning("Failed to update bee record #{}".format(id))
-			return response("false", "Bee Dexes not found!", True), 404
+			return response("false", "Bee Dexes not found!", True), 200
 		return response("success", "Retrieve the Bee information success!", False, data=[{"beerecord_id": id}]), 200
 
-	@staticmethod
+	@api.response(200, "Bee record deleted successfully", response_wrapper)
+	@api.response(404, "Failed to find bee record", response_wrapper)
 	@authenticate
 	@invalidate_caches("beerecord")
-	def delete(id: int, user):
+	def delete(self, id: int, user):
 		"""Delete a bee record by ID"""
 		log.debug("Deleting bee record #{}".format(id))
 		engine = database.get_engine()
@@ -97,16 +98,16 @@ class BeeRecord(Resource):
 
 		if results.rowcount == 0:
 			log.warning("Failed to delete bee record #{}".format(id))
-			return response("false", "Bee record id not found!", True), 404
+			return response("false", "Bee record id not found!", True), 200
 		return response("success", "Delete record success!", False, data=[{"beerecord_id": id}]), 200
 
 
 class BeeRecordsList(Resource):
-	@staticmethod
-	@authenticate
+	@api.response(200, "Found bee records", bee_record_by_page_response)
+	@api.response(404, "Failed to find bee records", response_wrapper)
 	@admin_required
-	def get(page: int, user=None):
-		"""Get bee records by page"""
+	def get(self, page: int, user=None):
+		"""Get bee records by page (segments of 50). Requires administrator access."""
 		log.debug("Getting page {} of bee records".format(page))
 		engine = database.get_engine()
 		bee = database.beerecord
@@ -144,7 +145,7 @@ class BeeRecordsList(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.error("Failed to retrieve bee records for beerecords")
-			return response("false", "Bee records not found!", True), 404
+			return response("false", "Bee records not found!", True), 200
 
 		# Correct date format
 		for datum in data:
@@ -153,10 +154,15 @@ class BeeRecordsList(Resource):
 
 
 class BeeVisRecords(Resource):
-	@staticmethod
+	@api.response(200, "Found bee records", bee_vis_record_response)
+	@api.response(404, "Failed to find bee records", response_wrapper)
 	@cache_response("beerecord", "flowerdict")
-	def get():
-		"""Get all bee records"""
+	def get(self):
+		"""Get all bee records (reduced).
+
+		**Warning!** This returns an *extremely* large dataset, literally the entire contents of the database!
+		Historically this endpoint has responded with several *mega*bytes of data, so bee **careful!**
+		"""
 		log.debug("Getting all bee records")
 		engine = database.get_engine()
 		bee = database.beerecord
@@ -184,7 +190,7 @@ class BeeVisRecords(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.error("Failed to retrieve bee records for beevisrecords")
-			return response("false", "Bee records not found!", True), 404
+			return response("false", "Bee records not found!", True), 200
 
 		# Correct date format
 		for datum in data:
@@ -194,10 +200,11 @@ class BeeVisRecords(Resource):
 
 
 class BeeUserRecords(Resource):
-	@staticmethod
+	@api.response(200, "Retrieved bee records for user", bee_record_no_elevation_response)
+	@api.response(404, "Failed to retrieve records for user", response_wrapper)
 	@authenticate
-	def get(user):
-		"""Get bee log records by user ID"""
+	def get(self, user):
+		"""Get all bee logs for a user. Supplying the user ID is not required, it's extracted from the authorization token."""
 		log.debug("Getting all bee records for user {}".format(user))
 		engine = database.get_engine()
 
@@ -226,7 +233,7 @@ class BeeUserRecords(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.warning("Failed to retrieve bee records for user {}".format(user))
-			return response("false", "Bee Records not found!", True), 404
+			return response("false", "Bee Records not found!", True), 200
 
 		# Correct date format
 		for datum in data:
@@ -235,9 +242,11 @@ class BeeUserRecords(Resource):
 
 class Beedex(Resource):
 	@staticmethod
+	@api.response(200, "Retrieved BeeDex entry", beedex_response)
+	@api.response(404, "Failed to retrieve BeeDex entry", response_wrapper)
 	@cache_response("beedict")
 	def get(id: int = -1):
-		"""Get an entry from the beedex by ID"""
+		"""Get an entry from the beedex by ID. If no ID is provided, all beedex entries are returned."""
 		log.debug("Getting beedex entry #{}".format(id if id != -1 else "*"))
 		engine = database.get_engine()
 		query = sql.select([database.beedict])
@@ -248,21 +257,22 @@ class Beedex(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.warning("Failed to retrieve entry #{} from beedex".format(id))
-			return response("false", "Bee Dexes not found!", True), 404
+			return response("false", "Bee Dexes not found!", True), 200
 		log.debug("Returning {} beedex entries".format(len(data)))
 		return response("success", "Retrieve the Bee information success!", False, data=data), 200
 
 class NoElevationData(Resource):
-	@staticmethod
+	@api.response(200, "Retrieved bee records", bee_record_by_page_response)
+	@api.response(404, "Failed to retrieve bee records", response_wrapper)
 	@cache_response("beerecord")
-	def get():
+	def get(self):
 		"""Get bee records for which there is no elevation info"""
 		engine = database.get_engine()
 		results = engine.execute(sql.select([database.beerecord]).where(database.beerecord.c.elevation.is_(None)))
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.info("Failed to find bee records without elevations. This may be intended, depending on data quality.")
-			return response("false", "No Elevation Records not found!", True), 404
+			return response("false", "No Elevation Records not found!", True), 200
 
 		# Correct date format
 		for datum in data:
@@ -270,32 +280,15 @@ class NoElevationData(Resource):
 		return response("success", "Retrieve the No Elevation Records success!", False, data=data), 200
 
 class RecordData(Resource):
-	@staticmethod
+	@api.expect(bee_record_parser)
+	@api.response(200, "Successfully logged new bee record", response_wrapper)
+	@api.response(400, "Invalid date or bee behavior", response_wrapper)
 	@authenticate
-	def post(user):
-		"""Record a new bee log"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("chead", type=str, required=True, dest="coloration_head")
-		parser.add_argument("cabdomen", type=str, required=True, dest="coloration_abdomen")
-		parser.add_argument("cthorax", type=str, required=True, dest="coloration_thorax")
-		parser.add_argument("gender", type=str, required=True)
-		parser.add_argument("fname", type=str, required=True, dest="flower_name")
-		parser.add_argument("cityname", type=str, required=True, dest="city_name"),
-		parser.add_argument("fshape", type=str, required=True, dest="flower_shape")
-		parser.add_argument("fcolor", type=str, required=True, dest="flower_color")
-		parser.add_argument("beename", type=str, required=True, dest="bee_name"),
-		parser.add_argument("loc", type=str, required=True, dest="loc_info")
-		parser.add_argument("time", type=str, required=True, dest="time")
-		parser.add_argument("recordpicpath", type=str, required=True, dest="record_pic_path")
-		parser.add_argument("recordvideopath", type=str, required=False, dest="record_video_path")
-		parser.add_argument("beedictid", type=str, required=False, dest="bee_dict_id")  # TODO revert to int type
-		parser.add_argument("beebehavior", type=int, required=True, dest="bee_behavior")
+	def post(self, user):
+		"""Record a new bee log. Requires user login."""
 
 		# Optional params that aren't specified in the v5 API but are in the bee web app API interface
-		parser.add_argument("elevation", type=str, required=False)
-		parser.add_argument("appversion", type=str, required=False, dest="app_version")
-
-		args = parser.parse_args()
+		args = bee_record_parser.parse_args()
 
 		# Terrible, terrible hack because the web app is broken and submits STRING DATES instead of beedictids
 		# The old API didn't parse it correctly (i.e. throw a hissy fit because of an incorrect data type) and just

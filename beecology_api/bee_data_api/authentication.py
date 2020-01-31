@@ -1,24 +1,32 @@
 import base64
 from logging import getLogger
+from functools import wraps
 
 from firebase_admin import auth
 from flask import request
 from sqlalchemy import sql, and_
 
-from api_services import database
-from .config import Config
-from .utility import response
+from beecology_api import config
+from beecology_api import database
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.models import response_wrapper
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
 # TODO Clean this up a bit
 
+authParser = api.parser()
+authParser.add_argument("Authorization", location="headers", help="Bearer token authorization")
 
 def authenticate(func):
 	"""Decorator for user authentication"""
+	@wraps(func)
+	@api.response(403, "Authorization failed", response_wrapper)
+	@api.doc(security="user")
 	def wrapper(*args, **kwargs):
 		# Allow unit tests to skip authentication
-		if "testing" in Config.config and Config.config["testing"]:
+		if "testing" in config.config and config.config["testing"]:
 			return func(*args, **kwargs, user="UNIT TEST")
 
 		if "Authorization" not in request.headers:
@@ -43,15 +51,18 @@ def authenticate(func):
 	return wrapper
 
 
+adminParser = api.parser()
+
 def admin_required(func):
-	"""Decorator for requiring administrator access. IMPORTANT: This must come AFTER a user authentication check"""
+	"""Decorator for requiring administrator access"""
+	@wraps(func)
+	@api.response(403, "Administrator access required")
+	@api.doc(security="admin")
+	@authenticate
 	def admin_wrapper(*args, **kwargs):
 		# Allow unit tests to skip admin guards
-		if "testing" in Config.config and Config.config["testing"]:
+		if "testing" in config.config and config.config["testing"]:
 			return func(*args, **kwargs)
-
-		if "user" not in kwargs:
-			return response("false", "Login required", True), 403
 
 		# Check administrator table to see if there's an entry for this user. If there isn't, return an error.
 		engine = database.get_engine()

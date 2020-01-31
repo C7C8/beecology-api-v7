@@ -5,21 +5,28 @@ from logging import getLogger
 
 from firebase_admin import auth
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 from sqlalchemy import sql, and_
 
-from api_services import database
-from .config import Config
-from .authentication import authenticate
-from .utility import response
+from beecology_api import database
+from beecology_api import config
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import authenticate
+from beecology_api.bee_data_api.models import response_wrapper, user_token_pair, user_access_token
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
 
 class Enroll(Resource):
-	@staticmethod
-	def get():
-		"""Enroll; uses a firebase token via basic auth to get a generate an access token"""
+	@api.doc(security="firebase")
+	@api.response(403, "Firebase authorization token not present or failed validation", response_wrapper)
+	@api.response(200, "Succeeded authentication, user token pair enclosed", user_token_pair)
+	def get(self):
+		"""Enroll; uses a firebase token via basic auth to get a generate an access token.
+
+		Enrolling will result in removal of all other enrollments from the authentication database, i.e. all other
+		sessions for this user are automatically logged out."""
 		if "Authorization" not in request.headers or request.headers["Authorization"].find("Basic") == -1:
 			log.warning("User tried to enroll but didn't present a Firebase auth token")
 			return response("false", "Firebase authorization token required", True), 403
@@ -33,7 +40,7 @@ class Enroll(Resource):
 		# Generate token (1024 random bytes), expiration,
 		accessToken = secrets.token_hex(1024)
 		refreshToken = secrets.token_hex(1024)
-		expiration = datetime.now() + timedelta(seconds=Config.config["auth"]["token-lifetime"])
+		expiration = datetime.now() + timedelta(seconds=config.config["auth"]["token-lifetime"])
 
 		# Delete all other entries for this user and insert a new auth table entry. This effectively logs the user out
 		# of all other devices, and helps keep the auth table clean.
@@ -48,16 +55,18 @@ class Enroll(Resource):
 		return {
 			"accessToken": accessToken,
 		    "refreshToken": refreshToken,
-			"expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
+			"expiresIn": config.config["auth"]["token-lifetime"] * 1000,
 			"expiresAt": int(expiration.timestamp() * 1000),
 			"type": "Bearer"
 		}, 200
 
 
 class Refresh(Resource):
-	@staticmethod
-	def get():
-		"""Refresh a token"""
+	@api.param("Authorization", "User's refresh token as HTTP bearer token authorization", _in="header", required=True)
+	@api.response(403, "Firebase authorization token not present or failed validation", response_wrapper)
+	@api.response(200, "Refreshed access token enclosed", user_access_token)
+	def get(self):
+		"""Obtain a new access token using a refresh token."""
 		if "Authorization" not in request.headers or request.headers["Authorization"].find("Bearer") == -1:
 			return response("false", "Authorization required", True), 403
 		try:
@@ -78,7 +87,7 @@ class Refresh(Resource):
 
 		# Generate a new access token and expiration time, update them in the database
 		access_token = secrets.token_hex(1024)
-		expiration = datetime.now() + timedelta(seconds=Config.config["auth"]["token-lifetime"])
+		expiration = datetime.now() + timedelta(seconds=config.config["auth"]["token-lifetime"])
 
 		engine.execute(sql.update(database.auth).values(token_expiry=expiration.timestamp() * 1000,
 		                                                access_token=access_token) \
@@ -86,16 +95,16 @@ class Refresh(Resource):
 
 		return {
 		       "accessToken": access_token,
-		       "expiresIn": Config.config["auth"]["token-lifetime"] * 1000,
+		       "expiresIn": config.config["auth"]["token-lifetime"] * 1000,
 		       "expiresAt": int(expiration.timestamp() * 1000)
 	    }, 200
 
 
 class Unenroll(Resource):
-	@staticmethod
+	@api.response("200", "Removed user from database")
 	@authenticate
 	def get(user):
-		"""Remove access+refresh token from auth database"""
+		"""Remove access+refresh token from the authentication database"""
 		engine = database.get_engine()
 		engine.execute(sql.delete(database.auth).where(database.auth.c.user_id == user))
 		return {"success": True}, 200

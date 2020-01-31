@@ -1,16 +1,13 @@
 import json
 import os
 import sys
-import logging.config
-from typing import Dict
 
 import yaml
 
-from api_services import Config
-
-__default_conf = {
+config = {
 	"auth": {
-		"keyfile": "firebase.json",
+		"key-file": "firebase.json",
+		"databaseURL": "https://someurl.firebaseio.com",
 		"token-lifetime": 3600
 	},
 	"admin-code": "SECRET_CODE",
@@ -51,10 +48,10 @@ __default_conf = {
 }
 
 
-def load_conf() -> Dict:
+def load_config():
 	# Load configuration file, fall back to default config if not available.
 	# Config file is given by environment variable BEE_API_CONF, or conf.yml if variable not provided.
-	conf = __default_conf
+	global config
 	conf_file_name = os.environ["BEE_API_CONF"] if "BEE_API_CONF" in os.environ else "conf.yml"
 
 	# Use YAML loader or JSON loader depending on file extension
@@ -62,14 +59,7 @@ def load_conf() -> Dict:
 
 	try:
 		with open(conf_file_name, "r") as conf_file:
-			conf = load(conf_file)
+			config = load(conf_file)
 	except IOError:
 		print("Failed to load config file \"{}\" falling back to local default. THIS IS ALMOST GUARANTEED TO FAIL!"
 		      .format(conf_file_name), file=sys.stderr)
-	Config.config = conf
-	return conf
-
-
-def setup_logging(config=None):
-	# Set up logging for Flask
-	logging.config.dictConfig(__default_conf["logging"] if config is None else config)

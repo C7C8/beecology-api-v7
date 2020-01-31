@@ -4,48 +4,47 @@ import uuid
 from logging import getLogger
 
 import magic
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource
 
-from .authentication import authenticate
-from .utility import response
-from .config import Config
+from beecology_api import config
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import authenticate
+from beecology_api.bee_data_api.models import video_parser, image_parser, media_upload_response, response_wrapper
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
 
 class UploadVideo(Resource):
-	@staticmethod
+	@api.expect(video_parser)
+	@api.response(200, "Video uploaded, path enclosed", media_upload_response)
+	@api.response(400, "Media received but had incorrect MIME type", response_wrapper)
 	@authenticate
-	def post(user):
-		"""Upload a video"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("recordVideo", type=str, required=True)
-		args = parser.parse_args()
-
+	def post(self, user):
+		"""Upload a video in base64 and save it. Returns file path."""
+		args = video_parser.parse_args()
 		return process_media(args["recordVideo"], "video", user)
 
 
 class UploadImage(Resource):
-	@staticmethod
+	@api.expect(image_parser)
+	@api.response(200, "Image uploaded, path enclosed", media_upload_response)
+	@api.response(400, "Media received but had incorrect MIME type", response_wrapper)
 	@authenticate
-	def post(user=None):
-		"""Upload an image in base64 and save it"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("recordImage", type=str, required=True)
-		args = parser.parse_args()
-
+	def post(self, user=None):
+		"""Upload an image in base64 and save it. Returns file path."""
+		args = image_parser.parse_args()
 		return process_media(args["recordImage"], "image", user)
 
 
 def process_media(b64, mime_type, user):
 	"""Process a media file from base64, validating its mime type in the process."""
-	b64 = b64.replace("-", "+").replace("/", "_") + "==="
-	data = base64.urlsafe_b64decode(b64)
+	data = base64.urlsafe_b64decode(b64 + ("=" * (4 - len(b64) % 4)))
 	mime = magic.Magic(mime=True)
 	file_type = mime.from_buffer(data)
 	if file_type.find(mime_type) == -1:
 		log.warning("User {} attempted to upload file with wrong MIME type, {}".format(user, file_type))
-		return response("false", "Received file but was of type {} instead of {}/*".format(file_type, mime_type), True)
+		return response("false", "Received file but was of type {} instead of {}/*".format(file_type, mime_type), True), 400
 
 	# Save image file to UUID-based name, with an extension determined by the file's MIME type
 	# Using a UUID allows us to guarantee unique filenames while embedding user and time information
@@ -54,11 +53,11 @@ def process_media(b64, mime_type, user):
 	# the filename, but not in a back-traceable way.
 	node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
 	file = "{uuid}.{ext}".format(uuid=uuid.uuid1(node=node), ext=file_type.split("/")[1])
-	filename = Config.config["storage"]["imageUploadPath"] + "/" + file
+	filename = config.config["storage"]["imageUploadPath"] + "/" + file
 	log.info("Saving image to {}".format(filename))
-	with open(filename, "wb") as file:
-		file.write(data)
+	with open(filename, "wb") as out_file:
+		out_file.write(data)
 
 	res = response("success", "upload image success", False)
-	res["imagePath"] = Config.config["storage"]["imageBasePath"] + "/" + file
+	res["imagePath"] = config.config["storage"]["imageBasePath"] + "/" + file
 	return res, 200

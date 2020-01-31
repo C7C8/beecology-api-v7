@@ -1,21 +1,46 @@
 from logging import getLogger
 
 import sqlalchemy as sql
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource
 from sqlalchemy import and_, func
 
-from api_services import database
-from .authentication import authenticate, admin_required
-from .utility import response
-from .cache import invalidate_caches, cache_response
+from beecology_api import database
+from beecology_api.bee_data_api.api import api
+from beecology_api.bee_data_api.authentication import admin_required
+from beecology_api.bee_data_api.cache import invalidate_caches, cache_response
+from beecology_api.bee_data_api.models import new_flower_parser, response_wrapper, add_flower_response, \
+	flower_dict_response, \
+	update_flower_parser, flower_shape_response, unmatched_flowers_response, flower_list_response
+from beecology_api.bee_data_api.response import response
 
 log = getLogger()
 
 
 class Flowerdex(Resource):
-	@staticmethod
+	@api.expect(new_flower_parser)
+	@api.response(200, "New flower added", add_flower_response)
+	@api.response(405, "Failed to log new flower", response_wrapper)
+	@admin_required
+	@invalidate_caches("flower")
+	def post(self, user=None):
+		"""Create a new flower."""
+		args = new_flower_parser.parse_args()
+		log.info("Adding flower {}".format(args))
+
+		engine = database.get_engine()
+		query = sql.insert(database.flower).values(**args)
+		id = engine.execute(query).inserted_primary_key[0]  # Not all SQL engines support RETURNING
+
+		if id is None:
+			log.error("Failed to log new flower {}".format(args))
+			return response("false", "Log a new flower failed", True), 405
+		return response("success", "Log a new flower success!", False, data=[{"flower_id": id}]), 200
+
+	@api.param("id", "Optional flower ID; if not provided, all flowers are returned.", required=False)
+	@api.response(200, "Flower dict entry(/entries) enclosed", flower_dict_response)
+	@api.response(404, "Flower dict entry not found", response_wrapper)
 	@cache_response("flowerdict")
-	def get(id: int = -1):
+	def get(self, id: int = -1):
 		"""Get flower by ID"""
 		log.debug("Getting flowerdex ID {}".format(id if id != -1 else "*"))
 		engine = database.get_engine()
@@ -35,41 +60,14 @@ class Flowerdex(Resource):
 		log.debug("Returning {} flowerdex entries".format(len(data)))
 		return response("success", "Retrieve the Flower information success!", False, data=data), 200
 
-	@staticmethod
-	@authenticate
+	@api.expect(update_flower_parser)
+	@api.response(200, "Updated flower", response_wrapper)
+	@api.response(404, "Flower not found")
 	@admin_required
 	@invalidate_caches("flower")
-	def post(user=None):
-		"""Create a new flower"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("flowercommonname", required=True, type=str, dest="flower_common_name")
-		parser.add_argument("flowershapeid", required=True, type=str, dest="flower_shape")
-		parser.add_argument("flowercolorid", required=True, type=str, dest="flower_color"),
-		parser.add_argument("flowerspecies", required=True, type=str, dest="flower_species"),
-		parser.add_argument("flowergenus", required=True, type=str, dest="flower_genus")
-		args = parser.parse_args()
-		log.info("Adding flower {}".format(args))
-
-		engine = database.get_engine()
-		query = sql.insert(database.flower).values(**args)
-		id = engine.execute(query).inserted_primary_key[0]  # Not all SQL engines support RETURNING
-
-		if id is None:
-			log.error("Failed to log new flower {}".format(args))
-			return response("false", "Log a new flower failed", True), 405
-		return response("success", "Log a new flower success!", False, data=[{"flower_id": id}]), 200
-
-	@staticmethod
-	@invalidate_caches("flower")
-	def put(id: int):
+	def put(self, id: int, user=None):
 		"""Update a flower by ID"""
-		parser = reqparse.RequestParser()
-		parser.add_argument("fcommon", required=False, type=str, dest="flower_common_name")
-		parser.add_argument("fshape", required=False, type=str, dest="flower_shape")
-		parser.add_argument("fcolor", required=False, type=str, dest="flower_color")
-		parser.add_argument("fspecies", required=False, type=str, dest="flower_species")
-		parser.add_argument("fgenus", required=False, type=str, dest="flower_genus")
-		args = parser.parse_args()
+		args = update_flower_parser.parse_args()
 		args = {k: v for k, v in args.items() if v is not None}
 
 		log.info("Updating flower {}".format(id))
@@ -82,9 +80,11 @@ class Flowerdex(Resource):
 			return response("false", "Flower not found!", True), 404
 		return response("success", "Update the Folwer information success!", False, data=[{"flower_id": id}]), 200  # TODO Fix typo
 
-	@staticmethod
+	@api.response(200, "Deleted flower", response_wrapper)
+	@api.response(404, "Flower ID not found", response_wrapper)
+	@admin_required
 	@invalidate_caches("flower")
-	def delete(id: int):
+	def delete(self, id: int, user=None):
 		"""Delete flower by ID"""
 		log.info("Deleting flower {}".format(id))
 		engine = database.get_engine()
@@ -98,10 +98,13 @@ class Flowerdex(Resource):
 
 
 class FlowerShapes(Resource):
-	@staticmethod
+	@api.response(200, "List of all flower shapes enclosed", flower_shape_response)
+	@api.response(404, "Failed to find any flower shapes", response_wrapper)
 	@cache_response("features")
-	def get():
-		"""Get all flower shapes"""
+	def get(self):
+		"""Get all flower shapes.
+
+		This endpoint's name is something of a misnomer, it's more appropriately flower **features**."""
 		log.debug("Retrieving list of all flower shapes")
 		engine = database.get_engine()
 		features = database.features
@@ -115,10 +118,13 @@ class FlowerShapes(Resource):
 
 
 class UnmatchedFlowers(Resource):
-	@staticmethod
+	@api.response(200, "List of unmatched flowers enclosed", unmatched_flowers_response)
+	@api.response(404, "Didn't find any unmatched flowers", response_wrapper)
 	@cache_response("flowerdict", "beerecord")
-	def get():
-		"""Get unmatched flowers"""
+	def get(self):
+		"""Get a list of recorded flowers that aren't in the flowerdex.
+
+		List is sorted in alphabetical order by flower name."""
 		log.debug("Retrieving list of unmatched flowers")
 		engine = database.get_engine()
 		bee = database.beerecord
@@ -141,9 +147,10 @@ class UnmatchedFlowers(Resource):
 
 
 class FlowerList(Resource):
-	@staticmethod
+	@api.response(200, "List of all flowers enclosed", flower_list_response)
+	@api.response(404, "Failed to retrieve any flowers", response_wrapper)
 	@cache_response("flowerdict")
-	def get():
+	def get(self):
 		"""Legacy flowerlist endpoint"""
 		log.debug("Getting list of all flowers in the flowerdict")
 		engine = database.get_engine()

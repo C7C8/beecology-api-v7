@@ -1,0 +1,37 @@
+admin-code: some-admin-code
+
+auth:
+  key-file: sample-firebase.json
+  databaseURL: https://some-firebase-db.firebaseio.com
+  token-lifetime: 3600
+
+storage:
+  imageUploadPath: images
+  imageBasePath: images
+  news-path: news/
+  cache: /tmp/beecology-cache
+
+database:
+  pool_size: 16
+             # DB syntax  driver     uname   password        host      port datbase
+  connection: "postgresql+psycopg2://username:password@localhost:5432/database"
+
+logging:
+  version: 1
+  formatters:
+    default:
+      format: "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
+  handlers:
+    wsgi:
+      class: logging.StreamHandler
+      stream: ext://flask.logging.wsgi_errors_stream
+      formatter: default
+    file:
+      class: logging.FileHandler
+      filename: log.txt
+      formatter: default
+  root:
+    level: INFO
+    handlers:
+      - wsgi
+      - file
