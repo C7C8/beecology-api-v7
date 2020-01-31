@@ -100,4 +100,4 @@ class DecisionTree(Resource):
 		img = io.BytesIO(graph.create_png())
 		img.seek(0)
 
-		return send_file(img, mimetype='image/png'), 200
+		return send_file(img, mimetype='image/png', as_attachment=True, attachment_filename="decisiontree_plot.png")

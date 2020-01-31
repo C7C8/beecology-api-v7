@@ -27,6 +27,12 @@ def convert_to_dataframe(json_file):
 
 	return df
 
+# TODO: CLEAN THIS UP
+
+# this function calculates the x and y values for the regression
+# df is the dataframe, x_var is the x variable (typically year but can be month),
+#  and corresponding range is x_var_range
+#  y_var and y_var_range are the desired dependent y variable and range
 
 def calc_x_y(df, x_var, x_var_range, y_var, y_var_range):
     workingseries = df.groupby([x_var, y_var]).size()

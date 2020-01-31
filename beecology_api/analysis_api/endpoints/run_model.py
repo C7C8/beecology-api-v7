@@ -28,7 +28,7 @@ class RunModel(Resource):
 	}
 
 	@api.deprecated
-	@api.expect(bee_data_analysis_request, validate=True)
+	@api.expect(bee_data_analysis_request, validate=False)
 	def post(self):
 		"""Run a selected model on given data.
 
@@ -52,6 +52,7 @@ class RunModel(Resource):
 		These endpoint docs also specify the returns and input validation messages you can expect.
 		"""
 		model = api.payload["model"]
+		log.info("Redirecting model {}".format(model))
 
 		if model not in RunModel._model_routes:
 			log.warning("User requested invalid model {}".format(model))

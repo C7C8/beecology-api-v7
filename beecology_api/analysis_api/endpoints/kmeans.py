@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from flask import send_file
 from flask_restx import Resource
+from sklearn.cluster import KMeans as KMeansClustering
 
 from beecology_api.analysis_api import api
 from beecology_api.analysis_api.models import k_means_request
@@ -58,7 +59,7 @@ class KMeans(Resource):
 		#     else:
 		#         df_elev = df_time
 
-		def_clustering = KMeans(n_clusters=num_clusters, random_state=0)
+		def_clustering = KMeansClustering(n_clusters=num_clusters, random_state=0)
 		X = df_time[['longitude', 'latitude']]
 		clusters = def_clustering.fit(X)
 		centers = clusters.cluster_centers_
@@ -77,4 +78,4 @@ class KMeans(Resource):
 		img = io.BytesIO()
 		plt.savefig(img, format='png')
 		img.seek(0)
-		return send_file(img, mimetype='image/png'), 200
+		return send_file(img, mimetype='image/png', as_attachment=True, attachment_filename="k-means-plot.png")
