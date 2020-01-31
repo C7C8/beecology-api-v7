@@ -233,7 +233,7 @@ class BeeUserRecords(Resource):
 		data = [dict(r) for r in results]
 		if len(data) == 0:
 			log.warning("Failed to retrieve bee records for user {}".format(user))
-			return response("false", "Bee Records not found!", True), 200
+			return response("false", "Bee Records not found!", True, data=[]), 200
 
 		# Correct date format
 		for datum in data:
