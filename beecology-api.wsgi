@@ -4,4 +4,4 @@
 import sys
 import os
 sys.path.insert(0, os.getcwd())
-from beecology_api.server import app
+from beecology_api.server import app as application

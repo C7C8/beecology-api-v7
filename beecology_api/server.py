@@ -48,7 +48,4 @@ def init_api():
 
 	app.register_blueprint(blueprint)
 
-
-if __name__ == '__main__' or __name__ == "beecology_api.server":
-	init_api()
-	app.run()
+init_api()
