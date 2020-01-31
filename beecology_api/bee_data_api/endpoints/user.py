@@ -103,7 +103,7 @@ class Refresh(Resource):
 class Unenroll(Resource):
 	@api.response("200", "Removed user from database")
 	@authenticate
-	def get(user):
+	def get(self, user):
 		"""Remove access+refresh token from the authentication database"""
 		engine = database.get_engine()
 		engine.execute(sql.delete(database.auth).where(database.auth.c.user_id == user))
