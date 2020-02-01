@@ -1,7 +1,7 @@
 from flask_restx import fields
 
 from beecology_api.analysis_api import api
-from beecology_api.bee_data_api.models import bee_vis_record
+from beecology_api.compat_bee_api.models import bee_vis_record
 
 
 base_bee_data = api.model("Base bee data analysis object", {

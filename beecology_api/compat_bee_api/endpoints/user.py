@@ -10,10 +10,10 @@ from sqlalchemy import sql, and_
 
 from beecology_api import database
 from beecology_api import config
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import authenticate
-from beecology_api.bee_data_api.models import response_wrapper, user_token_pair, user_access_token
-from beecology_api.bee_data_api.response import response
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import authenticate
+from beecology_api.compat_bee_api.models import response_wrapper, user_token_pair, user_access_token
+from beecology_api.compat_bee_api.response import response
 
 log = getLogger()
 

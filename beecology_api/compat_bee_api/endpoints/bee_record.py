@@ -6,13 +6,13 @@ from flask_restx import Resource
 from sqlalchemy import case, func, sql
 
 from beecology_api import database
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import authenticate, admin_required
-from beecology_api.bee_data_api.cache import cache_response, invalidate_caches
-from beecology_api.bee_data_api.models import bee_record_update_parser, response_wrapper, bee_record_response, \
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import authenticate, admin_required
+from beecology_api.compat_bee_api.cache import cache_response, invalidate_caches
+from beecology_api.compat_bee_api.models import bee_record_update_parser, response_wrapper, bee_record_response, \
 	bee_record_by_page_response, bee_vis_record_response, bee_record_no_elevation_response, beedex_response, \
 	bee_record_parser
-from beecology_api.bee_data_api.response import response
+from beecology_api.compat_bee_api.response import response
 
 log = getLogger()
 

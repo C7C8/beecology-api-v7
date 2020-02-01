@@ -7,10 +7,10 @@ import magic
 from flask_restx import Resource
 
 from beecology_api import config
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import authenticate
-from beecology_api.bee_data_api.models import video_parser, image_parser, media_upload_response, response_wrapper
-from beecology_api.bee_data_api.response import response
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import authenticate
+from beecology_api.compat_bee_api.models import video_parser, image_parser, media_upload_response, response_wrapper
+from beecology_api.compat_bee_api.response import response
 
 log = getLogger()
 

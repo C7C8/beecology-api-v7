@@ -3,8 +3,8 @@ from sqlalchemy import sql
 
 from beecology_api import config
 from beecology_api import database
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import authenticate
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import authenticate
 
 
 class VerifyAdmin(Resource):

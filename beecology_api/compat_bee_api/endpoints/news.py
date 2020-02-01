@@ -4,10 +4,10 @@ from logging import getLogger
 from flask_restx import Resource
 
 from beecology_api import config
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import admin_required
-from beecology_api.bee_data_api.models import news_response, news_parser, response_wrapper
-from beecology_api.bee_data_api.response import response
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import admin_required
+from beecology_api.compat_bee_api.models import news_response, news_parser, response_wrapper
+from beecology_api.compat_bee_api.response import response
 
 log = getLogger()
 

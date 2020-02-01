@@ -5,13 +5,13 @@ from flask_restx import Resource
 from sqlalchemy import and_, func
 
 from beecology_api import database
-from beecology_api.bee_data_api.api import api
-from beecology_api.bee_data_api.authentication import admin_required
-from beecology_api.bee_data_api.cache import invalidate_caches, cache_response
-from beecology_api.bee_data_api.models import new_flower_parser, response_wrapper, add_flower_response, \
+from beecology_api.compat_bee_api.api import api
+from beecology_api.compat_bee_api.authentication import admin_required
+from beecology_api.compat_bee_api.cache import invalidate_caches, cache_response
+from beecology_api.compat_bee_api.models import new_flower_parser, response_wrapper, add_flower_response, \
 	flower_dict_response, \
 	update_flower_parser, flower_shape_response, unmatched_flowers_response, flower_list_response
-from beecology_api.bee_data_api.response import response
+from beecology_api.compat_bee_api.response import response
 
 log = getLogger()
 
