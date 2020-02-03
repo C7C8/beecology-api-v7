@@ -9,6 +9,7 @@ from flask_restx import Api
 import beecology_api.config as config
 from beecology_api import compat_bee_api, analysis_api, beecology_api
 from beecology_api.compat_bee_api.models import authorizations as bee_authorizations
+from beecology_api.beecology_api.db import init_database as main_db_init
 
 # Beecology API Server, Python edition!
 # #####################################
@@ -28,8 +29,9 @@ app = Flask(__name__)
 def init_api():
 	config.load_config()
 	logging.config.dictConfig(config.config["logging"])
+	main_db_init()
 
-	CORS(app)  # TODO: Holdover from node server, this may not be needed.
+	CORS(app)
 	blueprint = Blueprint("api", __name__)
 	firebase_app = firebase_admin.initialize_app(credentials.Certificate(config.config["auth"]["key-file"]),
 	                                             options=config.config["auth"])

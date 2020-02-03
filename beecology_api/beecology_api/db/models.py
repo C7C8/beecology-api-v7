@@ -7,15 +7,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from beecology_api import config
-import beecology_api.beecology_api.db as db
 
 
 use_postgres = "postgres" in config.config["database"]["connection"]
 id_type = postgresql.UUID(as_uuid=True) if use_postgres else String
-Base = declarative_base()
+BaseTable = declarative_base()
 
 
-class User(Base):
+class User(BaseTable):
 	__tablename__       = "user"
 	id                  = Column(String, primary_key=True, index=True)
 	admin               = Column(Boolean, default=False)
@@ -28,11 +27,11 @@ class User(Base):
 	news                = relationship("News")
 
 
-class BeeRecord(Base):
+class BeeRecord(BaseTable):
 	__tablename__       = "bee_record"
 	id                  = Column(id_type, primary_key=True, index=True)
 	user                = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
-	bee_species_id      = Column(id_type, ForeignKey("bee_species.id"), index=True)
+	bee_species_id      = Column(id_type, ForeignKey("bee_species.id"), index=True, nullable=True)
 	flower_species_id   = Column(id_type, ForeignKey("flower_species.id"), index=True)
 	images              = relationship("Image", backref="bee_record")
 	videos              = relationship("Video", backref="bee_record")
@@ -47,7 +46,7 @@ class BeeRecord(Base):
 	elevation           = Column(Float)
 
 
-class BeeSpecies(Base):
+class BeeSpecies(BaseTable):
 	__tablename__       = "bee_species"
 	id                  = Column(id_type, primary_key=True, index=True)
 	genus               = Column(String)
@@ -62,7 +61,7 @@ class BeeSpecies(Base):
 	records             = relationship("BeeRecord", backref="bee_species")
 
 
-class FlowerSpecies(Base):
+class FlowerSpecies(BaseTable):
 	__tablename__       = "flower_species"
 	id                  = Column(id_type, primary_key=True, index=True)
 	genus               = Column(String)
@@ -78,28 +77,26 @@ class FlowerSpecies(Base):
 	records             = relationship("BeeRecord", backref="flower_species")
 
 
-class Image(Base):
+class Image(BaseTable):
 	__tablename__       = "image"
 	id                  = Column(id_type, primary_key=True)
-	bee_record_id       = Column(id_type, ForeignKey("bee_record.id"), index=True)
+	bee_record_id       = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
 	user_id             = Column(String, ForeignKey("user.id"))
 	path                = Column(String)
 
 
-class Video(Base):
+class Video(BaseTable):
 	__tablename__       = "video"
 	id                  = Column(id_type, primary_key=True)
-	bee_record_id       = Column(id_type, ForeignKey("bee_record.id"), index=True)
+	bee_record_id       = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
 	user_id             = Column(String, ForeignKey("user.id"))
 	path                = Column(String)
 
 
-class News(Base):
-	__tablename__       = "video"
+class News(BaseTable):
+	__tablename__       = "news"
 	id                  = Column(id_type, primary_key=True)
-	user_id             = Column(String, ForeignKey("user.id"), index=True)
+	user_id             = Column(String, ForeignKey("user.id"), index=True, nullable=True)
 	news_type           = Column(Enum("main", "bio_cs", name="news_type"))
 	content             = Column(JSON)
 
-
-Base.metadata.create_all(db.engine)
