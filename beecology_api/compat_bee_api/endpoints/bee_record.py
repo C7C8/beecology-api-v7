@@ -5,7 +5,7 @@ import sqlalchemy as sql
 from flask_restx import Resource
 from sqlalchemy import case, func, sql
 
-from beecology_api import database
+from beecology_api.compat_bee_api import database
 from beecology_api.compat_bee_api.api import api
 from beecology_api.compat_bee_api.authentication import authenticate, admin_required
 from beecology_api.compat_bee_api.cache import cache_response, invalidate_caches

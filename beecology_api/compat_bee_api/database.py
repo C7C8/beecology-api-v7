@@ -24,8 +24,8 @@ def get_engine() -> Engine:
 	"""Get a SQLAlchemy engine object"""
 	global engine, beedict, beerecord, flower, flowerdict, features, auth, admin
 	if engine is None:
-		log.debug("Starting SQLAlchemy engine")
-		dbconfig = config.config["database"]
+		log.debug("Starting SQLAlchemy engine for legacy database")
+		dbconfig = config.config["legacy-database"]
 
 		try:
 			# Exact dialect+driver is specified by the config file

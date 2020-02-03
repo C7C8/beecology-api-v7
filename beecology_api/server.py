@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_restx import Api
 
 import beecology_api.config as config
-from beecology_api import compat_bee_api, analysis_api
+from beecology_api import compat_bee_api, analysis_api, beecology_api
 from beecology_api.compat_bee_api.models import authorizations as bee_authorizations
 
 # Beecology API Server, Python edition!
@@ -43,9 +43,13 @@ def init_api():
 	          default_mediatype="application/json",
 	          authorizations=bee_authorizations,
 	          validate=True)
+	api.add_namespace(beecology_api.main_api, "")
+	api.add_namespace(beecology_api.reference_api, "/reference")
+	api.add_namespace(beecology_api.manage_api, "/management")
 	api.add_namespace(compat_bee_api.api, "/compat")
 	api.add_namespace(analysis_api.api, "/analysis")
 
 	app.register_blueprint(blueprint)
+
 
 init_api()

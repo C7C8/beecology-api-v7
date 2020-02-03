@@ -13,8 +13,14 @@ storage:
 
 database:
   pool_size: 16
-             # DB syntax  driver     uname   password        host      port datbase
+             # DB syntax  driver     uname   password        host      port database
+  connection: "postgresql+psycopg2://username:password@localhost:5432/database2"
+
+legacy-database:
+  pool_size: 16
+  # DB syntax  driver     uname   password        host      port datbase
   connection: "postgresql+psycopg2://username:password@localhost:5432/database"
+
 
 logging:
   version: 1

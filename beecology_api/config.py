@@ -19,6 +19,10 @@ config = {
 	},
 	"database": {
 		"pool_size": 16,
+		"connection": "postgresql+psycopg2://root@localhost:5432/beecologydb2"
+	},
+	"legacy-database": {
+		"pool_size": 16,
 		"connection": "postgresql+psycopg2://root@localhost:5432/beecologydb"
 	},
 	"logging": {
