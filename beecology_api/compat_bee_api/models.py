@@ -6,7 +6,7 @@ from beecology_api.compat_bee_api.api import api
 # DATA MODELS #
 ###############
 
-bee_record_no_elevation = api.model("Bee record (no elevation)", {
+bee_record_no_elevation = api.model("[Legacy] Bee record (no elevation)", {
     "beerecord_id": fields.Integer(min=0),
     "user_id": fields.String(description="User ID string"),
     "bee_dict_id": fields.Integer(description="A bee dictionary ID. Due to a bug in the old Node server , many of these"
@@ -27,7 +27,7 @@ bee_record_no_elevation = api.model("Bee record (no elevation)", {
     "record_video_path": fields.String(description="Unused. Currently left blank.")
 })
 
-bee_record = api.inherit("Bee record", bee_record_no_elevation, {
+bee_record = api.inherit("[Legacy] Bee record", bee_record_no_elevation, {
     "elevation": fields.String(description="Elevation in feet. Yes, this is actually an integer in string format.", example="129")
 })
 
@@ -36,7 +36,7 @@ bee_record_extended = api.inherit("Bee record (extended)", bee_record, {
     "common_name": fields.String(description="Flower common English name")
 })
 
-bee_vis_record = api.model("Bee vis record", {
+bee_vis_record = api.model("[Legacy] Bee vis record", {
     "bee_name": fields.String(description="Latin bee genus+species designation"),
     "date": fields.DateTime(dt_format="%Y-%m-%dT%H:%M:%S.%fZ"),
     "loc_info": fields.String(description="Comma-delimited latitude+longitude coordinates", example="42.59, -71.70"),
@@ -50,7 +50,7 @@ bee_vis_record = api.model("Bee vis record", {
     "spgender": fields.String(description="Gender of bee", enum=["Male", "Female", "Male/Female", "Unknown"]),
 })
 
-beedex_entry = api.model("BeeDex entry", {
+beedex_entry = api.model("[Legacy] BeeDex entry", {
     "bee_id": fields.Integer,
     "bee_name": fields.String(description="Latin genus+species bee designation", example="Bombus griseocollis"),
     "common_name": fields.String(description="Plain English bee name", example="Brown-belted bumble bee"),
@@ -63,40 +63,40 @@ beedex_entry = api.model("BeeDex entry", {
     "head_list": fields.String(description="List of heads associated with this bee. Usually null.", example='{"h2", "h3"}')
 })
 
-user_access_token = api.model("Access token", {
+user_access_token = api.model("[Legacy] Access token", {
     "accessToken": fields.String(description="Access token, a JWT used as bearer token for authentication."),
     "expiresIn": fields.Integer(3600000, description="Milliseconds until token expiration"),
     "expiresAt": fields.Integer(description="Timestamp of when the access token will expire, in milliseconds")
 })
 
-user_token_pair = api.inherit("User token set", user_access_token, {
+user_token_pair = api.inherit("[Legacy] User token set", user_access_token, {
     "refreshToken": fields.String(description="Token presented to the server at any time to obtain a new access token."),
     "type": fields.String("Bearer", description="HTTP authorization token type")
 })
 
-flower_id = api.model("Flower ID", {  # WHY does this need to exist?!
+flower_id = api.model("[Legacy] Flower ID", {  # WHY does this need to exist?!
     "flower_id": fields.Integer(description="Flower ID")
 })
 
-flower_dict_entry = api.model("Flowerdex entry", {
+flower_dict_entry = api.model("[Legacy] Flowerdex entry", {
     "flower_id": fields.Integer(description="Flower ID"),
     "flower_latin_name": fields.Integer(description="Latin genus+species flower designation"),
     "flower_common_name": fields.String(description="Plain English flower name")
 })
 
-flower_shape = api.model("Flower shape", {
+flower_shape = api.model("[Legacy] Flower shape", {
     "feature_id": fields.String(description="3-character flower shape identifier, prefixed with `fs`", example="fs5"),
     "feature_name": fields.String(description="Plain English description of the flower shape/feature", example="Tube with Spur"),
     "feature_description": fields.String(description="Alterate/longer description of feature", example="spiked tube"),
     "feature_pic_path": fields.String(description="File path under this server to image associated with the feature")
 })
 
-unmatched_flower = api.model("Unmatched flower", {
+unmatched_flower = api.model("[Legacy] Unmatched flower", {
     "flower_name": fields.String(description="Flower name as reported by the user"),
     "count": fields.String(description="Count of times this flower occurs in the bee records database. Yes, this is an integer transmitted as a string.")
 })
 
-flower = api.model("Flower", {
+flower = api.model("[Legacy] Flower", {
     "flower_id": fields.Integer(description="Flowerdex ID"),
     "latin_name": fields.String(description="Latin genus+species flower designation"),
     "main_common_name": fields.String(description="Plain English flower name"),
@@ -111,57 +111,57 @@ flower = api.model("Flower", {
 # RESPONSE MODELS #
 ###################
 
-response_wrapper = api.model("Standard response wrapper", {
+response_wrapper = api.model("[Legacy] Standard response wrapper", {
     "status": fields.String("success", description="Success status", enum=["success", "false"]),
     "message": fields.String(description="Information about operation performed"),
     "error": fields.Boolean(False, description="Success status")
 })
 
-bee_record_no_elevation_response = api.inherit("Bee record (w/o elevation) response", response_wrapper, {
+bee_record_no_elevation_response = api.inherit("[Legacy] Bee record (w/o elevation) response", response_wrapper, {
     "data": fields.List(fields.Nested(bee_record_no_elevation))
 })
 
-bee_record_response = api.inherit("Bee record response", response_wrapper, {
+bee_record_response = api.inherit("[Legacy] Bee record response", response_wrapper, {
     "data": fields.List(fields.Nested(bee_record))
 })
 
-bee_record_by_page_response = api.inherit("Bee record list (extended) response", response_wrapper, {
+bee_record_by_page_response = api.inherit("[Legacy] Bee record list (extended) response", response_wrapper, {
     "data": fields.List(fields.Nested(bee_record_extended))
 })
 
-bee_vis_record_response = api.inherit("Bee vis records response", response_wrapper, {
+bee_vis_record_response = api.inherit("[Legacy] Bee vis records response", response_wrapper, {
     "data": fields.List(fields.Nested(bee_vis_record))
 })
 
-beedex_response = api.inherit("Beedex entry response", response_wrapper, {
+beedex_response = api.inherit("[Legacy] Beedex entry response", response_wrapper, {
     "data": fields.List(fields.Nested(beedex_entry), description="Only ever contains one item.")
 })
 
-add_flower_response = api.inherit("Add flower response", response_wrapper, {
+add_flower_response = api.inherit("[Legacy] Add flower response", response_wrapper, {
     "data": fields.List(fields.Nested(flower_id), description="Only ever contains one item.")
 })
 
-flower_dict_response = api.inherit("Flowerdex response", response_wrapper, {
+flower_dict_response = api.inherit("[Legacy] Flowerdex response", response_wrapper, {
     "data": fields.List(fields.Nested(flower_dict_entry))
 })
 
-flower_shape_response = api.inherit("Flower shape response", response_wrapper, {
+flower_shape_response = api.inherit("[Legacy] Flower shape response", response_wrapper, {
     "data": fields.List(fields.Nested(flower_shape))
 })
 
-unmatched_flowers_response = api.inherit("Unmatched flowers response", response_wrapper, {
+unmatched_flowers_response = api.inherit("[Legacy] Unmatched flowers response", response_wrapper, {
     "data": fields.List(fields.Nested(unmatched_flower))
 })
 
-flower_list_response = api.inherit("Flower list response", response_wrapper, {
+flower_list_response = api.inherit("[Legacy] Flower list response", response_wrapper, {
     "data": fields.List(fields.Nested(flower))
 })
 
-media_upload_response = api.inherit("Media upload response", response_wrapper, {
+media_upload_response = api.inherit("[Legacy] Media upload response", response_wrapper, {
     "imagePath": fields.String(description="File path on this server that the uploaded media was stored at")
 })
 
-news_response = api.inherit("News response", response_wrapper, {
+news_response = api.inherit("[Legacy] News response", response_wrapper, {
     "data": fields.Raw(description="News object")
 })
 

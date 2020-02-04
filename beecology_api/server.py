@@ -45,7 +45,7 @@ def init_api():
 	          default_mediatype="application/json",
 	          authorizations=bee_authorizations,
 	          validate=True)
-	api.add_namespace(beecology_api.main_api, "")
+	api.add_namespace(beecology_api.main_api)
 	api.add_namespace(beecology_api.reference_api, "/reference")
 	api.add_namespace(beecology_api.manage_api, "/management")
 	api.add_namespace(compat_bee_api.api, "/compat")
