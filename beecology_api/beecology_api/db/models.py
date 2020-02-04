@@ -32,7 +32,7 @@ class BeeRecord(BaseTable):
 	id                  = Column(id_type, primary_key=True, index=True)
 	user                = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
 	bee_species_id      = Column(id_type, ForeignKey("bee_species.id"), index=True, nullable=True)
-	flower_species_id   = Column(id_type, ForeignKey("flower_species.id"), index=True)
+	flower_species_id   = Column(id_type, ForeignKey("flower_species.id"), index=True, nullable=True)
 	images              = relationship("Image", backref="bee_record")
 	videos              = relationship("Video", backref="bee_record")
 	name                = Column(String)
