@@ -20,14 +20,16 @@ class User(Resource):
 		"""Delete a user's record."""
 
 
-class Admin(Resource):
-	def get(self):
-		"""Get information on one or more admins."""
-
+class ChangeAdmin(Resource):
 	# TODO Determine whether put/post are correct here for admin verification and updating
 	def put(self):
 		"""Submit a verification code confirming the calling user is now an admin."""
 		pass
+
+
+class Admin(Resource):
+	def get(self):
+		"""Get information on one or more admins."""
 
 	def post(self):
 		"""Update another user's admin privileges."""

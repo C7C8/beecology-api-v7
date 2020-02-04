@@ -1,6 +1,6 @@
-from .bee import Bee
-from .flower import Flower
-from .media import Image, Video
-from .news import News
+from .bee import Bee, AddBee
+from .flower import Flower, AddFlower
+from .media import Image, Video, AddImage, AddVideo
+from .news import News, AddNews
 from .record import Record, AddRecord
-from .user import Admin, Token, User
+from .user import Admin, Token, User, ChangeAdmin

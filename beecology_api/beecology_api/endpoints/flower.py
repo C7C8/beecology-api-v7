@@ -1,13 +1,15 @@
 from flask_restx import Resource
 
 
+class AddFlower(Resource):
+	def post(self):
+		"""Add a new flower species, or replace an existing one."""
+		pass
+
+
 class Flower(Resource):
 	def get(self):
 		"""Get information on one or all flower species."""
-		pass
-
-	def post(self):
-		"""Add a new flower species, or replace an existing one."""
 		pass
 
 	def put(self):

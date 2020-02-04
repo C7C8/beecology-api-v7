@@ -1,12 +1,15 @@
 from flask_restx import Resource
 
+
+class AddImage(Resource):
+	def post(self):
+		"""Upload a new image."""
+		pass
+
+
 class Image(Resource):
 	def get(self):
 		"""Get an image's file path."""
-		pass
-
-	def post(self):
-		"""Upload a new image."""
 		pass
 
 	def put(self):
@@ -18,13 +21,15 @@ class Image(Resource):
 		pass
 
 
+class AddVideo(Resource):
+	def post(self):
+		"""Upload a new video."""
+		pass
+
+
 class Video (Resource):
 	def get(self):
 		"""Get a video's file path."""
-		pass
-
-	def post(self):
-		"""Upload a new video."""
 		pass
 
 	def put(self):

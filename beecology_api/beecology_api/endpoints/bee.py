@@ -1,13 +1,15 @@
 from flask_restx import Resource
 
 
+class AddBee(Resource):
+	def post(self):
+		"""Add a new bee species, or replace an existing one."""
+		pass
+
+
 class Bee(Resource):
 	def get(self):
 		"""Get information on one or all bee species."""
-		pass
-
-	def post(self):
-		"""Add a new bee species, or replace an existing one."""
 		pass
 
 	def put(self):
