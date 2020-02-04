@@ -19,7 +19,7 @@ class User(BaseTable):
 	id                  = Column(String, primary_key=True, index=True)
 	admin               = Column(Boolean, default=False)
 	locked              = Column(Boolean, default=False)
-	registered          = Column(DateTime, default=datetime.now())
+	registration_date   = Column(DateTime, default=datetime.now())
 	last_login          = Column(DateTime, default=datetime.now())
 	records             = relationship("BeeRecord")
 	images              = relationship("Image")
@@ -41,7 +41,7 @@ class BeeRecord(BaseTable):
 	time                = Column(DateTime)
 	loc_info            = Column(Geometry(geometry_type="POINT") if use_postgres else String)
 	city                = Column(String)
-	gender              = Column(Enum("male", "female", "either", "unknown", name="bee_gender"))
+	gender              = Column(Enum("male", "female", "queen", "unknown", name="bee_gender"))
 	behavior            = Column(Enum("pollen", "nectar", "unknown", name="bee_behavior"))
 	elevation           = Column(Float)
 
@@ -53,6 +53,7 @@ class BeeSpecies(BaseTable):
 	species             = Column(String)
 	common_name         = Column(String)
 	description         = Column(Text)
+	tongue_length       = Enum("long", "medium", "short", name="tongue_length")
 	active_start        = Column(Enum("January", "February", "March", "April", "May", "June", "July", "August", "September",
 	                                  "October", "November", "December", name="months"))
 	active_end          = Column(Enum(name="months"))
@@ -98,5 +99,6 @@ class News(BaseTable):
 	id                  = Column(id_type, primary_key=True)
 	user_id             = Column(String, ForeignKey("user.id"), index=True, nullable=True)
 	news_type           = Column(Enum("main", "bio_cs", name="news_type"))
+	post_date           = Column(DateTime, index=True)
 	content             = Column(JSON)
 

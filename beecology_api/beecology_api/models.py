@@ -23,8 +23,8 @@ bee_record = main_api.model("Bee record", {
 	"loc_info": fields.Nested(gis_coordinate, description="Point of observation", required=True),
 	"elevation": fields.Float(description="Elevation at the point the bee was observed at"),
 	"city": fields.String(description="Where the bee was observed"),
-	"gender": fields.String(description="Bee gender", choices=["male", "female", "either", "unknown"], required=True),
-	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", choices=["pollen", "nectar", "unknown"], required=True),
+	"gender": fields.String(description="Bee gender", enum=["male", "female", "either", "unknown"], required=True),
+	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", enum=["pollen", "nectar", "unknown"], required=True),
 	"images": fields.List(fields.String, description="List of image paths for images associated with this record", required=True),
 	"videos": fields.List(fields.String, description="List of video paths for videos associated with this record"),
 })
@@ -37,8 +37,8 @@ flower_species = reference_api.model("Flower species", {
 	"alt_name": fields.String(description="An alternate common name for the flower", required=True),
 	"main_color": fields.String(description="The flower's dominant color", required=True),
 	"colors": fields.String(description="Comma-separated list of other colors on the flower"),
-	"bloom_start": fields.String(description="When the flower species starts blooming", choices=_months, required=True),
-	"bloom_end": fields.String(description="When the flower species stops blooming", choices=_months, required=True),
+	"bloom_start": fields.String(description="When the flower species starts blooming", enum=_months, required=True),
+	"bloom_end": fields.String(description="When the flower species stops blooming", enum=_months, required=True),
 	"shape": fields.String(description="Flower shape"),
 	"image": fields.String(description="Path to a file on this server with an image of the flower"),
 })
@@ -49,8 +49,8 @@ bee_species = reference_api.model("Flower_species", {
 	"species": fields.String(description="Bee species", required=True),
 	"common_name": fields.String(description="The name the bee species is most often referred to by", required=True),
 	"description": fields.String(description="Textual description of the bee in plain English", required=True),
-	"active_start": fields.String(description="When the bee species is active", choices=_months, required=True),
-	"active_end": fields.String(description="When the bee species ceases activity", choices=_months, required=True),
+	"active_start": fields.String(description="When the bee species is active", enum=_months, required=True),
+	"active_end": fields.String(description="When the bee species ceases activity", enum=_months, required=True),
 	"confused_with": fields.String(description="Commma-separated list of bee species that this species is commonly confused with"),
 	"image": fields.String(description="Path to a file on this server with an image of the bee", required=True),
 })

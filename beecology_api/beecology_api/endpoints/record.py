@@ -10,11 +10,11 @@ from flask_restx import Resource
 
 class AddRecord(Resource):
 
-	@api.expect(bee_record, validate=True)
+	@api.expect(bee_record)
 	@api.response(201, "Bee record logged")
 	@api.response(400, "Invalid request")
-	def post(self, id: uuid.UUID = None):
-		"""Log a new record."""
+	def post(self):
+		"""Log a new record. ID and username are ignored and filled in by the server."""
 		# TODO require auth
 		bee = api.payload
 		record = BeeRecord(
