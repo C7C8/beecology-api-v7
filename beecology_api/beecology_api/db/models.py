@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 
 from beecology_api import config
 
+"""Core SQLAlchemy ORM mappings for objects to tables"""
 
 use_postgres = "postgres" in config.config["database"]["connection"]
 id_type = postgresql.UUID(as_uuid=True) if use_postgres else String
@@ -30,7 +31,7 @@ class User(BaseTable):
 class BeeRecord(BaseTable):
 	__tablename__       = "bee_record"
 	id                  = Column(id_type, primary_key=True, index=True)
-	user                = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
+	user_id             = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
 	bee_species_id      = Column(id_type, ForeignKey("bee_species.id"), index=True, nullable=True)
 	flower_species_id   = Column(id_type, ForeignKey("flower_species.id"), index=True, nullable=True)
 	images              = relationship("Image", backref="bee_record")
@@ -53,7 +54,7 @@ class BeeSpecies(BaseTable):
 	species             = Column(String)
 	common_name         = Column(String)
 	description         = Column(Text)
-	tongue_length       = Enum("long", "medium", "short", name="tongue_length")
+	tongue_length       = Column(Enum("long", "medium", "short", name="tongue_length"))
 	active_start        = Column(Enum("January", "February", "March", "April", "May", "June", "July", "August", "September",
 	                                  "October", "November", "December", name="months"))
 	active_end          = Column(Enum(name="months"))
@@ -101,4 +102,3 @@ class News(BaseTable):
 	news_type           = Column(Enum("main", "bio_cs", name="news_type"))
 	post_date           = Column(DateTime, index=True)
 	content             = Column(JSON)
-

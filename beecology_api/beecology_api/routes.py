@@ -13,8 +13,9 @@ def setup_main_routes(main: Namespace):
 	main.add_resource(Video, "/video/<uuid:id>")
 	main.add_resource(AddVideo, "/video")
 	main.add_resource(Token, "/token")
-	main.add_resource(Record, "/record/<uuid:id>")
-	main.add_resource(AddRecord, "/record")
+	main.add_resource(Record, "/record", methods=["POST"])
+	main.add_resource(Record, "/record/<uuid:id>", methods=["DELETE", "PUT", "GET"])
+	main.add_resource(Records, "/records")
 
 
 def setup_reference_routes(ref: Namespace):

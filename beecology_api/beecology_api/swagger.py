@@ -6,6 +6,10 @@ _uuid_pattern = "[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\
 _months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
            "December"]
 
+##########
+# MODELS #
+##########
+
 gis_coordinate = main_api.model("GIS coordinate", {
 	"latitude": fields.Float(description="Latitude"),
 	"longitude": fields.Float(description="Longitude")
@@ -62,3 +66,8 @@ user = manage_api.model("User record", {
 	"registered": fields.DateTime(description="When this user first registered with the server", required=True),
 	"last_login": fields.DateTime(description="The user's last login time", required=True)
 })
+
+###########
+# PARSERS #
+###########
+

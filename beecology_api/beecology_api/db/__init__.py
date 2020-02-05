@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from beecology_api import config
-from .models import BaseTable
+from .models import *
 
 
 Session = None
@@ -17,6 +17,3 @@ def init_database():
 	engine = create_engine(cxn_str, pool_size=db_config["pool_size"]) if "sqlite" not in cxn_str else create_engine(cxn_str)
 	BaseTable.metadata.create_all(engine)
 	Session = sessionmaker(bind=engine)
-
-
-__all__ = [Session, init_database]
