@@ -46,7 +46,7 @@ class BeeRecord(BaseTable):
 	abdomen = Column(String)
 	thorax = Column(String)
 	time = Column(DateTime)
-	loc_info = Column(Geometry(geometry_type="POINT") if use_postgres else String)
+	loc_info = Column(Geometry(geometry_type="POINT", spatial_index=True) if use_postgres else String)
 	city = Column(String)
 	gender = Column(Enum(*genders, name="bee_gender"))
 	behavior = Column(Enum(*beehaviors, name="bee_behavior"))

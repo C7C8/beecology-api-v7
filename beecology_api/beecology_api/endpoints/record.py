@@ -3,7 +3,8 @@ from uuid import UUID, uuid4
 
 from flask import request
 from flask_restx import Resource, abort
-from geoalchemy2 import Geometry, func
+from geoalchemy2 import func
+from marshmallow.exceptions import ValidationError
 
 import beecology_api.beecology_api.db as db
 from beecology_api.beecology_api.api import main_api as api
@@ -44,11 +45,35 @@ class Record(Resource):
 		records = session.query(BeeRecord).filter(BeeRecord.id == id).first()
 		if records is None:
 			abort(400, "ID {} not found".format(id))
-		return bee_record_schema.dump(records[0])
+		ret = bee_record_schema.dump(records)
+		session.close()
+		return ret
 
-	def put(self):
-		"""Update a bee record."""
-		pass
+	@api.expect(bee_record)
+	@api.response(204, "Bee record updated")
+	@api.response(404, "Bee record not found")
+	@api.response(400, "Unknown field or data type")
+	def put(self, id: UUID):
+		"""Update a bee record. Changes to the ID are ignored."""
+		# Delete id+user-id if they exist in the payload
+		session = db.Session()
+		record = session.query(BeeRecord).filter(BeeRecord.id == id).first()
+		if record is None:
+			session.close()
+			abort(404)
+
+		if "id" in api.payload:
+			api.payload["id"] = str(id)
+
+		try:
+			record = bee_record_schema.load(api.payload, session=session)
+		except (ValueError, ValidationError):
+			session.close()
+			abort(400, "Unknown field or data type")
+
+		session.commit()
+		session.close()
+		return "", 204
 
 	def delete(self):
 		"""Delete a bee record"""
@@ -87,9 +112,12 @@ class Records(Resource):
 				if len(coords) != 4 or coords[0] >= coords[2] or coords[1] >= coords[3]:
 					raise ValueError
 			except ValueError:
+				session.close()
 				abort(400, "Invalid bounding box filter parameters")
 
 			query = query.filter(func.ST_Within(BeeRecord.loc_info, func.ST_GeomFromText(
 				"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
 
-		return [bee_record_schema.dump(record) for record in query.all()], 200
+		ret = [bee_record_schema.dump(record) for record in query.all()], 200
+		session.close()
+		return ret
