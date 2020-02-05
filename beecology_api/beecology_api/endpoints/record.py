@@ -43,7 +43,7 @@ class Record(Resource):
 		with db.db_session() as session:
 			records = session.query(BeeRecord).filter(BeeRecord.id == id).first()
 			if records is None:
-				abort(400, "ID {} not found".format(id))
+				abort(404)
 			ret = bee_record_schema.dump(records)
 			return ret
 
@@ -51,6 +51,7 @@ class Record(Resource):
 	@api.response(204, "Bee record updated")
 	@api.response(404, "Bee record not found")
 	@api.response(400, "Unknown field or data type")
+	@api.response(403, "Not authorized to update this record")
 	def put(self, id: UUID):
 		"""Update a bee record. Changes to the ID are ignored."""
 		# Delete id+user-id if they exist in the payload
@@ -70,9 +71,15 @@ class Record(Resource):
 			session.commit()
 			return "", 204
 
-	def delete(self):
+	@api.response(204, "Bee record deleted")
+	@api.response(403, "Not authorized to delete this record")
+	def delete(self, id: UUID):
 		"""Delete a bee record"""
-		pass
+		# TODO auth
+		with db.db_session() as session:
+			session.query(BeeRecord).filter(BeeRecord.id == id).delete()
+			session.commit()
+		return "", 204
 
 
 class Records(Resource):
