@@ -3,7 +3,7 @@ from flask_restx import Resource
 
 class AddBee(Resource):
 	def post(self):
-		"""Add a new bee species, or replace an existing one."""
+		"""Add a new bee species"""
 		pass
 
 

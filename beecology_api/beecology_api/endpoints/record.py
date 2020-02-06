@@ -22,14 +22,14 @@ class Record(Resource):
 	def post(self):
 		"""Log a new record. ID and username are ignored and filled in by the server."""
 		# TODO require auth
+		api.payload["id"] = uuid4()
 		with db.db_session() as session:
 			try:
 				record = bee_record_schema.load(api.payload, session=session)
-			except ValueError:
-				log.error("Flask failed to validate input to Marshmallow's standards: {}".format(api.payload))
+			except ValueError as e:
+				log.error("Flask failed to validate input to Marshmallow's standards: {}".format(api.payload), e)
 				abort(400, "Invalid input")
 
-			record.id = uuid4()
 			session.add(record)
 			session.commit()
 

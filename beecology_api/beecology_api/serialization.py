@@ -1,9 +1,12 @@
+from uuid import UUID
+
 from geoalchemy2 import Geography
 from geoalchemy2.shape import from_shape, to_shape
 from marshmallow import fields
 from marshmallow_sqlalchemy import ModelSchema, ModelConverter
 from shapely import geometry
 
+from beecology_api.beecology_api.db import db_session
 from beecology_api.beecology_api.db.models import *
 
 """Marshmallow de/serialization schemas and related converters"""
@@ -25,7 +28,7 @@ class _PointField(fields.Field):
 		return from_shape(geometry.Point(*value.values()))
 
 
-class _MediaField(fields.Field):
+class _ImageField(fields.Field):
 	"""Marshmallow field for deserializing an image to just a path"""
 	def _serialize(self, value, attr, obj, **kwargs):
 		if value is None:
@@ -35,7 +38,8 @@ class _MediaField(fields.Field):
 	def _deserialize(self, value, attr, data, **kwargs):
 		if value is None:
 			return None
-		return value
+		ret = self.parent.session.query(Image).filter(Image.id.in_(value)).all()
+		return ret
 
 
 class Converter(ModelConverter):
@@ -53,7 +57,7 @@ class UserSchema(ModelSchema):
 
 class BeeRecordSchema(ModelSchema):
 	loc_info = _PointField(attribute="loc_info")
-	images = _MediaField(attribute="images")
+	images = _ImageField(attribute="images")
 
 	class Meta:
 		model = BeeRecord
