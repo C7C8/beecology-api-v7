@@ -26,7 +26,7 @@ class Record(Resource):
 		with db.db_session() as session:
 			try:
 				record = bee_record_schema.load(api.payload, session=session)
-			except ValueError as e:
+			except (ValueError, ValidationError) as e:
 				log.error("Flask failed to validate input to Marshmallow's standards: {}".format(api.payload), e)
 				abort(400, "Invalid input")
 
@@ -41,30 +41,27 @@ class Record(Resource):
 	def get(self, id: UUID):
 		"""Get one bee record by ID"""
 		with db.db_session() as session:
-			records = session.query(BeeRecord).filter(BeeRecord.id == id).first()
-			if records is None:
+			record = session.query(BeeRecord).filter(BeeRecord.id == id).first()
+			if record is None:
 				abort(404)
-			ret = bee_record_schema.dump(records)
-			return ret
+			return bee_record_schema.dump(record)
 
 	@api.expect(bee_record)
 	@api.response(204, "Bee record updated")
 	@api.response(404, "Bee record not found")
 	@api.response(400, "Unknown field or data type")
-	@api.response(403, "Not authorized to update this record")
 	def put(self, id: UUID):
 		"""Update a bee record. Changes to the ID are ignored."""
 		# Delete id+user-id if they exist in the payload
+		api.payload["id"] = id
 		with db.db_session() as session:
-			record = session.query(BeeRecord).filter(BeeRecord.id == id).first()
-			if record is None:
+			# Yes, technically this part could be skipped. However, including a guard is necessary because
+			# otherwise the user could attempt to put a record with arbitrary UUID in the database.
+			if session.query(BeeRecord).filter(BeeRecord.id == id).first() is None:
 				abort(404)
 
-			if "id" in api.payload:
-				api.payload["id"] = str(id)
-
 			try:
-				record = bee_record_schema.load(api.payload, session=session)
+				bee_record_schema.load(api.payload, session=session)
 			except (ValueError, ValidationError):
 				abort(400, "Unknown field or data type")
 
@@ -119,5 +116,4 @@ class Records(Resource):
 				query = query.filter(func.ST_Within(BeeRecord.loc_info, func.ST_GeomFromText(
 					"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
 
-			ret = [bee_record_schema.dump(record) for record in query.all()], 200
-			return ret
+			return [bee_record_schema.dump(record) for record in query.all()], 200

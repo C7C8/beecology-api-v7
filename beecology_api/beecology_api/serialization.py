@@ -1,12 +1,9 @@
-from uuid import UUID
-
 from geoalchemy2 import Geography
 from geoalchemy2.shape import from_shape, to_shape
 from marshmallow import fields
 from marshmallow_sqlalchemy import ModelSchema, ModelConverter
 from shapely import geometry
 
-from beecology_api.beecology_api.db import db_session
 from beecology_api.beecology_api.db.models import *
 
 """Marshmallow de/serialization schemas and related converters"""
@@ -38,8 +35,8 @@ class _ImageField(fields.Field):
 	def _deserialize(self, value, attr, data, **kwargs):
 		if value is None:
 			return None
-		ret = self.parent.session.query(Image).filter(Image.id.in_(value)).all()
-		return ret
+		# TODO make this accept image paths?
+		return self.parent.session.query(Image).filter(Image.id.in_(value)).all()
 
 
 class Converter(ModelConverter):

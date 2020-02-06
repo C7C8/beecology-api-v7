@@ -91,3 +91,7 @@ bee_record_filter_parser.add_argument("max-elevation", type=float, help="Elevati
 bee_record_filter_parser.add_argument("min-elevation", type=float, help="Elevation that records must be at or above", required=False)
 bee_record_filter_parser.add_argument("bounding-box", type=str, help="Bounding box that records must fall in, in format minLat,minLong,maxLat,maxLong", required=False)
 
+bee_species_filter_parser = reqparse.RequestParser()
+bee_species_filter_parser.add_argument("genus", type=str, help="Bee genus", required=False)
+bee_species_filter_parser.add_argument("tongue-length", type=str, help="Bee tongue length", required=False)
+bee_species_filter_parser.add_argument("active-during", type=str, help="Month that the bee must be active during", choices=months, required=False)
