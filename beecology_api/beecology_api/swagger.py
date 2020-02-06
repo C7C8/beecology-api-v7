@@ -24,6 +24,7 @@ bee_record = main_api.model("Bee record", {
 	"bee_species_id": fields.String(description="If known, the species ID of the observed bee", example="b6567a3c-be2e-4350-b944-3ec24d868586", pattern=_uuid_pattern, required=False),
 	"flower_species_id": fields.String(description="If known, the species ID of the observed flower", example="955c499b-5dd3-4521-9f75-f13b173bbc7b", pattern=_uuid_pattern, required=False),
 	"name": fields.String(description="Bee name", example="Bombus impatiens"),
+	"head": fields.String(description="Bee head type", example="h1", required=True),
 	"abdomen": fields.String(description="Bee abdomen type", example="a1", required=True),
 	"thorax": fields.String(description="Bee thorax type", example="f1", required=True),
 	"time": fields.DateTime(description="Time the bee record was logged", required=True),
@@ -78,6 +79,7 @@ bee_record_filter_parser = reqparse.RequestParser()
 bee_record_filter_parser.add_argument("user", type=str, help="User ID. Only works if the current user is the one given by the ID.", required=False)
 bee_record_filter_parser.add_argument("species", type=str, help="Species UUID", required=False)
 bee_record_filter_parser.add_argument("flower-species", type=str, help="Flower species UUID", required=False),
+bee_record_filter_parser.add_argument("head", type=str, help="Head type", required=False)
 bee_record_filter_parser.add_argument("abdomen", type=str, help="Abdomen type", required=False)
 bee_record_filter_parser.add_argument("thorax", type=str, help="Thorax type", required=False)
 bee_record_filter_parser.add_argument("time-start", type=inputs.datetime, help="Time that records must fall at or after", required=False)

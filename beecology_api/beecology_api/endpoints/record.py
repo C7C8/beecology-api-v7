@@ -94,7 +94,7 @@ class Records(Resource):
 			query = session.query(BeeRecord)
 
 			# Simple equality filtering
-			for attr in ["user", "species", "flower-species", "abdomen", "thorax", "city", "gender", "behavior"]:
+			for attr in ["user", "species", "flower-species", "head", "abdomen", "thorax", "city", "gender", "behavior"]:
 				if attr in args:
 					query = query.filter(BeeRecord.__dict__[attr] == args[attr])
 

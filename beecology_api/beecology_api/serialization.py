@@ -25,6 +25,19 @@ class _PointField(fields.Field):
 		return from_shape(geometry.Point(*value.values()))
 
 
+class _MediaField(fields.Field):
+	"""Marshmallow field for deserializing an image to just a path"""
+	def _serialize(self, value, attr, obj, **kwargs):
+		if value is None:
+			return None
+		return [image.path for image in value]
+
+	def _deserialize(self, value, attr, data, **kwargs):
+		if value is None:
+			return None
+		return value
+
+
 class Converter(ModelConverter):
 	"""Converter to serialize or deserialize a point."""
 	SQLA_TYPE_MAPPING = ModelConverter.SQLA_TYPE_MAPPING.copy()
@@ -40,6 +53,7 @@ class UserSchema(ModelSchema):
 
 class BeeRecordSchema(ModelSchema):
 	loc_info = _PointField(attribute="loc_info")
+	images = _MediaField(attribute="images")
 
 	class Meta:
 		model = BeeRecord
@@ -63,6 +77,16 @@ class NewsSchema(ModelSchema):
 	class Meta:
 		model = News
 		include_fk = True
+
+
+class ImageSchema(ModelSchema):
+	class Meta:
+		model = Image
+
+
+class VideoSchema(ModelSchema):
+	class Meta:
+		model = Video
 
 
 user_schema = UserSchema()

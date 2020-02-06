@@ -11,7 +11,7 @@ from beecology_api import config
 """Core SQLAlchemy ORM mappings for objects to tables"""
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
           "December"]
-genders = ["male", "female", "either", "unknown"]
+genders = ["male", "female", "queen", "unknown"]
 beehaviors = ["pollen", "nectar", "unknown"]
 tongue_lengths = ["long", "medium", "short"]
 news_types = ["biocs", "main"]
@@ -43,6 +43,7 @@ class BeeRecord(BaseTable):
 	images = relationship("Image", backref="bee_record")
 	videos = relationship("Video", backref="bee_record")
 	name = Column(String)
+	head = Column(String)
 	abdomen = Column(String)
 	thorax = Column(String)
 	time = Column(DateTime)
