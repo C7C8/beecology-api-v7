@@ -6,7 +6,7 @@ from flask_restx import Resource, abort
 from geoalchemy2 import func
 from marshmallow.exceptions import ValidationError
 
-import beecology_api.beecology_api.db as db
+from beecology_api.beecology_api.db import db_session
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.db.models import BeeRecord
 from beecology_api.beecology_api.serialization import bee_record_schema
@@ -23,7 +23,7 @@ class Record(Resource):
 		"""Log a new record. ID and username are ignored and filled in by the server."""
 		# TODO require auth
 		api.payload["id"] = uuid4()
-		with db.db_session() as session:
+		with db_session() as session:
 			try:
 				record = bee_record_schema.load(api.payload, session=session)
 			except (ValueError, ValidationError) as e:
@@ -40,7 +40,7 @@ class Record(Resource):
 	@api.response(404, "Record not found")
 	def get(self, id: UUID):
 		"""Get one bee record by ID"""
-		with db.db_session() as session:
+		with db_session() as session:
 			record = session.query(BeeRecord).filter(BeeRecord.id == id).first()
 			if record is None:
 				abort(404)
@@ -54,7 +54,7 @@ class Record(Resource):
 		"""Update a bee record. Changes to the ID are ignored."""
 		# Delete id+user-id if they exist in the payload
 		api.payload["id"] = id
-		with db.db_session() as session:
+		with db_session() as session:
 			# Yes, technically this part could be skipped. However, including a guard is necessary because
 			# otherwise the user could attempt to put a record with arbitrary UUID in the database.
 			if session.query(BeeRecord).filter(BeeRecord.id == id).first() is None:
@@ -68,12 +68,12 @@ class Record(Resource):
 			session.commit()
 			return "", 204
 
-	@api.response(204, "Bee record deleted")
-	@api.response(403, "Not authorized to delete this record")
+	@api.param("id", "UUID of record to delete")
+	@api.response(204, "Bee record deleted (if present)")
 	def delete(self, id: UUID):
 		"""Delete a bee record"""
 		# TODO auth
-		with db.db_session() as session:
+		with db_session() as session:
 			session.query(BeeRecord).filter(BeeRecord.id == id).delete()
 			session.commit()
 		return "", 204
@@ -86,7 +86,7 @@ class Records(Resource):
 	def get(self):
 		"""Get a list of records, filtered by any means."""
 		# TODO Make sure current user is the specified user
-		with db.db_session() as session:
+		with db_session() as session:
 			args = request.args
 			query = session.query(BeeRecord)
 

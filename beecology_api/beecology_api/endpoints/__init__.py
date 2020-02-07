@@ -1,5 +1,5 @@
 from .bee import Bee, Bees
-from .flower import Flower, AddFlower
+from .flower import Flower, Flowers
 from .media import Image, Video, AddImage, AddVideo
 from .news import News, AddNews
 from .record import Record, Records

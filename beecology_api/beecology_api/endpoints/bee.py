@@ -6,8 +6,8 @@ from flask_restx import Resource, abort
 from marshmallow import ValidationError
 from sqlalchemy import and_
 
-from beecology_api.beecology_api import db
 from beecology_api.beecology_api.api import reference_api as api
+from beecology_api.beecology_api.db import db_session
 from beecology_api.beecology_api.serialization import bee_species_schema, BeeSpecies
 from beecology_api.beecology_api.swagger import bee_species, bee_species_filter_parser
 
@@ -21,7 +21,7 @@ class Bee(Resource):
 		"""Add a new bee species"""
 		# TODO Require admin auth
 		api.payload["id"] = uuid4()
-		with db.db_session() as session:
+		with db_session() as session:
 			try:
 				species = bee_species_schema.load(api.payload, session=session)
 			except (ValueError, ValidationError) as e:
@@ -31,20 +31,22 @@ class Bee(Resource):
 			session.add(species)
 			session.commit()
 
+		log.info("Added new bee species {} {}".format(api.payload["genus"], api.payload["species"]))
 		return {"message": "Bee species added"}, 201
 
 	@api.param("id", "UUID of bee species to return information on")
-	@api.response(200, "Species data enclosed")
+	@api.response(200, "Species data enclosed", bee_species)
 	@api.response(404, "Species not found")
 	def get(self, id: UUID):
 		"""Get information on a single bee species."""
-		with db.db_session() as session:
+		with db_session() as session:
 			species = session.query(BeeSpecies).filter(BeeSpecies.id == id).first()
 			if species is None:
 				abort(404)
 			return bee_species_schema.dump(species)
 
 	@api.param("id", "UUID of bee species to update")
+	@api.expect(bee_species)
 	@api.response(204, "Species updated")
 	@api.response(404, "Species not found")
 	@api.response(400, "Unknown field or data type")
@@ -52,7 +54,7 @@ class Bee(Resource):
 		"""Update a bee species. Changes to the ID are ignored"""
 		# TODO require admin auth
 		api.payload["id"] = id
-		with db.db_session() as session:
+		with db_session() as session:
 			if session.query(BeeSpecies).filter(BeeSpecies.id == id).first() is None:
 				abort(404)
 
@@ -65,22 +67,24 @@ class Bee(Resource):
 			session.commit()
 			return "", 204
 
+	@api.param("id", "UUID of species to delete")
+	@api.response(204, "Bee species deleted (if present)")
 	def delete(self, id: UUID):
 		"""Delete a bee species."""
 		# TODO require admin auth
-		with db.db_session() as session:
+		with db_session() as session:
 			session.query(BeeSpecies).filter(BeeSpecies.id == id).delete()
 			session.commit()
 		return "", 204
 
 
 class Bees(Resource):
-	"""Get all bee species"""
 	@api.expect(bee_species_filter_parser)
 	@api.response(400, "Bad filter parameters")
 	@api.marshal_with(bee_species, as_list=True)
 	def get(self):
-		with db.db_session() as session:
+		"""Get all bee species, subject to optional filtering"""
+		with db_session() as session:
 			args = request.args
 			query = session.query(BeeSpecies)
 

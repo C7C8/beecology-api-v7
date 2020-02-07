@@ -22,8 +22,9 @@ def setup_reference_routes(ref: Namespace):
 	ref.add_resource(Bee, "/bee", methods=["POST"])
 	ref.add_resource(Bee, "/bee/<uuid:id>", methods=["DELETE", "PUT", "GET"])
 	ref.add_resource(Bees, "/bees")
-	ref.add_resource(Flower, "/flower-species/<uuid:id>")
-	ref.add_resource(AddFlower, "/flower-species")
+	ref.add_resource(Flower, "/flower", methods=["POST"])
+	ref.add_resource(Flower, "/flower/<uuid:id>", methods=["DELETE", "PUT", "GET"])
+	ref.add_resource(Flowers, "/flowers")
 
 
 def setup_admin_routes(manage: Namespace):

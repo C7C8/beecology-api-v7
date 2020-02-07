@@ -95,3 +95,8 @@ bee_species_filter_parser = reqparse.RequestParser()
 bee_species_filter_parser.add_argument("genus", type=str, help="Bee genus", required=False)
 bee_species_filter_parser.add_argument("tongue-length", type=str, help="Bee tongue length", required=False)
 bee_species_filter_parser.add_argument("active-during", type=str, help="Month that the bee must be active during", choices=months, required=False)
+
+flower_species_filter_parser = reqparse.RequestParser()
+flower_species_filter_parser.add_argument("genus", type=str, help="Flower genus", required=False)
+flower_species_filter_parser.add_argument("shape", type=str, help="Flower shape", required=False)
+flower_species_filter_parser.add_argument("blooms-during", type=str, help="Month in which the flower must be in bloom", choices=months, required=False)
