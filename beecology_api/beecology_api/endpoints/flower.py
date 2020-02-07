@@ -84,8 +84,8 @@ class Flowers(Resource):
 	@api.marshal_with(flower_species, as_list=True)
 	def get(self):
 		"""Get all flower species, subject to optional filtering"""
+		args = flower_species_filter_parser.parse_args()
 		with db_session() as session:
-			args = request.args
 			query = session.query(FlowerSpecies)
 
 			# Simple equality filtering

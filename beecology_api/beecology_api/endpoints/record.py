@@ -86,8 +86,8 @@ class Records(Resource):
 	def get(self):
 		"""Get a list of records, filtered by any means."""
 		# TODO Make sure current user is the specified user
+		args = bee_record_filter_parser.parse_args()
 		with db_session() as session:
-			args = request.args
 			query = session.query(BeeRecord)
 
 			# Simple equality filtering

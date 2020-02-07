@@ -84,8 +84,8 @@ class Bees(Resource):
 	@api.marshal_with(bee_species, as_list=True)
 	def get(self):
 		"""Get all bee species, subject to optional filtering"""
+		args = bee_species_filter_parser.parse_args()
 		with db_session() as session:
-			args = request.args
 			query = session.query(BeeSpecies)
 
 			# Simple equality filtering

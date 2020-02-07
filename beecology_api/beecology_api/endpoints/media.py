@@ -7,15 +7,14 @@ from logging import getLogger
 from uuid import uuid1, UUID
 
 import magic
-from flask import request
 from flask_restx import Resource, abort
 
 from beecology_api import config
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.db import db_session
+from beecology_api.beecology_api.db.models import Image as DBImage, Video as DBVideo
 from beecology_api.beecology_api.serialization import image_schema, video_schema
 from beecology_api.beecology_api.swagger import media_upload_parser, media
-from beecology_api.beecology_api.db.models import Image as DBImage, Video as DBVideo
 
 log = getLogger()
 
@@ -29,12 +28,13 @@ class Image(Resource):
 		"""Upload a new image, returning image info"""
 		# TODO require auth
 		# Process media of image/* mime type and a max file size of 10 MB
-		id, file_path, client_path = _process_media(b64=request.args["data"], mime_type="image", max_size=10**7)
+		args = media_upload_parser.parse_args()
+		id, file_path, client_path = _process_media(b64=args["data"], mime_type="image", max_size=10**7)
 		image = DBImage(id=id, file_path=file_path, client_path=client_path)
 		with db_session() as session:
 			session.add(image)
 			session.commit()
-		return image_schema.dump(image), 201
+			return image_schema.dump(image), 201
 
 	@api.param("id", "Image UUID")
 	@api.response(404, "Image not found")
@@ -55,6 +55,7 @@ class Image(Resource):
 	def put(self, id: UUID):
 		"""Change an existing image."""
 		# TODO require auth
+		args = media_upload_parser.parse_args()
 		with db_session() as session:
 			# First get the original image record so we can reuse its ID and delete the original file
 			image = session.query(DBImage).filter(DBImage.id == id).first()
@@ -62,7 +63,7 @@ class Image(Resource):
 				abort(404)
 
 			# Process the new media file
-			id, file_path, client_path = _process_media(b64=request.args["data"], mime_type="image", max_size=10**7)
+			id, file_path, client_path = _process_media(b64=args["data"], mime_type="image", max_size=10**7)
 
 			# Since no HTTPException was thrown, it worked and the file is now stored on-disk. Delete the old file,
 			# and update the database records to match the new file.
@@ -100,7 +101,8 @@ class Video(Resource):
 		"""Upload a new video."""
 		# TODO require auth
 		# Process media of video/* mime type and a max file size of 100 MB
-		id, file_path, client_path = _process_media(b64=request.args["data"], mime_type="video", max_size=10**8)
+		args = media_upload_parser.parse_args()
+		id, file_path, client_path = _process_media(b64=args["data"], mime_type="video", max_size=10**8)
 		video = DBVideo(id=id, file_path=file_path, client_path=client_path)
 		with db_session() as session:
 			session.add(video)
@@ -126,6 +128,7 @@ class Video(Resource):
 	def put(self, id: UUID):
 		"""Change an existing video."""
 		# TODO require auth
+		args = media_upload_parser.parse_args()
 		with db_session() as session:
 			# First get the original video record so we can reuse its ID and delete the original file
 			video = session.query(DBVideo).filter(DBVideo.id == id).first()
@@ -133,7 +136,7 @@ class Video(Resource):
 				abort(404)
 
 			# Process the new media file
-			id, file_path, client_path = _process_media(b64=request.args["data"], mime_type="video", max_size=10**8)
+			id, file_path, client_path = _process_media(b64=args["data"], mime_type="video", max_size=10**8)
 
 			# Since no HTTPException was thrown, it worked and the file is now stored on-disk. Delete the old file,
 			# and update the database records to match the new file.
@@ -183,7 +186,7 @@ def _process_media(b64: str, mime_type: str, user: str = None, max_size: int = N
 	node = None if user is None else int(hashlib.sha1(user.encode("utf-8")).hexdigest(), 16) % (1 << 48)
 	id = uuid1(node=node)
 	file_name = "{uuid}.{ext}".format(uuid=id, ext=upload_mime_type.split("/")[1])
-	file_path = "{path}/{file_name}".format(config.config["storage"]["imageUploadPath"], file_name)
+	file_path = "{path}/{file_name}".format(path=config.config["storage"]["imageUploadPath"], file_name=file_name)
 	with open(file_path, "wb") as file:
 		file.write(data)
 
