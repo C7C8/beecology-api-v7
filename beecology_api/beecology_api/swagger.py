@@ -34,13 +34,13 @@ bee_record = main_api.model("Bee record", {
 	"abdomen": fields.String(description="Bee abdomen type", example="a1", required=True),
 	"thorax": fields.String(description="Bee thorax type", example="f1", required=True),
 	"time": fields.DateTime(description="Time the bee record was logged", required=True),
-	"submitted": fields.DateTime(decription="Time the bee record was submitted", required=True),
+	"submitted": fields.DateTime(decription="Time the bee record was submitted", required=False),
 	"loc_info": fields.Nested(gis_coordinate, description="Point of observation", required=True),
 	"elevation": fields.Float(description="Elevation at the point the bee was observed at"),
 	"city": fields.String(description="Where the bee was observed"),
 	"gender": fields.String(description="Bee gender", enum=genders, required=True),
 	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", enum=beehaviors, required=True),
-	"images": fields.List(fields.Nested(media), description="List of images associated with this record", required=True),
+	"images": fields.List(fields.String, description="List of images associated with this record", required=True),
 	"videos": fields.List(fields.String, description="List of video paths for videos associated with this record"),
 	"app_version": fields.String(description="App version that submitted the log", required=False)
 })

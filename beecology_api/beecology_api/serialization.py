@@ -39,8 +39,7 @@ class _MediaField(fields.Field):
 	def _deserialize(self, value, attr, data, **kwargs):
 		if value is None:
 			return None
-		ids = [media["id"] for media in value]
-		return self.parent.session.query(self.table).filter(self.table.id.in_(ids)).all()
+		return self.parent.session.query(self.table).filter(self.table.id.in_(value)).all()
 
 
 class Converter(ModelConverter):
