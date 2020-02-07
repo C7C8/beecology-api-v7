@@ -8,10 +8,10 @@ from .endpoints import *
 #########################################################
 
 def setup_main_routes(main: Namespace):
-	main.add_resource(Image, "/image/<uuid:id>")
-	main.add_resource(AddImage, "/image")
-	main.add_resource(Video, "/video/<uuid:id>")
-	main.add_resource(AddVideo, "/video")
+	main.add_resource(Image, "/image/<uuid:id>", methods=["DELETE", "PUT", "GET"])
+	main.add_resource(Image, "/image", methods=["POST"])
+	main.add_resource(Video, "/video/<uuid:id>", methods=["DELETE", "PUT", "GET"])
+	main.add_resource(Image, "/video", methods=["POST"])
 	main.add_resource(Token, "/token")
 	main.add_resource(Record, "/record", methods=["POST"])
 	main.add_resource(Record, "/record/<uuid:id>", methods=["DELETE", "PUT", "GET"])

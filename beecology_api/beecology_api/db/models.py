@@ -5,6 +5,7 @@ from sqlalchemy import Column, String, DateTime, Enum, Float, ForeignKey, Boolea
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from beecology_api import config
 
@@ -18,6 +19,7 @@ news_types = ["biocs", "main"]
 
 use_postgres = "postgres" in config.config["database"]["connection"]
 id_type = postgresql.UUID(as_uuid=True) if use_postgres else String
+array_type = postgresql.ARRAY(String) if use_postgres else String
 BaseTable = declarative_base()
 
 
@@ -26,7 +28,7 @@ class User(BaseTable):
 	id = Column(String, primary_key=True, index=True)
 	admin = Column(Boolean, default=False)
 	locked = Column(Boolean, default=False)
-	registration_date = Column(DateTime, default=datetime.now())
+	registration_date = Column(DateTime(timezone=True), default=datetime.now())
 	last_login = Column(DateTime, default=datetime.now())
 	records = relationship("BeeRecord")
 	images = relationship("Image")
@@ -46,12 +48,14 @@ class BeeRecord(BaseTable):
 	head = Column(String)
 	abdomen = Column(String)
 	thorax = Column(String)
-	time = Column(DateTime)
+	time = Column(DateTime(timezone=True))
+	submitted = Column(DateTime(timezone=True), server_default=func.now())
 	loc_info = Column(Geometry(geometry_type="POINT", spatial_index=True) if use_postgres else String)
 	city = Column(String)
 	gender = Column(Enum(*genders, name="bee_gender"))
 	behavior = Column(Enum(*beehaviors, name="bee_behavior"))
 	elevation = Column(Float)
+	app_version = Column(String)
 
 
 class BeeSpecies(BaseTable):
@@ -75,7 +79,7 @@ class FlowerSpecies(BaseTable):
 	genus = Column(String)
 	species = Column(String)
 	common_name = Column(String)
-	alt_name = Column(String)
+	alt_names = Column(array_type)
 	main_color = Column(String)
 	colors = Column(String)
 	bloom_start = Column(Enum(name="months"))
@@ -90,7 +94,9 @@ class Image(BaseTable):
 	id = Column(id_type, primary_key=True)
 	bee_record_id = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
 	user_id = Column(String, ForeignKey("user.id"))
-	path = Column(String)
+	uploaded = Column(DateTime(timezone=True), server_default=func.now())
+	client_path = Column(String)
+	file_path = Column(String)
 
 
 class Video(BaseTable):
@@ -98,7 +104,9 @@ class Video(BaseTable):
 	id = Column(id_type, primary_key=True)
 	bee_record_id = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
 	user_id = Column(String, ForeignKey("user.id"))
-	path = Column(String)
+	uploaded = Column(DateTime(timezone=True), server_default=func.now())
+	client_path = Column(String)           # What the user should see
+	file_path = Column(String)      # Where the file is actually stored
 
 
 class News(BaseTable):
@@ -106,5 +114,5 @@ class News(BaseTable):
 	id = Column(id_type, primary_key=True)
 	user_id = Column(String, ForeignKey("user.id"), index=True, nullable=True)
 	news_type = Column(Enum(*news_types, name="news_type"))
-	post_date = Column(DateTime, index=True)
+	post_date = Column(DateTime(timezone=True), index=True)
 	content = Column(JSON)

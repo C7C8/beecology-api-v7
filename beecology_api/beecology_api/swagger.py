@@ -18,6 +18,12 @@ gis_coordinate = main_api.model("GIS coordinate", {
 	"longitude": fields.Float(description="Longitude")
 })
 
+media = main_api.model("Media information", {
+	"id": fields.String(description="UUID (v1) for the media", pattern=_uuid_pattern, required=True),
+	"path": fields.String(description="File path to the media on this server", required=False),
+	"uploaded": fields.DateTime(description="When the image was uploaded to the server", required=False)
+})
+
 bee_record = main_api.model("Bee record", {
 	"id": fields.String(description="UUID (v4) of the bee record", example="d667f8bc-60e5-4ea4-99b5-196c091657ac", pattern=_uuid_pattern),
 	# "user": fields.String(description="ID of user who submitted the record", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2"),
@@ -28,13 +34,15 @@ bee_record = main_api.model("Bee record", {
 	"abdomen": fields.String(description="Bee abdomen type", example="a1", required=True),
 	"thorax": fields.String(description="Bee thorax type", example="f1", required=True),
 	"time": fields.DateTime(description="Time the bee record was logged", required=True),
+	"submitted": fields.DateTime(decription="Time the bee record was submitted", required=True),
 	"loc_info": fields.Nested(gis_coordinate, description="Point of observation", required=True),
 	"elevation": fields.Float(description="Elevation at the point the bee was observed at"),
 	"city": fields.String(description="Where the bee was observed"),
 	"gender": fields.String(description="Bee gender", enum=genders, required=True),
 	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", enum=beehaviors, required=True),
-	"images": fields.List(fields.String, description="List of image paths for images associated with this record", required=True),
+	"images": fields.List(fields.Nested(media), description="List of images associated with this record", required=True),
 	"videos": fields.List(fields.String, description="List of video paths for videos associated with this record"),
+	"app_version": fields.String(description="App version that submitted the log", required=False)
 })
 
 flower_species = reference_api.model("Flower species", {
@@ -42,7 +50,7 @@ flower_species = reference_api.model("Flower species", {
 	"genus": fields.String(description="Flower genus", required=True),
 	"species": fields.String(description="Flower species", required=True),
 	"common_name": fields.String(description="The name the flower is most often referred to by", required=True),
-	"alt_name": fields.String(description="An alternate common name for the flower", required=True),
+	"alt_names": fields.List(fields.String, description="An alternate common name for the flower", required=False),
 	"main_color": fields.String(description="The flower's dominant color", required=True),
 	"colors": fields.String(description="Comma-separated list of other colors on the flower"),
 	"bloom_start": fields.String(description="When the flower species starts blooming", enum=months, required=True),
@@ -100,3 +108,6 @@ flower_species_filter_parser = reqparse.RequestParser()
 flower_species_filter_parser.add_argument("genus", type=str, help="Flower genus", required=False)
 flower_species_filter_parser.add_argument("shape", type=str, help="Flower shape", required=False)
 flower_species_filter_parser.add_argument("blooms-during", type=str, help="Month in which the flower must be in bloom", choices=months, required=False)
+
+media_upload_parser = reqparse.RequestParser()
+media_upload_parser.add_argument("data", type=str, help="Base 64 encoded media", required=True)

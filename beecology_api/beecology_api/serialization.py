@@ -25,18 +25,22 @@ class _PointField(fields.Field):
 		return from_shape(geometry.Point(*value.values()))
 
 
-class _ImageField(fields.Field):
+class _MediaField(fields.Field):
+	def __init__(self, table, **metadata):
+		self.table = table
+		super().__init__(**metadata)
+
 	"""Marshmallow field for deserializing an image to just a path"""
 	def _serialize(self, value, attr, obj, **kwargs):
 		if value is None:
 			return None
-		return [image.path for image in value]
+		return [{"path": media.client_path, "id": media.id} for media in value]
 
 	def _deserialize(self, value, attr, data, **kwargs):
 		if value is None:
 			return None
-		# TODO make this accept image paths?
-		return self.parent.session.query(Image).filter(Image.id.in_(value)).all()
+		ids = [media["id"] for media in value]
+		return self.parent.session.query(self.table).filter(self.table.id.in_(ids)).all()
 
 
 class Converter(ModelConverter):
@@ -54,7 +58,8 @@ class UserSchema(ModelSchema):
 
 class BeeRecordSchema(ModelSchema):
 	loc_info = _PointField(attribute="loc_info")
-	images = _ImageField(attribute="images")
+	images = _MediaField(table=Image, attribute="images")
+	videos = _MediaField(table=Video, attribute="videos")
 
 	class Meta:
 		model = BeeRecord
@@ -95,3 +100,5 @@ bee_record_schema = BeeRecordSchema(exclude=["user_id"])
 bee_species_schema = BeeSpeciesSchema()
 flower_species_schema = FlowerSpeciesSchema()
 news_schema = NewsSchema(exclude=["user_id"])
+image_schema = ImageSchema(exclude=["file_path"])
+video_schema = VideoSchema(exclude=["file_path"])
