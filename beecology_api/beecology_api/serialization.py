@@ -56,7 +56,7 @@ class UserSchema(ModelSchema):
 
 
 class BeeRecordSchema(ModelSchema):
-	loc_info = _PointField(attribute="loc_info")
+	loc_info = _PointField(attribute="location")
 	images = _MediaField(table=Image, attribute="images")
 	videos = _MediaField(table=Video, attribute="videos")
 

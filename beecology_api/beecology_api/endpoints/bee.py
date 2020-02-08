@@ -1,7 +1,6 @@
 from logging import getLogger
 from uuid import uuid4, UUID
 
-from flask import request
 from flask_restx import Resource, abort
 from marshmallow import ValidationError
 from sqlalchemy import and_

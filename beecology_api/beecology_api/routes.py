@@ -16,6 +16,8 @@ def setup_main_routes(main: Namespace):
 	main.add_resource(Record, "/record", methods=["POST"])
 	main.add_resource(Record, "/record/<uuid:id>", methods=["DELETE", "PUT", "GET"])
 	main.add_resource(Records, "/records")
+	main.add_resource(News, "/news", methods=["GET"])
+	main.add_resource(News, "/news/<uuid:id>", methods=["PUT", "POST", "DELETE"])
 
 
 def setup_reference_routes(ref: Namespace):

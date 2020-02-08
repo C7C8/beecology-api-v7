@@ -1,12 +1,11 @@
 from flask_restx import Resource
 
-class AddNews(Resource):
+
+class News(Resource):
 	def post(self):
 		"""Add a new news item."""
 		pass
 
-
-class News(Resource):
 	def get(self):
 		"""Get all news."""
 		pass
