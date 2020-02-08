@@ -15,7 +15,7 @@ log = getLogger()
 class Bee(Resource):
 	@api.expect(bee_species)
 	@api.response(201, "Bee species added")
-	@api.response(400, "Invalid request")
+	@api.response(400, "Invalid input")
 	def post(self):
 		"""Add a new bee species"""
 		# TODO Require admin auth
@@ -30,7 +30,7 @@ class Bee(Resource):
 			session.add(species)
 			session.commit()
 
-		log.info("Added new bee species {} {}".format(api.payload["genus"], api.payload["species"]))
+		log.info("Added new bee species {}".format(api.payload["species"]))
 		return {"message": "Bee species added"}, 201
 
 	@api.param("id", "UUID of bee species to return information on")
@@ -64,7 +64,7 @@ class Bee(Resource):
 				abort(400, "Unknown field or data type")
 
 			session.commit()
-			return "", 204
+		return "", 204
 
 	@api.param("id", "UUID of species to delete")
 	@api.response(204, "Bee species deleted (if present)")
@@ -97,4 +97,4 @@ class Bees(Resource):
 				month = args["active-during"]
 				query = query.filter(and_(BeeSpecies.active_start <= month, BeeSpecies.active_end >= month))
 
-		return [bee_species_schema.dump(species) for species in query.all()], 200
+			return [bee_species_schema.dump(species) for species in query.all()], 200

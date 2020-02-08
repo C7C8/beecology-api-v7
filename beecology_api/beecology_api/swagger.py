@@ -4,7 +4,7 @@ from uuid import UUID
 from flask_restx import fields, reqparse, inputs
 
 from beecology_api.beecology_api import main_api, manage_api, reference_api
-from .db import beehaviors, months, genders
+from .db import beehaviors, months, genders, news_types
 
 _uuid_pattern = "[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}"
 
@@ -80,6 +80,12 @@ user = manage_api.model("User record", {
 	"last_login": fields.DateTime(description="The user's last login time", required=True)
 })
 
+news_item = manage_api.model("News item", {
+	"type": fields.String(description="Type or category of news", enum=news_types),
+	"posted": fields.DateTime(description="When the news was posted"),
+	"content": fields.Raw(description="Arbitrary news content as a regular JSON object (not a string)")
+})
+
 ###########
 # PARSERS #
 ###########
@@ -114,4 +120,6 @@ media_upload_parser = reqparse.RequestParser()
 media_upload_parser.add_argument("data", type=str, help="Base 64 encoded media", required=True)
 
 news_filter_parser = reqparse.RequestParser()
-
+news_filter_parser.add_argument("type", type=str, help="News type to fetch", choices=news_types, required=False)
+news_filter_parser.add_argument("before", type=str, help="Filter by date posted: entries posted on or before given date")
+news_filter_parser.add_argument("after", type=str, help="Filter by date posted: entries posted on or after given date")

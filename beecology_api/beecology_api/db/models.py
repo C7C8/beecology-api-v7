@@ -114,6 +114,6 @@ class News(BaseTable):
 	__tablename__ = "news"
 	id = Column(id_type, primary_key=True)
 	user_id = Column(String, ForeignKey("user.id"), index=True, nullable=True)
-	news_type = Column(Enum(*news_types, name="news_type"))
-	post_date = Column(DateTime(timezone=True), index=True)
+	type = Column(Enum(*news_types, name="news_type"))
+	posted = Column(DateTime(timezone=True), index=True)
 	content = Column(JSON)

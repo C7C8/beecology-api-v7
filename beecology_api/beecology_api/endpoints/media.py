@@ -25,7 +25,7 @@ class Image(Resource):
 	@api.response(413, "Upload exceeded file size limit")
 	@api.response(201, "Image uploaded", media)
 	def post(self):
-		"""Upload a new image, returning image info"""
+		"""Upload a new image"""
 		# TODO require auth
 		# Process media of image/* mime type and a max file size of 10 MB
 		args = media_upload_parser.parse_args()
@@ -51,6 +51,7 @@ class Image(Resource):
 	@api.expect(media_upload_parser)
 	@api.response(415, "Incorrect file upload MIME type or decoding failure")
 	@api.response(413, "Upload exceeded file size limit")
+	@api.response(404, "Image not found")
 	@api.response(204, "Image updated")
 	def put(self, id: UUID):
 		"""Change an existing image."""
@@ -123,6 +124,7 @@ class Video(Resource):
 	@api.param("id", "Video UUID")
 	@api.expect(media_upload_parser)
 	@api.response(415, "Incorrect file upload MIME type or decoding failure")
+	@api.response(413, "Upload exceeded file size limit")
 	@api.response(404, "Video not found")
 	@api.response(204, "Video updated")
 	def put(self, id: UUID):
