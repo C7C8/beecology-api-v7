@@ -7,9 +7,9 @@ from flask_restx import Resource
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import base_bee_data
-from beecology_api.analysis_api.utility import convert_to_dataframe
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import base_bee_data
+from beecology_api.compat_analysis_api.utility import convert_to_dataframe
 
 
 class RelativePercent(Resource):

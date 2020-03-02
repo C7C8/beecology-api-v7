@@ -1,0 +1,6 @@
+[submodule "beecology_api/analysis_api/analysis-scripts"]
+	path = beecology_api/analysis_api/analysis-scripts
+	url = git@arcgit.wpi.edu:Bee-cology/analysis-scripts.git
+[submodule "beecology_api/analysis_api/analysis_scripts"]
+	path = beecology_api/analysis_api/analysis_scripts
+	url = git@arcgit.wpi.edu:Bee-cology/analysis-scripts.git

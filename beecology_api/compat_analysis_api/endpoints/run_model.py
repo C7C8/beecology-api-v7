@@ -2,8 +2,8 @@ from logging import getLogger
 
 from flask_restx import Resource
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import bee_data_analysis_request
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import bee_data_analysis_request
 from .crosstab import CrossTabulation
 from .decisiontree import DecisionTree
 from .kmeans import KMeans

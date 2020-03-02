@@ -8,9 +8,9 @@ from flask import send_file
 from flask_restx import Resource
 from sklearn.cluster import KMeans as KMeansClustering
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import k_means_request
-from beecology_api.analysis_api.utility import convert_to_dataframe
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import k_means_request
+from beecology_api.compat_analysis_api.utility import convert_to_dataframe
 
 
 class KMeans(Resource):

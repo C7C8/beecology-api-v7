@@ -6,9 +6,9 @@ from flask_restx import Resource
 import matplotlib.pyplot as plt
 from sklearn import linear_model
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import regression_request
-from beecology_api.analysis_api.utility import convert_to_dataframe, calc_x_y
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import regression_request
+from beecology_api.compat_analysis_api.utility import convert_to_dataframe, calc_x_y
 
 
 class LinearRegression(Resource):

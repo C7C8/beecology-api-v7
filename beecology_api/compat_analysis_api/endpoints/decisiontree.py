@@ -9,9 +9,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import bi_var_request
-from beecology_api.analysis_api.utility import convert_to_dataframe
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import bi_var_request
+from beecology_api.compat_analysis_api.utility import convert_to_dataframe
 
 
 class DecisionTree(Resource):

@@ -1,9 +1,9 @@
 import pandas as pd
 from flask_restx import Resource
 
-from beecology_api.analysis_api import api
-from beecology_api.analysis_api.models import bi_var_request
-from beecology_api.analysis_api.utility import convert_to_dataframe
+from beecology_api.compat_analysis_api import api
+from beecology_api.compat_analysis_api.models import bi_var_request
+from beecology_api.compat_analysis_api.utility import convert_to_dataframe
 
 
 class CrossTabulation(Resource):
