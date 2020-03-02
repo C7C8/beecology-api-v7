@@ -1,16 +1,15 @@
 from logging import getLogger
 from uuid import UUID, uuid4
 
-from flask import request
 from flask_restx import Resource, abort
 from geoalchemy2 import func
 from marshmallow.exceptions import ValidationError
 
-from beecology_api.beecology_api.db import db_session
+from beecology_api.db import db_session
 from beecology_api.beecology_api.api import main_api as api
-from beecology_api.beecology_api.db.models import BeeRecord
-from beecology_api.beecology_api.serialization import bee_record_schema
-from beecology_api.beecology_api.swagger import bee_record, bee_record_filter_parser
+from beecology_api.db import BeeRecord
+from beecology_api.serialization import bee_record_schema
+from beecology_api.swagger import bee_record, bee_record_filter_parser
 
 log = getLogger()
 

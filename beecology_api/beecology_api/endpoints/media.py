@@ -11,10 +11,10 @@ from flask_restx import Resource, abort
 
 from beecology_api import config
 from beecology_api.beecology_api.api import main_api as api
-from beecology_api.beecology_api.db import db_session
-from beecology_api.beecology_api.db.models import Image as DBImage, Video as DBVideo
-from beecology_api.beecology_api.serialization import image_schema, video_schema
-from beecology_api.beecology_api.swagger import media_upload_parser, media
+from beecology_api.db import db_session
+from beecology_api.db import Image as DBImage, Video as DBVideo
+from beecology_api.serialization import image_schema, video_schema
+from beecology_api.swagger import media_upload_parser, media
 
 log = getLogger()
 

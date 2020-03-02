@@ -4,7 +4,7 @@ from marshmallow import fields
 from marshmallow_sqlalchemy import ModelSchema, ModelConverter
 from shapely import geometry
 
-from beecology_api.beecology_api.db.models import *
+from beecology_api.db import *
 
 """Marshmallow de/serialization schemas and related converters"""
 

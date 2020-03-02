@@ -1,10 +1,7 @@
-from datetime import datetime
-from uuid import UUID
-
 from flask_restx import fields, reqparse, inputs
 
 from beecology_api.beecology_api import main_api, manage_api, reference_api
-from .db import beehaviors, months, genders, news_types
+from beecology_api.db import beehaviors, months, genders, news_types
 
 _uuid_pattern = "[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}"
 

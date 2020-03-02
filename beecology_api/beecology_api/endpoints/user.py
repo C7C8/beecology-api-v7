@@ -9,8 +9,8 @@ from flask_restx import Resource
 
 from beecology_api import config
 from beecology_api.beecology_api.api import main_api as api
-from beecology_api.beecology_api.db import db_session, User as DBUser
-from beecology_api.beecology_api.swagger import jwt_response
+from beecology_api.db import db_session, User as DBUser
+from beecology_api.swagger import jwt_response
 
 log = getLogger()
 
