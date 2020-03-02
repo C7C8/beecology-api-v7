@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import List
 from uuid import UUID, uuid4
 
 from flask_restx import Resource, abort
@@ -86,33 +87,38 @@ class Records(Resource):
 		"""Get a list of records, filtered by any means."""
 		# TODO Make sure current user is the specified user
 		args = bee_record_filter_parser.parse_args()
-		with db_session() as session:
-			query = session.query(BeeRecord)
+		return [bee_record_schema.dump(record) for record in bee_records_filter(args)], 200
 
-			# Simple equality filtering
-			for attr in ["user", "species", "flower-species", "head", "abdomen", "thorax", "city", "gender", "behavior"]:
-				if attr in args:
-					query = query.filter(BeeRecord.__dict__[attr] == args[attr])
 
-			# Range or spatial -based filtering
-			if "max-elevation" in args:
-				query = query.filter(BeeRecord.elevation <= args["max-elevation"])
-			if "min-elevation" in args:
-				query = query.filter(BeeRecord.elevation >= args["min-elevation"])
-			if "time-start" in args:
-				query = query.filter(BeeRecord.time >= args["time-start"])
-			if "time-end" in args:
-				query = query.filter(BeeRecord.time <= args["time-end"])
-			if "bounding-box" in args:
-				# Bounding box is passed in as a list of comma-separated floats: minLat, minLong, maxLat, maxLong
-				try:
-					coords = [float(coord) for coord in args["bounding-box"].split(",")]
-					if len(coords) != 4 or coords[0] >= coords[2] or coords[1] >= coords[3]:
-						raise ValueError
-				except ValueError:
-					abort(400, "Invalid bounding box filter parameters")
+def bee_records_filter(args) -> List[BeeRecord]:
+	"""Bee record filtering, encapsulated as a function so that the analysis API can use it"""
+	with db_session() as session:
+		query = session.query(BeeRecord)
 
-				query = query.filter(func.ST_Within(BeeRecord.loc_info, func.ST_GeomFromText(
-					"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
+		# Simple equality filtering
+		for attr in ["user", "species", "flower-species", "head", "abdomen", "thorax", "city", "gender", "behavior"]:
+			if attr in args:
+				query = query.filter(BeeRecord.__dict__[attr] == args[attr])
 
-			return [bee_record_schema.dump(record) for record in query.all()], 200
+		# Range or spatial -based filtering
+		if "max-elevation" in args:
+			query = query.filter(BeeRecord.elevation <= args["max-elevation"])
+		if "min-elevation" in args:
+			query = query.filter(BeeRecord.elevation >= args["min-elevation"])
+		if "time-start" in args:
+			query = query.filter(BeeRecord.time >= args["time-start"])
+		if "time-end" in args:
+			query = query.filter(BeeRecord.time <= args["time-end"])
+		if "bounding-box" in args:
+			# Bounding box is passed in as a list of comma-separated floats: minLat, minLong, maxLat, maxLong
+			try:
+				coords = [float(coord) for coord in args["bounding-box"].split(",")]
+				if len(coords) != 4 or coords[0] >= coords[2] or coords[1] >= coords[3]:
+					raise ValueError
+			except ValueError:
+				abort(400, "Invalid bounding box filter parameters")
+
+			query = query.filter(func.ST_Within(BeeRecord.loc_info, func.ST_GeomFromText(
+				"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
+
+		return query.all()

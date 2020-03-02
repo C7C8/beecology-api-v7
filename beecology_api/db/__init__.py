@@ -4,9 +4,7 @@ from logging import getLogger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from beecology_api import config
 from .models import *
-
 
 Session = None
 
