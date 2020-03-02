@@ -91,15 +91,15 @@ jwt_response = manage_api.model("JWT", {
 ###########
 
 bee_record_filter_parser = reqparse.RequestParser()
-bee_record_filter_parser.add_argument("user", type=str, help="User ID. Only works if the current user is the one given by the ID.", required=False)
-bee_record_filter_parser.add_argument("species", type=str, help="Species UUID", required=False)
-bee_record_filter_parser.add_argument("flower-species", type=str, help="Flower species UUID", required=False),
-bee_record_filter_parser.add_argument("head", type=str, help="Head type", required=False)
-bee_record_filter_parser.add_argument("abdomen", type=str, help="Abdomen type", required=False)
-bee_record_filter_parser.add_argument("thorax", type=str, help="Thorax type", required=False)
+bee_record_filter_parser.add_argument("user-id", type=str, help="User ID. Only works if the current user is the one given by the ID.", required=False, dest="user_id")
+bee_record_filter_parser.add_argument("species", type=str, help="Species UUID", required=False, dest="bee_species_id")
+bee_record_filter_parser.add_argument("flower-species", type=str, help="Flower species UUID", required=False, dest="flower_species_id"),
+bee_record_filter_parser.add_argument("head", type=str, help="Head type", required=False, dest="head_coloration")
+bee_record_filter_parser.add_argument("abdomen", type=str, help="Abdomen type", required=False, dest="abdomen_coloration")
+bee_record_filter_parser.add_argument("thorax", type=str, help="Thorax type", required=False, dest="thorax_coloration")
 bee_record_filter_parser.add_argument("time-start", type=inputs.datetime, help="Time that records must fall at or after", required=False)
 bee_record_filter_parser.add_argument("time-end", type=inputs.datetime, help="Time that records must fall at or before", required=False)
-bee_record_filter_parser.add_argument("city", type=str, help="City that records must be located in", required=False)
+bee_record_filter_parser.add_argument("city", type=str, help="City that records must be located in", required=False, dest="closest_city")
 bee_record_filter_parser.add_argument("gender", type=str, help="Bee gender", choices=genders, required=False)
 bee_record_filter_parser.add_argument("behavior", type=str, help="Bee beehavior", choices=beehaviors, required=False)
 bee_record_filter_parser.add_argument("max-elevation", type=float, help="Elevation that records must be at or below", required=False)

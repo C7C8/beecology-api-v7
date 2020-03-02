@@ -5,6 +5,7 @@ from flask_restx import Resource, abort
 
 from beecology_api.analysis_api.analysis_scripts import relative_frequencies
 from beecology_api.analysis_api.api import api
+from beecology_api.db import db_session
 from beecology_api.swagger import bee_record_filter_parser
 from beecology_api.beecology_api.endpoints.record import bee_records_filter
 
@@ -31,11 +32,13 @@ class RelativeFrequencies(Resource):
 			abort(400, "x-bin-cutoffs timestamps invalid")
 
 		# Select bee records and filter
-		records = bee_records_filter(args)
+		with db_session() as session:
+			records = bee_records_filter(args, session)
 		if len(records) == 0:
 			abort(400, "No bee records matched filter parameters")
 
 		df = pd.DataFrame([obj.__dict__ for obj in records])
+		df.to_pickle("example_df.pkl")
 		image_binary = relative_frequencies(df=df,
 		                                    x_var=args["x-var"],
 		                                    x_bin_cutoffs=cutoffs,

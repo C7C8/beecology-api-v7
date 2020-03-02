@@ -12,7 +12,7 @@ from beecology_api import config
 """Core SQLAlchemy ORM mappings for objects to tables"""
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
           "December"]
-genders = ["male", "female", "queen", "unknown"]
+genders = ["male", "female", "queen", "male/female", "worker"]
 beehaviors = ["pollen", "nectar", "unknown"]
 tongue_lengths = ["long", "medium", "short"]
 news_types = ["biocs", "main"]
@@ -63,9 +63,9 @@ class BeeSpecies(BaseTable):
 	common_names = Column(array_type)
 	description = Column(Text)
 	tongue_length = Column(Enum(*tongue_lengths, name="tongue_length"))
-	active_start = Column(Enum(*months, name="months"))
-	active_end = Column(Enum(name="months"))
-	confused_with = Column(String)
+	active_start = Column(String)
+	active_end = Column(String)
+	confused_with = Column(array_type)
 	image = Column(String)
 	records = relationship("BeeRecord", backref="bee_species")
 
@@ -79,8 +79,8 @@ class FlowerSpecies(BaseTable):
 	alt_names = Column(array_type)
 	main_color = Column(String)
 	colors = Column(array_type)
-	bloom_start = Column(Enum(name="months"))
-	bloom_end = Column(Enum(name="months"))
+	bloom_start = Column(String)
+	bloom_end = Column(String)
 	shape = Column(String)
 	image = Column(String)
 	records = relationship("BeeRecord", backref="flower_species")
@@ -88,7 +88,7 @@ class FlowerSpecies(BaseTable):
 
 class Media(BaseTable):
 	__tablename__ = "media"
-	id = Column(id_type, primary_key=True)
+	d = Column(id_type, primary_key=True)
 	bee_flower_observation_id = Column(id_type, ForeignKey("bee_flower_observation.id"), index=True, nullable=True)
 	user_id = Column(String, ForeignKey("user.id"))
 	uploaded = Column(DateTime(timezone=True), server_default=func.now())
