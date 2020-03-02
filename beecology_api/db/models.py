@@ -26,24 +26,21 @@ BaseTable = declarative_base()
 class User(BaseTable):
 	__tablename__ = "user"
 	id = Column(String, primary_key=True, index=True)
-	email = Column(String)
 	admin = Column(Boolean, default=False)
 	locked = Column(Boolean, default=False)
 	registration_date = Column(DateTime(timezone=True), default=datetime.now())
 	last_login = Column(DateTime, default=datetime.now())
 	records = relationship("BeeRecord")
-	images = relationship("Image")
-	videos = relationship("Video")
+	media = relationship("Media")
 	news = relationship("News")
 
 
 class BeeRecord(BaseTable):
-	__tablename__ = "bee_record"
+	__tablename__ = "bee_flower_observation"
 	id = Column(id_type, primary_key=True, index=True)
 	user_id = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
 	bee_species_id = Column(id_type, ForeignKey("bee_species.id"), index=True, nullable=True)
 	flower_species_id = Column(id_type, ForeignKey("flower_species.id"), index=True, nullable=True)
-	bee_name = Column(String)
 	abdomen_coloration = Column(String)
 	thorax_coloration = Column(String)
 	head_coloration = Column(String)
@@ -54,9 +51,8 @@ class BeeRecord(BaseTable):
 	location = Column(Geometry(geometry_type="POINT", spatial_index=True) if use_postgres else String)
 	elevation = Column(Float)
 	closest_city = Column(String)
-	images = relationship("Image", backref="bee_record")
-	videos = relationship("Video", backref="bee_record")
-	app_version = Column(String)
+	media = relationship("Media", backref="bee_flower_observation")
+	how_submitted = Column(Enum("webapp", "androidapp", "museum", "expert", name="submission_type"))
 
 
 class BeeSpecies(BaseTable):
@@ -90,24 +86,15 @@ class FlowerSpecies(BaseTable):
 	records = relationship("BeeRecord", backref="flower_species")
 
 
-class Image(BaseTable):
-	__tablename__ = "image"
+class Media(BaseTable):
+	__tablename__ = "media"
 	id = Column(id_type, primary_key=True)
-	bee_record_id = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
+	bee_flower_observation_id = Column(id_type, ForeignKey("bee_flower_observation.id"), index=True, nullable=True)
 	user_id = Column(String, ForeignKey("user.id"))
 	uploaded = Column(DateTime(timezone=True), server_default=func.now())
-	client_path = Column(String)
+	web_path = Column(String)
 	file_path = Column(String)
-
-
-class Video(BaseTable):
-	__tablename__ = "video"
-	id = Column(id_type, primary_key=True)
-	bee_record_id = Column(id_type, ForeignKey("bee_record.id"), index=True, nullable=True)
-	user_id = Column(String, ForeignKey("user.id"))
-	uploaded = Column(DateTime(timezone=True), server_default=func.now())
-	client_path = Column(String)           # What the user should see
-	file_path = Column(String)      # Where the file is actually stored
+	type = Column(Enum("image", "video", name="media_type"))
 
 
 class News(BaseTable):

@@ -57,8 +57,7 @@ class UserSchema(ModelSchema):
 
 class BeeRecordSchema(ModelSchema):
 	location = _PointField(attribute="location")
-	images = _MediaField(table=Image, attribute="images")
-	videos = _MediaField(table=Video, attribute="videos")
+	media = _MediaField(table=Media, attribute="images")
 
 	class Meta:
 		model = BeeRecord
@@ -84,14 +83,9 @@ class NewsSchema(ModelSchema):
 		include_fk = True
 
 
-class ImageSchema(ModelSchema):
+class MediaSchema(ModelSchema):
 	class Meta:
-		model = Image
-
-
-class VideoSchema(ModelSchema):
-	class Meta:
-		model = Video
+		model = Media
 
 
 user_schema = UserSchema()
@@ -99,5 +93,4 @@ bee_record_schema = BeeRecordSchema(exclude=["user_id"])
 bee_species_schema = BeeSpeciesSchema()
 flower_species_schema = FlowerSpeciesSchema()
 news_schema = NewsSchema(exclude=["user_id"])
-image_schema = ImageSchema(exclude=["file_path"])
-video_schema = VideoSchema(exclude=["file_path"])
+image_schema = MediaSchema(exclude=["file_path"])

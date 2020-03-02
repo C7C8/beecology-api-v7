@@ -26,7 +26,6 @@ bee_record = main_api.model("Bee record", {
 	# "user": fields.String(description="ID of user who submitted the record", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2"),
 	"bee_species_id": fields.String(description="If known, the species ID of the observed bee", example="b6567a3c-be2e-4350-b944-3ec24d868586", pattern=_uuid_pattern, required=False),
 	"flower_species_id": fields.String(description="If known, the species ID of the observed flower", example="955c499b-5dd3-4521-9f75-f13b173bbc7b", pattern=_uuid_pattern, required=False),
-	"bee_name": fields.String(description="Bee name", example="Bombus impatiens", required=False),
 	"abdomen_coloration": fields.String(description="Bee abdomen type", example="a1", required=True),
 	"thorax_coloration": fields.String(description="Bee thorax type", example="f1", required=True),
 	"head_coloration": fields.String(description="Bee head type", example="h1", required=True),
@@ -37,9 +36,8 @@ bee_record = main_api.model("Bee record", {
 	"location": fields.Nested(gis_coordinate, description="Point of observation", required=True),
 	"elevation": fields.Float(description="Elevation at the point the bee was observed at", required=False),
 	"closest_city": fields.String(description="Where the bee was observed", required=False),
-	"images": fields.List(fields.String, description="List of images associated with this record", required=True),
-	"videos": fields.List(fields.String, description="List of video paths for videos associated with this record", required=False),
-	"app_version": fields.String(description="App version that submitted the log", required=True)
+	"media": fields.List(fields.String, description="List of media paths for media associated with this record", required=False),
+	"how_submitted": fields.String(description="How the record was submitted", required=True, enum=["webapp", "androidapp", "museum", "expert"])
 })
 
 flower_species = reference_api.model("Flower species", {
@@ -70,7 +68,6 @@ bee_species = reference_api.model("Flower_species", {
 
 user = manage_api.model("User record", {
 	"id": fields.String(description="User ID", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2", required=True),
-	"email": fields.String(description="User email", required=False),
 	"admin": fields.Boolean(description="Whether this user is an admin or not", default=False, required=True),
 	"locked": fields.Boolean(description="Whether this user's account is locked or not", default=False, required=True),
 	"registered": fields.DateTime(description="When this user first registered with the server", required=True),
