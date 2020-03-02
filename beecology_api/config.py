@@ -8,7 +8,8 @@ config = {
 	"auth": {
 		"key-file": "firebase.json",
 		"databaseURL": "https://someurl.firebaseio.com",
-		"token-lifetime": 3600
+		"token-lifetime": 3600,
+		"jwt-key": "asupersecretjwtthatnobodywilleverknow"
 	},
 	"admin-code": "SECRET_CODE",
 	"storage": {

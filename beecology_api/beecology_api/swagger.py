@@ -86,6 +86,12 @@ news_item = manage_api.model("News item", {
 	"content": fields.Raw(description="Arbitrary news content as a regular JSON object (not a string)")
 })
 
+jwt_response = manage_api.model("JWT", {
+	"access_token": fields.String,
+	"refresh_token": fields.String,
+	"expires": fields.DateTime
+})
+
 ###########
 # PARSERS #
 ###########

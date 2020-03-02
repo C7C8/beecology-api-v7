@@ -4,6 +4,7 @@ import firebase_admin
 from firebase_admin import credentials
 from flask import Flask, Blueprint
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from flask_restx import Api
 
 import beecology_api.config as config
@@ -24,12 +25,15 @@ from beecology_api.beecology_api.db import init_database as main_db_init
 # BEE_API_CONF        Configuration file path ("conf.yml" by default)
 
 app = Flask(__name__)
+jwt = JWTManager(app)
 
 
 def init_api():
 	config.load_config()
 	logging.config.dictConfig(config.config["logging"])
+	app.config["JWT_SECRET_KEY"] = config.config["auth"]["jwt-key"]
 	main_db_init()
+
 
 	CORS(app)
 	blueprint = Blueprint("api", __name__)
@@ -52,6 +56,7 @@ def init_api():
 	api.add_namespace(analysis_api.api, "/analysis")
 
 	app.register_blueprint(blueprint)
+	jwt._set_error_handler_callbacks(api)  # hack: plz stop returning 500 Server Error
 
 
 init_api()

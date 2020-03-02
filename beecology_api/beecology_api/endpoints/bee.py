@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 from sqlalchemy import and_
 
 from beecology_api.beecology_api.api import reference_api as api
+from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.beecology_api.db import db_session
 from beecology_api.beecology_api.serialization import bee_species_schema, BeeSpecies
 from beecology_api.beecology_api.swagger import bee_species, bee_species_filter_parser
@@ -16,9 +17,9 @@ class Bee(Resource):
 	@api.expect(bee_species)
 	@api.response(201, "Bee species added")
 	@api.response(400, "Invalid input")
+	@admin_required
 	def post(self):
 		"""Add a new bee species"""
-		# TODO Require admin auth
 		api.payload["id"] = uuid4()
 		with db_session() as session:
 			try:
@@ -44,6 +45,7 @@ class Bee(Resource):
 				abort(404)
 			return bee_species_schema.dump(species)
 
+	@admin_required
 	@api.param("id", "UUID of bee species to update")
 	@api.expect(bee_species)
 	@api.response(204, "Species updated")
@@ -51,7 +53,6 @@ class Bee(Resource):
 	@api.response(400, "Unknown field or data type")
 	def put(self, id: UUID):
 		"""Update a bee species. Changes to the ID are ignored"""
-		# TODO require admin auth
 		api.payload["id"] = id
 		with db_session() as session:
 			if session.query(BeeSpecies).filter(BeeSpecies.id == id).first() is None:
@@ -66,11 +67,11 @@ class Bee(Resource):
 			session.commit()
 		return "", 204
 
+	@admin_required
 	@api.param("id", "UUID of species to delete")
 	@api.response(204, "Bee species deleted (if present)")
 	def delete(self, id: UUID):
 		"""Delete a bee species."""
-		# TODO require admin auth
 		with db_session() as session:
 			session.query(BeeSpecies).filter(BeeSpecies.id == id).delete()
 			session.commit()

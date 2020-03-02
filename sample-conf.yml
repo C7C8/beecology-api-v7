@@ -4,6 +4,7 @@ auth:
   key-file: sample-firebase.json
   databaseURL: https://some-firebase-db.firebaseio.com
   token-lifetime: 3600
+  jwt-key: asupersecretjwtthatnobodywilleverknow
 
 storage:
   imageUploadPath: images
