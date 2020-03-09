@@ -13,8 +13,10 @@ config = {
 	},
 	"admin-code": "SECRET_CODE",
 	"storage": {
-		"imageUploadPath": "images",
-		"imageBasePath": "images",
+		"mediaUploadPath": "images",
+		"mediaBasePath": "images",
+		"imageMaxSize": 10000000,
+		"videoMaxSize": 100000000,
 		"news-path": "/tmp",
 		"cache": "/tmp/beecology-cache"
 	},

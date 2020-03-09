@@ -7,8 +7,10 @@ auth:
   jwt-key: asupersecretjwtthatnobodywilleverknow
 
 storage:
-  imageUploadPath: images
-  imageBasePath: images
+  mediaUploadPath: images
+  mediaBasePath: images
+  imageMaxSize: 10000000,
+  videoMaxSize: 100000000,
   news-path: news/
   cache: /tmp/beecology-cache
 

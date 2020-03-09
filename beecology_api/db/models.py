@@ -88,7 +88,7 @@ class FlowerSpecies(BaseTable):
 
 class Media(BaseTable):
 	__tablename__ = "media"
-	d = Column(id_type, primary_key=True)
+	id = Column(id_type, primary_key=True)
 	bee_flower_observation_id = Column(id_type, ForeignKey("bee_flower_observation.id"), index=True, nullable=True)
 	user_id = Column(String, ForeignKey("user.id"))
 	uploaded = Column(DateTime(timezone=True), server_default=func.now())
