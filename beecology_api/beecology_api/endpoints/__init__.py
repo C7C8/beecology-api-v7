@@ -3,4 +3,5 @@ from .flower import Flower, Flowers
 from .media import Media
 from .news import News
 from .record import Record, Records
-from .user import Token, Refresh, User, Users
+from .token import Refresh, Token
+from .user import User, Users
