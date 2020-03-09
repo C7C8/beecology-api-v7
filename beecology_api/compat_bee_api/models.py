@@ -171,6 +171,11 @@ authorizations = {
         "in": "header",
         "name": "Authorization"
     },
+    "user-refresh": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
     "admin": {
         "type": "apiKey",
         "in": "header",

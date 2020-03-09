@@ -4,7 +4,8 @@ from logging import getLogger
 
 from firebase_admin import auth as firebase_auth
 from flask import request, abort
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_identity, \
+	get_jwt_claims
 from flask_restx import Resource
 
 from beecology_api import config
@@ -24,7 +25,7 @@ class Token(Resource):
 	def get(self):
 		"""Get a JWT for authentication using Firebase credentials."""
 		if "Authorization" not in request.headers:
-			abort(401, "Firebae basic token required")
+			abort(401, "Firebase basic token required")
 		try:
 			token = base64.standard_b64decode(request.headers["Authorization"].split(" ")[1])
 			user_data = firebase_auth.verify_id_token(token)
@@ -40,7 +41,6 @@ class Token(Resource):
 			user: DBUser = session.query(DBUser).filter(DBUser.id == user_id).first()
 			if user is None:
 				user = DBUser(id=user_id,
-				              email=user_data["email"],
 				              registration_date=datetime.datetime.now(),
 				              locked=False,
 				              admin=False)
@@ -59,10 +59,20 @@ class Token(Resource):
 
 
 class Refresh(Resource):
-	@api.doc(security="user")
+	@api.doc(security="user-refresh")
+	@api.marshal_with(jwt_response)
+	@api.response(401, "Refresh token required")
+	@api.response(403, "Refresh token authentication failed")
+	@api.response(200, "New access token enclosed", jwt_response)
+	@jwt_refresh_token_required
 	def get(self):
 		"""Get a JWT using a refresh token"""
-		pass
+		user = get_jwt_identity()
+		claims = get_jwt_claims()
+		expires = datetime.timedelta(seconds=config.config["auth"]["token-lifetime"])
+		return {
+			"access_token": create_access_token(user, expires_delta=expires, user_claims=claims)
+		}, 200
 
 
 class User(Resource):
