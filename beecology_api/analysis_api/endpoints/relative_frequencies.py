@@ -1,14 +1,13 @@
 import pandas as pd
 from flask import send_file
-
 from flask_restx import Resource, abort
 
 from beecology_api.analysis_api.analysis_scripts import relative_frequencies
 from beecology_api.analysis_api.api import api
+from beecology_api.analysis_api.convert_dataframe import convert_dataframe
+from beecology_api.beecology_api.endpoints.record import bee_records_filter
 from beecology_api.db import db_session
 from beecology_api.swagger import bee_record_filter_parser
-from beecology_api.beecology_api.endpoints.record import bee_records_filter
-
 
 relative_frequencies_parser = bee_record_filter_parser.copy()
 relative_frequencies_parser.add_argument("x-var", type=str, help="X variable", required=True)
@@ -27,18 +26,16 @@ class RelativeFrequencies(Resource):
 		if len(args["x-bin-cutoffs"]) < 3:
 			abort(400, "x-bin-cutoffs must have at least 3 cutoffs")
 		try:
-			cutoffs = [pd.Timestamp(cutoff) for cutoff in args["x-bin-cutoffs"]]
+			cutoffs = [pd.Timestamp(cutoff).value for cutoff in args["x-bin-cutoffs"]]
 		except:
 			abort(400, "x-bin-cutoffs timestamps invalid")
 
 		# Select bee records and filter
 		with db_session() as session:
-			records = bee_records_filter(args, session)
-		if len(records) == 0:
+			df = convert_dataframe(bee_records_filter(args, session))
+		if len(df) == 0:
 			abort(400, "No bee records matched filter parameters")
 
-		df = pd.DataFrame([obj.__dict__ for obj in records])
-		df.to_pickle("example_df.pkl")
 		image_binary = relative_frequencies(df=df,
 		                                    x_var=args["x-var"],
 		                                    x_bin_cutoffs=cutoffs,

@@ -41,6 +41,8 @@ class BeeRecord(BaseTable):
 	user_id = Column(String, ForeignKey("user.id", ondelete="SET NULL"), index=True)
 	bee_species_id = Column(id_type, ForeignKey("bee_species.id"), index=True, nullable=True)
 	flower_species_id = Column(id_type, ForeignKey("flower_species.id"), index=True, nullable=True)
+	bee_species = relationship("BeeSpecies", backref="records")
+	flower_species = relationship("FlowerSpecies", backref="records")
 	abdomen_coloration = Column(String)
 	thorax_coloration = Column(String)
 	head_coloration = Column(String)
@@ -67,7 +69,6 @@ class BeeSpecies(BaseTable):
 	active_end = Column(String)
 	confused_with = Column(array_type)
 	image = Column(String)
-	records = relationship("BeeRecord", backref="bee_species")
 
 
 class FlowerSpecies(BaseTable):
@@ -83,7 +84,6 @@ class FlowerSpecies(BaseTable):
 	bloom_end = Column(String)
 	shape = Column(String)
 	image = Column(String)
-	records = relationship("BeeRecord", backref="flower_species")
 
 
 class Media(BaseTable):
