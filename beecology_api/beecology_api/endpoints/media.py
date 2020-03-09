@@ -37,7 +37,6 @@ class Media(Resource):
 			session.commit()
 			return media_schema.dump(db_media), 201
 
-	@api.param("id", "Image UUID")
 	@api.response(404, "Image not found")
 	@api.response(200, "Image found", media)
 	def get(self, id: UUID):
@@ -48,7 +47,6 @@ class Media(Resource):
 				abort(404)
 			return media_schema.dump(db_media), 200
 
-	@api.param("id", "Image UUID")
 	@api.expect(media_upload_parser)
 	@api.response(415, "Incorrect file upload MIME type or decoding failure")
 	@api.response(413, "Upload exceeded file size limit")
@@ -83,7 +81,6 @@ class Media(Resource):
 
 		return "", 204
 
-	@api.param("id", "Media UUID")
 	@api.response(204, "Media deleted")
 	@api.response(404, "Media not found")
 	@api.response(403, "Media delete disallowed")

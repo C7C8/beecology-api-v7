@@ -51,7 +51,6 @@ class News(Resource):
 
 			return [news_schema.dump(news) for news in query.all()], 200
 
-	@api.param("id", "UUID of news item to update")
 	@api.expect(news_item)
 	@api.response(204, "News item updated")
 	@api.response(404, "News item not found")
@@ -76,7 +75,6 @@ class News(Resource):
 		session.commit()
 		return "", 204
 
-	@api.param("id", "UUID of news item to delete")
 	@api.response(204, "News item deleted (if present)")
 	@admin_required(api)
 	def delete(self, id: UUID):

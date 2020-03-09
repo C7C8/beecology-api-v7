@@ -34,7 +34,6 @@ class Flower(Resource):
 		log.info("Added new flower species {} {}".format(api.payload["genus"], api.payload["species"]))
 		return {"message": "Flower species added"}, 201
 
-	@api.param("id", "UUID of flower species to return information on")
 	@api.response(200, "Species data enclosed")
 	@api.response(404, "Species not found")
 	def get(self, id: UUID):
@@ -45,7 +44,6 @@ class Flower(Resource):
 				abort(404)
 			return flower_species_schema.dump(species)
 
-	@api.param("id", "UUID of flower species to update")
 	@api.expect(flower_species)
 	@api.response(204, "Species updated")
 	@api.response(404, "Species not found")
@@ -67,7 +65,6 @@ class Flower(Resource):
 		session.commit()
 		return "", 204
 
-	@api.param("id", "UUID of flower species to be deleted")
 	@api.response(204, "Flower species deleted (if present)")
 	@admin_required(api)
 	def delete(self, id: UUID):

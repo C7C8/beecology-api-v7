@@ -38,7 +38,6 @@ class Record(Resource):
 
 		return {"message": "Bee record logged"}, 201
 
-	@api.param("id", "UUID of record to return", required=False)
 	@api.response(200, "Record enclosed", bee_record)
 	@api.response(404, "Record not found")
 	def get(self, id: UUID):
@@ -78,7 +77,6 @@ class Record(Resource):
 			session.commit()
 			return "", 204
 
-	@api.param("id", "UUID of record to delete")
 	@api.response(204, "Bee record deleted (if present)")
 	@api.response(403, "Record delete forbidden")
 	@authenticate(api)

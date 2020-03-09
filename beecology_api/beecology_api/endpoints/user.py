@@ -14,7 +14,6 @@ log = getLogger()
 
 class User(Resource):
 	@admin_required(api)
-	@api.param("id", "User ID")
 	@api.response(404, "Could not find user")
 	@api.response(200, "User data enclosed")
 	def get(self, id: str):
@@ -27,7 +26,6 @@ class User(Resource):
 
 	@admin_required(api)
 	@api.expect(user)
-	@api.param("id", "User ID")
 	@api.response(404, "Could not find user")
 	@api.response(400, "Unknown field or data type")
 	@api.response(204, "User updated")
@@ -46,7 +44,6 @@ class User(Resource):
 			return "", 204
 
 	@admin_required(api)
-	@api.param("id", "User ID")
 	@api.response(204, "User deleted if present")
 	def delete(self, id: str):
 		"""Delete a user's record."""

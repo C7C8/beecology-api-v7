@@ -36,7 +36,6 @@ class Flowerdex(Resource):
 			return response("false", "Log a new flower failed", True), 405
 		return response("success", "Log a new flower success!", False, data=[{"flower_id": id}]), 200
 
-	@api.param("id", "Optional flower ID; if not provided, all flowers are returned.", required=False)
 	@api.response(200, "Flower dict entry(/entries) enclosed", flower_dict_response)
 	@api.response(404, "Flower dict entry not found", response_wrapper)
 	@cache_response("flowerdict")

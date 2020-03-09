@@ -34,7 +34,6 @@ class Bee(Resource):
 		log.info("Added new bee species {}".format(api.payload["species"]))
 		return {"message": "Bee species added"}, 201
 
-	@api.param("id", "UUID of bee species to return information on")
 	@api.response(200, "Species data enclosed", bee_species)
 	@api.response(404, "Species not found")
 	def get(self, id: UUID):
@@ -45,7 +44,6 @@ class Bee(Resource):
 				abort(404)
 			return bee_species_schema.dump(species)
 
-	@api.param("id", "UUID of bee species to update")
 	@api.expect(bee_species)
 	@api.response(204, "Species updated")
 	@api.response(404, "Species not found")
@@ -67,7 +65,6 @@ class Bee(Resource):
 			session.commit()
 		return "", 204
 
-	@api.param("id", "UUID of species to delete")
 	@api.response(204, "Bee species deleted (if present)")
 	@admin_required(api)
 	def delete(self, id: UUID):
