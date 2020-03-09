@@ -48,12 +48,12 @@ def init_api():
 	          default_mediatype="application/json",
 	          authorizations=bee_authorizations,
 	          validate=True)
-	api.add_namespace(beecology_api.main_api, "/prototype")
-	api.add_namespace(beecology_api.reference_api, "/prototype/reference")
-	api.add_namespace(beecology_api.manage_api, "/prototype/management")
-	api.add_namespace(analysis_api.api, "/prototype/analysis")
-	api.add_namespace(compat_analysis_api.api, "/analysis")
-	api.add_namespace(compat_bee_api.api)
+	api.add_namespace(beecology_api.main_api)
+	api.add_namespace(beecology_api.reference_api, "/reference")
+	api.add_namespace(beecology_api.manage_api, "/management")
+	api.add_namespace(analysis_api.api, "/analysis")
+	api.add_namespace(compat_analysis_api.api, "/compat/analysis")
+	api.add_namespace(compat_bee_api.api, "/compat")
 
 	app.register_blueprint(blueprint)
 	jwt._set_error_handler_callbacks(api)  # hack: plz stop returning 500 Server Error

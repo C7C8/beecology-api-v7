@@ -1,3 +1,3 @@
 from flask_restx import Namespace
 
-api = Namespace("/analysis", "Legacy data analysis API, for compatibility purposes")
+api = Namespace("/compat/analysis", "Legacy data analysis API, for compatibility purposes")
