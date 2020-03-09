@@ -89,7 +89,7 @@ class Flowers(Resource):
 			query = session.query(FlowerSpecies)
 
 			# Simple equality filtering
-			for attr in  ["genus", "shape"]:
+			for attr in ["genus", "shape"]:
 				if attr in args:
 					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr])
 
@@ -98,4 +98,4 @@ class Flowers(Resource):
 				month = args["blooms-during"]
 				query = query.filter(and_(FlowerSpecies.bloom_start <= month, FlowerSpecies.bloom_end >= month))
 
-		return [flower_species_schema.dump(species) for species in query.all()], 200
+			return [flower_species_schema.dump(species) for species in query.all()], 200

@@ -30,5 +30,6 @@ def setup_reference_routes(ref: Namespace):
 
 def setup_admin_routes(manage: Namespace):
 	manage.add_resource(User, "/user/<string:id>")
-	manage.add_resource(Admin, "/admin/<string:id>")
-	manage.add_resource(ChangeAdmin, "/admin")
+	manage.add_resource(Users, "/users")
+	# manage.add_resource(Admin, "/admin/<string:id>")
+	# manage.add_resource(ChangeAdmin, "/admin")

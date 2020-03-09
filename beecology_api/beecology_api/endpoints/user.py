@@ -7,11 +7,14 @@ from flask import request, abort
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_identity, \
 	get_jwt_claims
 from flask_restx import Resource
+from marshmallow import ValidationError
 
 from beecology_api import config
 from beecology_api.beecology_api.api import main_api as api
+from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.db import db_session, User as DBUser
-from beecology_api.swagger import jwt_response
+from beecology_api.swagger import jwt_response, user
+from beecology_api.serialization import user_schema
 
 log = getLogger()
 
@@ -76,32 +79,60 @@ class Refresh(Resource):
 
 
 class User(Resource):
-	def get(self):
-		"""Get information on one or all users."""
-		pass
+	@admin_required(api)
+	@api.param("id", "User ID")
+	@api.response(404, "Could not find user")
+	@api.response(200, "User data enclosed")
+	def get(self, id: str):
+		"""Get information on one user."""
+		with db_session() as session:
+			user = session.query(DBUser).filter(DBUser.id == id).first()
+			if user is None:
+				abort(404)
+			return user_schema.dump(user), 200
 
-	def put(self):
-		"""Make changes to a user's record."""
-		pass
+	@admin_required(api)
+	@api.expect(user)
+	@api.param("id", "User ID")
+	@api.response(404, "Could not find user")
+	@api.response(400, "Unknown field or data type")
+	@api.response(204, "User updated")
+	def put(self, id: str):
+		with db_session() as session:
+			if session.query(DBUser).filter(DBUser.id == id).first() is None:
+				abort(404)
 
-	def delete(self):
+			try:
+				user_schema.load(api.payload, session=session)
+			except (ValueError, ValidationError) as e:
+				log.error("Flask failed to validate input to Marshmallow's standards: {}".format(api.payload), e)
+				abort(400, "Unknown field or data type")
+
+			session.commit()
+			return "", 204
+
+	@admin_required(api)
+	@api.param("id", "User ID")
+	@api.response(204, "User deleted if present")
+	def delete(self, id: str):
 		"""Delete a user's record."""
+		with db_session() as session:
+			session.query(DBUser).filter(DBUser.id == id).delete()
+			session.commit()
+		return "", 204
 
 
-class ChangeAdmin(Resource):
-	# TODO Determine whether put/post are correct here for admin verification and updating
-	def put(self):
-		"""Submit a verification code confirming the calling user is now an admin."""
-		pass
-
-
-class Admin(Resource):
+class Users(Resource):
+	@admin_required(api)
+	@api.marshal_with(user, as_list=True)
 	def get(self):
-		"""Get information on one or more admins."""
+		"""Get information on all users."""
+		with db_session() as session:
+			return [user_schema.dump(user) for user in session.query(DBUser).all()], 200
 
-	def post(self):
-		"""Update another user's admin privileges."""
-		pass
 
-	def delete(self):
-		"""Remove self as user. For safety reasons this can't be done by POST to this resource."""
+# class ChangeAdmin(Resource):
+# 	Determine whether put/post are correct here for admin verification and updating
+	# def put(self):
+	# 	"""Submit a verification code confirming the calling user is now an admin."""
+	# 	pass
