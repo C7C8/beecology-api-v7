@@ -17,7 +17,7 @@ class Bee(Resource):
 	@api.expect(bee_species)
 	@api.response(201, "Bee species added")
 	@api.response(400, "Invalid input")
-	@admin_required
+	@admin_required(api)
 	def post(self):
 		"""Add a new bee species"""
 		api.payload["id"] = uuid4()
@@ -45,12 +45,12 @@ class Bee(Resource):
 				abort(404)
 			return bee_species_schema.dump(species)
 
-	@admin_required
 	@api.param("id", "UUID of bee species to update")
 	@api.expect(bee_species)
 	@api.response(204, "Species updated")
 	@api.response(404, "Species not found")
 	@api.response(400, "Unknown field or data type")
+	@admin_required(api)
 	def put(self, id: UUID):
 		"""Update a bee species. Changes to the ID are ignored"""
 		api.payload["id"] = id
@@ -67,9 +67,9 @@ class Bee(Resource):
 			session.commit()
 		return "", 204
 
-	@admin_required
 	@api.param("id", "UUID of species to delete")
 	@api.response(204, "Bee species deleted (if present)")
+	@admin_required(api)
 	def delete(self, id: UUID):
 		"""Delete a bee species."""
 		with db_session() as session:

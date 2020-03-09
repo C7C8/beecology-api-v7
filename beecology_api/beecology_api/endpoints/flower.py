@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 from sqlalchemy import and_
 
 from beecology_api.beecology_api.api import reference_api as api
+from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.db import db_session, FlowerSpecies
 from beecology_api.serialization import flower_species_schema
 from beecology_api.swagger import flower_species, flower_species_filter_parser
@@ -16,9 +17,9 @@ class Flower(Resource):
 	@api.expect(flower_species)
 	@api.response(201, "Flower species")
 	@api.response(400, "Invalid request")
+	@admin_required(api)
 	def post(self):
 		"""Add a new flower species"""
-		# TODO Require admin auth
 		api.payload["id"] = uuid4()
 		with db_session() as session:
 			try:
@@ -49,9 +50,9 @@ class Flower(Resource):
 	@api.response(204, "Species updated")
 	@api.response(404, "Species not found")
 	@api.response(400, "Unknown field or data type")
+	@admin_required(api)
 	def put(self, id: UUID):
 		"""Update a flower species. Changes to the ID are ignored."""
-		# TODO require admin auth
 		api.payload["id"] = id
 		with db_session() as session:
 			if session.query(FlowerSpecies).filter(FlowerSpecies.id == id).first() is None:
@@ -68,9 +69,9 @@ class Flower(Resource):
 
 	@api.param("id", "UUID of flower species to be deleted")
 	@api.response(204, "Flower species deleted (if present)")
+	@admin_required(api)
 	def delete(self, id: UUID):
 		"""Delete a flower species."""
-		# TODO require admin auth
 		with db_session() as session:
 			session.query(FlowerSpecies).filter(FlowerSpecies.id == id).delete()
 			session.commit()

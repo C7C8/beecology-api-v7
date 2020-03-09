@@ -101,7 +101,6 @@ class Records(Resource):
 	@api.marshal_with(bee_record, as_list=True)
 	def get(self):
 		"""Get a list of records, filtered by any means except user ID."""
-		# TODO Make sure current user is the specified user
 		args = bee_record_filter_parser.parse_args()
 		args["user_id"] = None
 		with db_session() as session:
