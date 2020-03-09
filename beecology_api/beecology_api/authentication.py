@@ -16,7 +16,7 @@ def authenticate(api):
 			return func(*args, **kwargs)
 
 		return wrapper
-	return decorator_wrapper()
+	return decorator_wrapper
 
 
 def admin_required(api):
