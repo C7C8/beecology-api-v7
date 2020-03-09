@@ -5,6 +5,7 @@ from flask_restx import Resource, abort
 from marshmallow import ValidationError
 
 from beecology_api.beecology_api.api import main_api as api
+from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.db import db_session, News as DBNews
 from beecology_api.serialization import news_schema
 from beecology_api.swagger import news_item, news_filter_parser
@@ -15,9 +16,9 @@ class News(Resource):
 	@api.expect(news_item)
 	@api.response(400, "Invalid input")
 	@api.response(201, "Added news item")
+	@admin_required(api)
 	def post(self):
 		"""Add a new news item."""
-		# TODO Require admin auth
 		api.payload["id"] = uuid4()
 		with db_session() as session:
 			try:
@@ -55,9 +56,9 @@ class News(Resource):
 	@api.response(204, "News item updated")
 	@api.response(404, "News item not found")
 	@api.response(400, "Unknown field or data type")
+	@admin_required(api)
 	def put(self, id: UUID):
 		"""Update a news item. Changes to ID or user ID are ignored"""
-		# TODO require admin auth
 		api.payload["id"] = id
 		if "user_id" in api.payload:
 			del api.payload["user_id"]
@@ -77,6 +78,7 @@ class News(Resource):
 
 	@api.param("id", "UUID of news item to delete")
 	@api.response(204, "News item deleted (if present)")
+	@admin_required(api)
 	def delete(self, id: UUID):
 		"""Delete a news item."""
 		with db_session() as session:
