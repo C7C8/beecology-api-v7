@@ -21,25 +21,6 @@ media = main_api.model("Media information", {
 	"uploaded": fields.DateTime(description="When the image was uploaded to the server", required=False)
 })
 
-bee_record = main_api.model("Bee record", {
-	"id": fields.String(description="UUID (v4) of the bee record", example="d667f8bc-60e5-4ea4-99b5-196c091657ac", pattern=_uuid_pattern),
-	# "user": fields.String(description="ID of user who submitted the record", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2"),
-	"bee_species_id": fields.String(description="If known, the species ID of the observed bee", example="b6567a3c-be2e-4350-b944-3ec24d868586", pattern=_uuid_pattern, required=False),
-	"flower_species_id": fields.String(description="If known, the species ID of the observed flower", example="955c499b-5dd3-4521-9f75-f13b173bbc7b", pattern=_uuid_pattern, required=False),
-	"abdomen_coloration": fields.String(description="Bee abdomen type", example="a1", required=True),
-	"thorax_coloration": fields.String(description="Bee thorax type", example="f1", required=True),
-	"head_coloration": fields.String(description="Bee head type", example="h1", required=True),
-	"gender": fields.String(description="Bee gender", enum=genders, required=True),
-	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", enum=beehaviors, required=True),
-	"time": fields.DateTime(description="Time the bee record was logged", required=True),
-	"submitted": fields.DateTime(decription="Time the bee record was submitted", required=False),
-	"location": fields.Nested(gis_coordinate, description="Point of observation", required=True),
-	"elevation": fields.Float(description="Elevation at the point the bee was observed at", required=False),
-	"closest_city": fields.String(description="Where the bee was observed", required=False),
-	"media": fields.List(fields.String, description="List of media paths for media associated with this record", required=False),
-	"how_submitted": fields.String(description="How the record was submitted", required=True, enum=["webapp", "androidapp", "museum", "expert"])
-})
-
 flower_species = reference_api.model("Flower species", {
 	"id": fields.String(description="UUID (v4) of the flower species", example="9c4d71a6-06a0-4aa0-9e87-428e2a77b866", pattern=_uuid_pattern),
 	"genus": fields.String(description="Flower genus", required=True),
@@ -54,7 +35,7 @@ flower_species = reference_api.model("Flower species", {
 	"image": fields.String(description="Path to a file on this server with an image of the flower"),
 })
 
-bee_species = reference_api.model("Flower_species", {
+bee_species = reference_api.model("Bee species", {
 	"id": fields.String(description="UUID (v4) of the bee species", example="57aa4241-b860-4992-992b-e827b90c0c76", pattern=_uuid_pattern),
 	"genus": fields.String(description="Bee genus", required=True),
 	"species": fields.String(description="Bee species", required=True),
@@ -62,8 +43,29 @@ bee_species = reference_api.model("Flower_species", {
 	"description": fields.String(description="Textual description of the bee in plain English", required=True),
 	"active_start": fields.String(description="When the bee species is active", enum=months, required=True),
 	"active_end": fields.String(description="When the bee species ceases activity", enum=months, required=True),
-	"confused_with": fields.String(description="Commma-separated list of bee species that this species is commonly confused with"),
+	"confused_with": fields.List(fields.String, description="List of bee species that this species is commonly confused with"),
 	"image": fields.String(description="Path to a file on this server with an image of the bee", required=True),
+})
+
+bee_record = main_api.model("Bee record", {
+	"id": fields.String(description="UUID (v4) of the bee record", example="d667f8bc-60e5-4ea4-99b5-196c091657ac", pattern=_uuid_pattern),
+	# "user": fields.String(description="ID of user who submitted the record", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2"),
+	"bee_species_id": fields.String(description="If known, the species ID of the observed bee", example="b6567a3c-be2e-4350-b944-3ec24d868586", pattern=_uuid_pattern, required=False),
+	"bee_species": fields.Nested(bee_species, description="Bee species details", required=False),
+	"flower_species_id": fields.String(description="If known, the species ID of the observed flower", example="955c499b-5dd3-4521-9f75-f13b173bbc7b", pattern=_uuid_pattern, required=False),
+	"flower_species": fields.Nested(flower_species, description="Flower species details", required=False),
+	"abdomen_coloration": fields.String(description="Bee abdomen type", example="a1", required=True),
+	"thorax_coloration": fields.String(description="Bee thorax type", example="f1", required=True),
+	"head_coloration": fields.String(description="Bee head type", example="h1", required=True),
+	"gender": fields.String(description="Bee gender", enum=genders, required=True),
+	"behavior": fields.String(description="The bee's beehavior, i.e. what it was collecting", enum=beehaviors, required=True),
+	"time": fields.DateTime(description="Time the bee record was logged", required=True),
+	"submitted": fields.DateTime(decription="Time the bee record was submitted", required=False),
+	"location": fields.Nested(gis_coordinate, description="Point of observation", required=True),
+	"elevation": fields.Float(description="Elevation at the point the bee was observed at", required=False),
+	"closest_city": fields.String(description="Where the bee was observed", required=False),
+	"media": fields.List(fields.String, description="List of media paths for media associated with this record", required=False),
+	"how_submitted": fields.String(description="How the record was submitted", required=True, enum=["webapp", "androidapp", "museum", "expert"])
 })
 
 user = manage_api.model("User record", {

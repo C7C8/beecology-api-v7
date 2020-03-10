@@ -42,7 +42,7 @@ class _MediaField(fields.Field):
 		return self.parent.session.query(self.table).filter(self.table.id.in_(value)).all()
 
 
-class Converter(ModelConverter):
+class _Converter(ModelConverter):
 	"""Converter to serialize or deserialize a point."""
 	SQLA_TYPE_MAPPING = ModelConverter.SQLA_TYPE_MAPPING.copy()
 	SQLA_TYPE_MAPPING.update({
@@ -55,16 +55,6 @@ class UserSchema(ModelSchema):
 		model = User
 
 
-class BeeRecordSchema(ModelSchema):
-	location = _PointField(attribute="location")
-	media = _MediaField(table=Media, attribute="images")
-
-	class Meta:
-		model = BeeRecord
-		model_converter = Converter
-		include_fk = True
-
-
 class BeeSpeciesSchema(ModelSchema):
 	class Meta:
 		model = BeeSpecies
@@ -74,6 +64,18 @@ class BeeSpeciesSchema(ModelSchema):
 class FlowerSpeciesSchema(ModelSchema):
 	class Meta:
 		model = FlowerSpecies
+		include_fk = True
+
+
+class BeeRecordSchema(ModelSchema):
+	location = _PointField(attribute="location")
+	media = _MediaField(table=Media, attribute="images")
+	bee_species = fields.Nested(BeeSpeciesSchema)
+	flower_species = fields.Nested(FlowerSpeciesSchema)
+
+	class Meta:
+		model = BeeRecord
+		model_converter = _Converter
 		include_fk = True
 
 

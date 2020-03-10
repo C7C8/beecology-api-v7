@@ -44,7 +44,7 @@ def init_api():
 	          title="Beecology API",
 	          description="The Beecology API, for uploading/downloading Beecology data or performing data analyses",
 	          contact_email="beecologyproject@wpi.edu",
-	          version="1.1.0",
+	          version="2.0.0",
 	          default_mediatype="application/json",
 	          authorizations=bee_authorizations,
 	          validate=True)
