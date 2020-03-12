@@ -88,7 +88,7 @@ class Flowers(Resource):
 			# Simple equality filtering
 			for attr in ["genus", "species", "shape"]:
 				if attr in args:
-					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr])
+					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr].lower())
 
 			# Months blooming filtering
 			if "blooms-during" in args:

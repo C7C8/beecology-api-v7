@@ -88,7 +88,7 @@ class Bees(Resource):
 			# Simple equality filtering
 			for attr in ["tongue-length", "species"]:
 				if attr in args:
-					query = query.filter(BeeSpecies.__dict__[attr] == args[attr])
+					query = query.filter(BeeSpecies.__dict__[attr] == args[attr].lower())
 
 			# Months active filtering
 			if "active-during" in args:
