@@ -34,7 +34,7 @@ def init_api():
 	app.config["JWT_SECRET_KEY"] = config.config["auth"]["jwt-key"]
 	main_db_init()
 
-	CORS(app)
+	# CORS(app)
 	blueprint = Blueprint("api", __name__)
 	firebase_app = firebase_admin.initialize_app(credentials.Certificate(config.config["auth"]["key-file"]),
 	                                             options=config.config["auth"])

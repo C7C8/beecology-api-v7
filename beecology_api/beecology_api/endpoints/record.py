@@ -133,7 +133,7 @@ def bee_records_filter(args, session) -> List[BeeRecord]:
 		except ValueError:
 			abort(400, "Invalid bounding box filter parameters")
 
-		query = query.filter(func.ST_Within(BeeRecord.loc_info, func.ST_GeomFromText(
+		query = query.filter(func.ST_Within(BeeRecord.location, func.ST_GeomFromText(
 			"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
 
 	return query.all()

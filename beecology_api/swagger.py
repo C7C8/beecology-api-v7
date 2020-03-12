@@ -109,12 +109,13 @@ bee_record_filter_parser.add_argument("min-elevation", type=float, help="Elevati
 bee_record_filter_parser.add_argument("bounding-box", type=str, help="Bounding box that records must fall in, in format minLat,minLong,maxLat,maxLong", required=False)
 
 bee_species_filter_parser = reqparse.RequestParser()
-bee_species_filter_parser.add_argument("genus", type=str, help="Bee genus", required=False)
+bee_species_filter_parser.add_argument("species", type=str, help="Bee species", required=False)
 bee_species_filter_parser.add_argument("tongue-length", type=str, help="Bee tongue length", required=False)
 bee_species_filter_parser.add_argument("active-during", type=str, help="Month that the bee must be active during", choices=months, required=False)
 
 flower_species_filter_parser = reqparse.RequestParser()
 flower_species_filter_parser.add_argument("genus", type=str, help="Flower genus", required=False)
+flower_species_filter_parser.add_argument("species", type=str, help="Flower species", required=False)
 flower_species_filter_parser.add_argument("shape", type=str, help="Flower shape", required=False)
 flower_species_filter_parser.add_argument("blooms-during", type=str, help="Month in which the flower must be in bloom", choices=months, required=False)
 

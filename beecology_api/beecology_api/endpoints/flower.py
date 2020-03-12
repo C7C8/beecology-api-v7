@@ -86,7 +86,7 @@ class Flowers(Resource):
 			query = session.query(FlowerSpecies)
 
 			# Simple equality filtering
-			for attr in ["genus", "shape"]:
+			for attr in ["genus", "species", "shape"]:
 				if attr in args:
 					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr])
 

@@ -86,7 +86,7 @@ class Bees(Resource):
 			query = session.query(BeeSpecies)
 
 			# Simple equality filtering
-			for attr in ["tongue-length", "genus"]:
+			for attr in ["tongue-length", "species"]:
 				if attr in args:
 					query = query.filter(BeeSpecies.__dict__[attr] == args[attr])
 

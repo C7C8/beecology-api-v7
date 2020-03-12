@@ -12,7 +12,7 @@ from beecology_api.serialization import bee_record_schema
 def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 	"""Convert a dataframe of serialized bee records into an analysis-script format dataframe"""
 	df = pd.DataFrame([{
-			"time": pd.Timestamp(record.time).value if record.time is not None else None, # timestamp.value? shoot me
+			"time": pd.Timestamp(record.time).value if record.time is not None else None,  # timestamp.value? shoot me
 			"latitude": geometry.mapping(to_shape(record.location))["coordinates"][0] if record.location is not None else None,
 			"longitude": geometry.mapping(to_shape(record.location))["coordinates"][1] if record.location is not None else None,
 			"elevation": record.elevation,
@@ -20,10 +20,11 @@ def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 			"behavior": record.behavior,
 			"head_coloration": record.head_coloration,
 			"abdomen_color": record.abdomen_coloration,
+			"thorax_coloration": record.thorax_coloration,
 			"how_submitted": record.how_submitted,
 			"submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
-			"thorax_coloration": record.thorax_coloration,
 			"flower_species": ("{} {}".format(record.flower_species.genus, record.flower_species.species)) if record.flower_species is not None else None
 		} for record in records])
 
+	df.to_excel("dataframe.xlsx")
 	return df
