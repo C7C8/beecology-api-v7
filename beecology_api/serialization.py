@@ -26,20 +26,16 @@ class _PointField(fields.Field):
 
 
 class _MediaField(fields.Field):
-	def __init__(self, table, **metadata):
-		self.table = table
-		super().__init__(**metadata)
-
 	"""Marshmallow field for deserializing an image to just a path"""
 	def _serialize(self, value, attr, obj, **kwargs):
 		if value is None:
 			return None
-		return [{"path": media.client_path, "id": media.id} for media in value]
+		return [media.web_path for media in value]
 
 	def _deserialize(self, value, attr, data, **kwargs):
 		if value is None:
 			return None
-		return self.parent.session.query(self.table).filter(self.table.id.in_(value)).all()
+		return self.parent.session.query(Media).filter(Media.web_path.in_(value)).all()
 
 
 class _Converter(ModelConverter):
@@ -69,9 +65,7 @@ class FlowerSpeciesSchema(ModelSchema):
 
 class BeeRecordSchema(ModelSchema):
 	location = _PointField(attribute="location")
-	media = _MediaField(table=Media, attribute="images")
-	bee_species = fields.Nested(BeeSpeciesSchema)
-	flower_species = fields.Nested(FlowerSpeciesSchema)
+	media = _MediaField(attribute="media")
 
 	class Meta:
 		model = BeeRecord

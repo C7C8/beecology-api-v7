@@ -37,9 +37,8 @@ flower_species = reference_api.model("Flower species", {
 
 bee_species = reference_api.model("Bee species", {
 	"id": fields.String(description="UUID (v4) of the bee species", example="57aa4241-b860-4992-992b-e827b90c0c76", pattern=_uuid_pattern),
-	"genus": fields.String(description="Bee genus", required=True),
 	"species": fields.String(description="Bee species", required=True),
-	"common_name": fields.String(description="The name the bee species is most often referred to by", required=True),
+	"common_names": fields.List(fields.String, description="The names the bee species is most often referred to by", required=True),
 	"description": fields.String(description="Textual description of the bee in plain English", required=True),
 	"active_start": fields.String(description="When the bee species is active", enum=months, required=True),
 	"active_end": fields.String(description="When the bee species ceases activity", enum=months, required=True),
@@ -51,9 +50,7 @@ bee_record = main_api.model("Bee record", {
 	"id": fields.String(description="UUID (v4) of the bee record", example="d667f8bc-60e5-4ea4-99b5-196c091657ac", pattern=_uuid_pattern),
 	# "user": fields.String(description="ID of user who submitted the record", example="wbVJ1cYguVcggk21dEkcGbnDI0Q2"),
 	"bee_species_id": fields.String(description="If known, the species ID of the observed bee", example="b6567a3c-be2e-4350-b944-3ec24d868586", pattern=_uuid_pattern, required=False),
-	"bee_species": fields.Nested(bee_species, description="Bee species details", required=False),
 	"flower_species_id": fields.String(description="If known, the species ID of the observed flower", example="955c499b-5dd3-4521-9f75-f13b173bbc7b", pattern=_uuid_pattern, required=False),
-	"flower_species": fields.Nested(flower_species, description="Flower species details", required=False),
 	"abdomen_coloration": fields.String(description="Bee abdomen type", example="a1", required=True),
 	"thorax_coloration": fields.String(description="Bee thorax type", example="f1", required=True),
 	"head_coloration": fields.String(description="Bee head type", example="h1", required=True),
@@ -93,7 +90,7 @@ jwt_response = manage_api.model("JWT", {
 ###########
 
 bee_record_filter_parser = reqparse.RequestParser()
-bee_record_filter_parser.add_argument("user-id", type=str, help="User ID. Only works if the current user is the one given by the ID.", required=False, dest="user_id")
+bee_record_filter_parser.add_argument("user-id", type=str, help="User ID", required=False, dest="user_id")
 bee_record_filter_parser.add_argument("species", type=str, help="Species UUID", required=False, dest="bee_species_id")
 bee_record_filter_parser.add_argument("flower-species", type=str, help="Flower species UUID", required=False, dest="flower_species_id"),
 bee_record_filter_parser.add_argument("head", type=str, help="Head type", required=False, dest="head_coloration")
@@ -110,7 +107,7 @@ bee_record_filter_parser.add_argument("bounding-box", type=str, help="Bounding b
 
 bee_species_filter_parser = reqparse.RequestParser()
 bee_species_filter_parser.add_argument("species", type=str, help="Bee species", required=False)
-bee_species_filter_parser.add_argument("tongue-length", type=str, help="Bee tongue length", required=False)
+bee_species_filter_parser.add_argument("tongue-length", dest="tongue_length", type=str, help="Bee tongue length", required=False)
 bee_species_filter_parser.add_argument("active-during", type=str, help="Month that the bee must be active during", choices=months, required=False)
 
 flower_species_filter_parser = reqparse.RequestParser()

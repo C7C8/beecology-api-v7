@@ -100,14 +100,13 @@ class Records(Resource):
 	def get(self):
 		"""Get a list of records, filtered by any means except user ID."""
 		args = bee_record_filter_parser.parse_args()
-		args["user_id"] = None
 		with db_session() as session:
 			return [bee_record_schema.dump(record) for record in bee_records_filter(args, session)], 200
 
 
 def bee_records_filter(args, session) -> List[BeeRecord]:
 	"""Bee record filtering, encapsulated as a function so that the analysis API can use it"""
-	query = session.query(BeeRecord)
+	query = session.query(BeeRecord).order_by(BeeRecord.time.desc())
 
 	# Simple equality filtering
 	for attr in ["user_id", "bee_species_id", "flower_species_id", "head_coloration", "abdomen_coloration",

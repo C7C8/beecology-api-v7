@@ -11,20 +11,52 @@ from beecology_api.serialization import bee_record_schema
 # TODO Do something marshmallow-y with this?
 def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 	"""Convert a dataframe of serialized bee records into an analysis-script format dataframe"""
-	df = pd.DataFrame([{
+	dict_records = []
+	for record in records:
+		dict_record = {
+			"how_submitted": record.how_submitted,
+			"submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
 			"time": pd.Timestamp(record.time).value if record.time is not None else None,  # timestamp.value? shoot me
-			"latitude": geometry.mapping(to_shape(record.location))["coordinates"][0] if record.location is not None else None,
-			"longitude": geometry.mapping(to_shape(record.location))["coordinates"][1] if record.location is not None else None,
+			"year": record.time.year if record.time is not None else None,
+			"month": record.time.month if record.time is not None else None,
+			"day": record.time.day if record.time is not None else None,
+			"latitude": geometry.mapping(to_shape(record.location))["coordinates"][
+				0] if record.location is not None else None,
+			"longitude": geometry.mapping(to_shape(record.location))["coordinates"][
+				1] if record.location is not None else None,
 			"elevation": record.elevation,
-			"species": record.bee_species.species if record.bee_species is not None else None,
+			"species": None,
 			"behavior": record.behavior,
 			"head_coloration": record.head_coloration,
 			"abdomen_color": record.abdomen_coloration,
 			"thorax_coloration": record.thorax_coloration,
-			"how_submitted": record.how_submitted,
-			"submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
-			"flower_species": ("{} {}".format(record.flower_species.genus, record.flower_species.species)) if record.flower_species is not None else None
-		} for record in records])
+			"tongue_length": None,
+			"bee_active_start": None,
+			"bee_active_end": None,
+			"flower_species": None,
+			"flower_genus": None,
+			"flower_common_name": None,
+			"flower_main_color": None,
+			"flower_shape": None,
+			"flower_bloom_start": None,
+			"flower_bloom_end": None
+		}
+		if record.bee_species is not None:
+			s = record.bee_species
+			dict_record["species"] = s.species
+			dict_record["tongue_length"] = s.tongue_length
+			dict_record["bee_active_start"] = s.active_start
+			dict_record["bee_active_end"] = s.active_end
+		if record.flower_species is not None:
+			f = record.flower_species
+			dict_record["flower_species"] = f.species
+			dict_record["flower_genus"] = f.genus
+			dict_record["flower_common_name"] = f.common_name
+			dict_record["flower_main_color"] = f.main_color,
+			dict_record["flower_shape"] = f.shape,
+			dict_record["flower_bloom_start"] = f.bloom_start
+			dict_record["flower_bloom_end"] = f.bloom_end,
 
-	df.to_excel("dataframe.xlsx")
-	return df
+		dict_records.append(dict_record)
+
+	return pd.DataFrame(dict_records)

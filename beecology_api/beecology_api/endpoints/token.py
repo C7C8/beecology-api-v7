@@ -20,7 +20,7 @@ log = getLogger()
 class Token(Resource):
 	@api.doc(security="firebase")
 	@api.marshal_with(jwt_response)
-	@api.response(401, "Firebase basic token required")
+	@api.response(401, "Firebase JWT required")
 	@api.response(403, "Firebase token authentication failed")
 	@api.response(200, "Access and refresh tokens enclosed", jwt_response)
 	def get(self):

@@ -86,12 +86,13 @@ class Bees(Resource):
 			query = session.query(BeeSpecies)
 
 			# Simple equality filtering
-			for attr in ["tongue-length", "species"]:
-				if attr in args:
-					query = query.filter(BeeSpecies.__dict__[attr] == args[attr].lower())
+			for attr in ["tongue_length", "species"]:
+				if  args[attr] is not None:
+					args[attr] = args[attr].lower()
+					query = query.filter(BeeSpecies.__dict__[attr] == args[attr])
 
 			# Months active filtering
-			if "active-during" in args:
+			if args["active-during"] is not None:
 				month = args["active-during"]
 				query = query.filter(and_(BeeSpecies.active_start <= month, BeeSpecies.active_end >= month))
 
