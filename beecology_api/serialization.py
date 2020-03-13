@@ -66,6 +66,8 @@ class FlowerSpeciesSchema(ModelSchema):
 class BeeRecordSchema(ModelSchema):
 	location = _PointField(attribute="location")
 	media = _MediaField(attribute="media")
+	flower_species = fields.Nested(FlowerSpeciesSchema)
+	bee_species = fields.Nested(BeeSpeciesSchema)
 
 	class Meta:
 		model = BeeRecord

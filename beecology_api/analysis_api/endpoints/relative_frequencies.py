@@ -4,7 +4,7 @@ from flask_restx import Resource, abort
 
 from beecology_api.analysis_api.analysis_scripts import relative_frequencies
 from beecology_api.analysis_api.api import api
-from beecology_api.analysis_api.convert_dataframe import convert_dataframe
+from beecology_api.convert_dataframe import convert_dataframe
 from beecology_api.beecology_api.endpoints.record import bee_records_filter
 from beecology_api.db import db_session
 from beecology_api.swagger import bee_record_filter_parser

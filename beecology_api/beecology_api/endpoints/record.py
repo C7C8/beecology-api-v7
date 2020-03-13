@@ -1,16 +1,19 @@
+import io
 from logging import getLogger
 from typing import List
 from uuid import UUID, uuid4
 
+from flask import send_file
 from flask_jwt_extended import get_jwt_identity
 from flask_restx import Resource, abort
 from geoalchemy2 import func
 from marshmallow.exceptions import ValidationError
 
-from beecology_api.beecology_api.authentication import authenticate
-from beecology_api.db import db_session
 from beecology_api.beecology_api.api import main_api as api
+from beecology_api.beecology_api.authentication import authenticate
+from beecology_api.convert_dataframe import convert_dataframe
 from beecology_api.db import BeeRecord, User
+from beecology_api.db import db_session
 from beecology_api.serialization import bee_record_schema
 from beecology_api.swagger import bee_record, bee_record_filter_parser
 
@@ -98,10 +101,27 @@ class Records(Resource):
 	@api.response(400, "Bad filter parameters")
 	@api.marshal_with(bee_record, as_list=True)
 	def get(self):
-		"""Get a list of records, filtered by any means except user ID."""
+		"""Get a list of records, filtered by any means"""
 		args = bee_record_filter_parser.parse_args()
 		with db_session() as session:
 			return [bee_record_schema.dump(record) for record in bee_records_filter(args, session)], 200
+
+
+class CSVRecords(Resource):
+	@api.expect(bee_record_filter_parser)
+	@api.response(400, "Bad filter parameters")
+	@api.response(200, "CSV enclosed")
+	@api.produces(["text/csv"])
+	def get(self):
+		"""Get a list of records, filtered by any means in CSV format."""
+		args = bee_record_filter_parser.parse_args()
+		with db_session() as session:
+			df = convert_dataframe(bee_records_filter(args, session))
+			df.fillna("Unknown", inplace=True)
+			out = io.BytesIO()
+			out.write(df.to_csv(header=True, index=False).replace('\\n', '\n').encode("utf-8"))
+			out.seek(0)
+			return send_file(out, mimetype="text/csv")
 
 
 def bee_records_filter(args, session) -> List[BeeRecord]:
