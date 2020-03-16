@@ -50,7 +50,7 @@ def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 			dict_record["flower_main_color"] = f.main_color
 			dict_record["flower_shape"] = f.shape
 			dict_record["flower_bloom_start"] = f.bloom_start
-			dict_record["flower_bloom_end"] = f.bloom_end,
+			dict_record["flower_bloom_end"] = f.bloom_end
 
 		dict_records.append(dict_record)
 
