@@ -19,13 +19,12 @@ def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 			"year": record.time.year if record.time is not None else None,
 			"month": record.time.month if record.time is not None else None,
 			"day": record.time.day if record.time is not None else None,
-			"latitude": geometry.mapping(to_shape(record.location))["coordinates"][
-				0] if record.location is not None else None,
-			"longitude": geometry.mapping(to_shape(record.location))["coordinates"][
-				1] if record.location is not None else None,
+			"latitude": geometry.mapping(to_shape(record.location))["coordinates"][0] if record.location is not None else None,
+			"longitude": geometry.mapping(to_shape(record.location))["coordinates"][1] if record.location is not None else None,
 			"elevation": record.elevation,
 			"species": None,
 			"behavior": record.behavior,
+			"gender": record.gender,
 			"tongue_length": None,
 			"bee_active_start": None,
 			"bee_active_end": None,
@@ -48,8 +47,8 @@ def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 			dict_record["flower_species"] = f.species
 			dict_record["flower_genus"] = f.genus
 			dict_record["flower_common_name"] = f.common_name
-			dict_record["flower_main_color"] = f.main_color,
-			dict_record["flower_shape"] = f.shape,
+			dict_record["flower_main_color"] = f.main_color
+			dict_record["flower_shape"] = f.shape
 			dict_record["flower_bloom_start"] = f.bloom_start
 			dict_record["flower_bloom_end"] = f.bloom_end,
 
