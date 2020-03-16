@@ -3,12 +3,11 @@ import logging.config
 import firebase_admin
 from firebase_admin import credentials
 from flask import Flask, Blueprint
-from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restx import Api
 
 import beecology_api.config as config
-from beecology_api import compat_bee_api, compat_analysis_api, beecology_api, analysis_api
+from beecology_api import beecology_api, analysis_api
 from beecology_api.compat_bee_api.models import authorizations as bee_authorizations
 from beecology_api.db import init_database as main_db_init
 

@@ -8,8 +8,8 @@ from sqlalchemy import and_
 from beecology_api.beecology_api.api import reference_api as api
 from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.db import db_session, FlowerSpecies
-from beecology_api.serialization import flower_species_schema
-from beecology_api.swagger import flower_species, flower_species_filter_parser
+from beecology_api.db.serialization import flower_species_schema
+from beecology_api.beecology_api.swagger import flower_species, flower_species_filter_parser
 
 log = getLogger()
 

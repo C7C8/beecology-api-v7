@@ -7,8 +7,8 @@ from marshmallow import ValidationError
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.db import db_session, News as DBNews
-from beecology_api.serialization import news_schema
-from beecology_api.swagger import news_item, news_filter_parser
+from beecology_api.db.serialization import news_schema
+from beecology_api.beecology_api.swagger import news_item, news_filter_parser
 
 log = getLogger()
 

@@ -5,7 +5,6 @@ from geoalchemy2.shape import to_shape
 from shapely import geometry
 
 from beecology_api.db import BeeRecord
-from beecology_api.serialization import bee_record_schema
 
 
 # TODO Do something marshmallow-y with this?

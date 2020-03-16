@@ -15,8 +15,8 @@ from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.authentication import authenticate
 from beecology_api.db import db_session
 from beecology_api.db import Media as DBMedia, User
-from beecology_api.serialization import media_schema
-from beecology_api.swagger import media_upload_parser, media
+from beecology_api.db.serialization import media_schema
+from beecology_api.beecology_api.swagger import media_upload_parser, media
 
 log = getLogger()
 

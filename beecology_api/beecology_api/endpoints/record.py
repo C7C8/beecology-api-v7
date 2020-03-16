@@ -11,11 +11,12 @@ from marshmallow.exceptions import ValidationError
 
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.authentication import authenticate
+from beecology_api.common_parsers import bee_record_filter_parser
 from beecology_api.convert_dataframe import convert_dataframe
 from beecology_api.db import BeeRecord, User
 from beecology_api.db import db_session
-from beecology_api.serialization import bee_record_schema
-from beecology_api.swagger import bee_record, bee_record_filter_parser
+from beecology_api.db.serialization import bee_record_schema
+from beecology_api.beecology_api.swagger import bee_record
 
 log = getLogger()
 
