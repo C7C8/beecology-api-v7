@@ -36,6 +36,7 @@ class Flower(Resource):
 
 	@api.response(200, "Species data enclosed")
 	@api.response(404, "Species not found")
+	@api.marshal_with(flower_species)
 	def get(self, id: UUID):
 		"""Get information on one flower species."""
 		with db_session() as session:
@@ -91,7 +92,7 @@ class Flowers(Resource):
 					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr].lower())
 
 			# Months blooming filtering
-			if "blooms-during" in args:
+			if args["blooms-during"] is not None:
 				month = args["blooms-during"]
 				query = query.filter(and_(FlowerSpecies.bloom_start <= month, FlowerSpecies.bloom_end >= month))
 

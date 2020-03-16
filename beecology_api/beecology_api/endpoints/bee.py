@@ -36,6 +36,7 @@ class Bee(Resource):
 
 	@api.response(200, "Species data enclosed", bee_species)
 	@api.response(404, "Species not found")
+	@api.marshal_with(bee_species)
 	def get(self, id: UUID):
 		"""Get information on a single bee species."""
 		with db_session() as session:
