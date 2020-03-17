@@ -21,7 +21,7 @@ class RelativeFrequencies(Resource):
 
 		if args["x-var"] == "time":
 			try:
-				cutoffs = [pd.Timestamp(cutoff, unit="ms").value for cutoff in args["x-bin-cutoffs"]]
+				cutoffs = [int(cutoff) for cutoff in args["x-bin-cutoffs"]]
 				cutoffs.sort()
 			except Exception as e:
 				abort(400, "x-bin-cutoffs timestamps invalid: {}".format(e))
