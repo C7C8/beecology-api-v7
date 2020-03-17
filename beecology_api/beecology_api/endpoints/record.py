@@ -117,8 +117,7 @@ class CSVRecords(Resource):
 		"""Get a list of records, filtered by any means in CSV format."""
 		args = bee_record_filter_parser.parse_args()
 		with db_session() as session:
-			df = convert_dataframe(bee_records_filter(args, session))
-			df.fillna("Unknown", inplace=True)
+			df = convert_dataframe(bee_records_filter(args, session)).apply(lambda x: x.fillna("Unknown") if x.dtype.kind not in 'biufc' else x)
 			out = io.BytesIO()
 			out.write(df.to_csv(header=True, index=False).replace('\\n', '\n').encode("utf-8"))
 			out.seek(0)
