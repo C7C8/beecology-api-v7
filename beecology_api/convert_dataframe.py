@@ -13,9 +13,9 @@ def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
 	dict_records = []
 	for record in records:
 		dict_record = {
-			"how_submitted": record.how_submitted,
-			"submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
-			"time": pd.Timestamp(record.time).value if record.time is not None else None,  # timestamp.value? shoot me
+			# "how_submitted": record.how_submitted,
+			# "submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
+			"time": record.time.isoformat() if record.time is not None else None,  # timestamp.value? shoot me
 			"year": record.time.year if record.time is not None else None,
 			"month": record.time.month if record.time is not None else None,
 			"day": record.time.day if record.time is not None else None,
