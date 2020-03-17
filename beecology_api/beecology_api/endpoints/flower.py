@@ -7,9 +7,11 @@ from sqlalchemy import and_
 
 from beecology_api.beecology_api.api import reference_api as api
 from beecology_api.beecology_api.authentication import admin_required
+from beecology_api.beecology_api.endpoints.record import bee_records_filter
+from beecology_api.common_parsers import bee_record_filter_parser
 from beecology_api.db import db_session, FlowerSpecies
 from beecology_api.db.serialization import flower_species_schema
-from beecology_api.beecology_api.swagger import flower_species, flower_species_filter_parser
+from beecology_api.beecology_api.swagger import flower_species, flower_species_filter_parser, flower_distinct_values
 
 log = getLogger()
 
@@ -102,3 +104,32 @@ class Flowers(Resource):
 				query = query.filter(and_(FlowerSpecies.bloom_start <= month, FlowerSpecies.bloom_end >= month))
 
 			return [flower_species_schema.dump(species) for species in query.all()], 200
+
+
+class FlowerDistinctValues(Resource):
+	@api.expect(bee_record_filter_parser)
+	@api.response(200, "Distinct flower values in-use enclosed", flower_distinct_values)
+	def get(self):
+		"""Returns lists of possible flower names, shapes, and colors, but only for those flowers that actually appear in bee records"""
+		with db_session() as session:
+			args = bee_record_filter_parser.parse_args()
+			records = bee_records_filter(args, session)
+
+			flowers = set()
+			colors = set()
+			shapes = set()
+			for record in records:
+				if record.flower_species is None:
+					continue
+				flower = record.flower_species
+				flowers.add(flower)
+				colors.update(flower.colors)
+				shapes.add(flower.shape)
+
+			flowers = [flower_species_schema.dump(flower) for flower in flowers]
+			return {
+				"shapes": list(shapes),
+				"colors": list(colors),
+				"flowers": flowers
+			}
+

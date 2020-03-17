@@ -35,6 +35,12 @@ flower_species = reference_api.model("Flower species", {
 	"image": fields.String(description="Path to a file on this server with an image of the flower"),
 })
 
+flower_distinct_values = reference_api.model("Distinct flower values", {
+	"shapes": fields.List(fields.String, description="List of distinct flower shapes that occur in bee records"),
+	"colors": fields.List(fields.String, description="List of distinct flower colors that occur in bee records"),
+	"flowers": fields.List(fields.Nested(flower_species), description="List of distinct flowers that occur in bee records")
+})
+
 bee_species = reference_api.model("Bee species", {
 	"id": fields.String(description="UUID (v4) of the bee species", example="57aa4241-b860-4992-992b-e827b90c0c76", pattern=_uuid_pattern),
 	"species": fields.String(description="Bee species", required=True),

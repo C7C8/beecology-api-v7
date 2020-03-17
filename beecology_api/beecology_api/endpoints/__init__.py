@@ -1,5 +1,5 @@
 from .bee import Bee, Bees
-from .flower import Flower, Flowers
+from .flower import Flower, Flowers, FlowerDistinctValues
 from .media import Media
 from .news import News
 from .record import Record, Records, CSVRecords

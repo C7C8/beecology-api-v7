@@ -89,6 +89,6 @@ class MediaSchema(ModelSchema):
 user_schema = UserSchema()
 bee_record_schema = BeeRecordSchema(exclude=["user_id"])
 bee_species_schema = BeeSpeciesSchema()
-flower_species_schema = FlowerSpeciesSchema()
+flower_species_schema = FlowerSpeciesSchema(exclude=["records"])
 news_schema = NewsSchema(exclude=["user_id"])
 media_schema = MediaSchema(exclude=["file_path"])
