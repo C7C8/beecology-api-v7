@@ -1,7 +1,7 @@
 from flask_restx import Resource
 
 from .. import api
-from ..analysis_scripts import summary_statistics
+from ..analysis_scripts import summary_stats
 from ..swagger import summary_stats_parser
 from ...beecology_api.endpoints.record import bee_records_filter
 from ...convert_dataframe import convert_dataframe
@@ -18,4 +18,4 @@ class SummaryStats(Resource):
 		with db_session() as session:
 			records = bee_records_filter(args, session)
 			df = convert_dataframe(records)
-			return summary_statistics(df, args["how"])
+			return summary_stats.summary_stats(df, args["how"])

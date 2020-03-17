@@ -8,14 +8,14 @@ from beecology_api.db import BeeRecord
 
 
 # TODO Do something marshmallow-y with this?
-def convert_dataframe(records: List[BeeRecord]) -> pd.DataFrame:
+def convert_dataframe(records: List[BeeRecord], time_human_readable=False) -> pd.DataFrame:
 	"""Convert a dataframe of serialized bee records into an analysis-script format dataframe"""
 	dict_records = []
 	for record in records:
 		dict_record = {
 			# "how_submitted": record.how_submitted,
 			# "submitted": pd.Timestamp(record.submitted).value if record.submitted is not None else None,
-			"time": record.time.isoformat() if record.time is not None else None,  # timestamp.value? shoot me
+			"time": (record.time.isoformat() if time_human_readable else record.time) if record.time is not None else None,  # timestamp.value? shoot me
 			"year": record.time.year if record.time is not None else None,
 			"month": record.time.month if record.time is not None else None,
 			"day": record.time.day if record.time is not None else None,

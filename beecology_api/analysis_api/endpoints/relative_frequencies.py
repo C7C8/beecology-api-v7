@@ -14,15 +14,15 @@ class RelativeFrequencies(Resource):
 	@api.response(400, "Bad parameters supplied")
 	@api.marshal_with(relative_frequencies_result, as_list=True)
 	def get(self):
-		"""Conduct a relative frequencies analysis and return the resulting data
-		TODO expand docs"""
+		"""Conduct a relative frequencies analysis and return the resulting data"""
 		args = relative_frequencies_parser.parse_args()
 		if len(args["x-bin-cutoffs"]) < 3:
 			abort(400, "x-bin-cutoffs must have at least 3 cutoffs")
 		try:
-			cutoffs = [pd.Timestamp(cutoff).value for cutoff in args["x-bin-cutoffs"]]
-		except:
-			abort(400, "x-bin-cutoffs timestamps invalid")
+			cutoffs = [pd.Timestamp(cutoff * 1000).value for cutoff in args["x-bin-cutoffs"]]
+			cutoffs.sort()
+		except Exception as e:
+			abort(400, "x-bin-cutoffs timestamps invalid: {}".format(e))
 
 		# Select bee records and filter
 		with db_session() as session:
@@ -30,9 +30,12 @@ class RelativeFrequencies(Resource):
 		if len(df) == 0:
 			abort(400, "No bee records matched filter parameters")
 
-		results = relative_frequencies(df=df,
+		try:
+			results = relative_frequencies(df=df,
 		                               x_var=args["x-var"],
 		                               x_bin_cutoffs=cutoffs,
 		                               y_var=args["y-var"],
-		                               norm_mode=args["norm-mode"] if "norm-mode" in args else None)
-		return results, 200
+		                               norm_mode=args["norm-mode"])
+		except ValueError as e:
+			abort(400, "Binning error: {}".format(e))
+		return results["results"], 200
