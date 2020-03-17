@@ -18,11 +18,15 @@ class RelativeFrequencies(Resource):
 		args = relative_frequencies_parser.parse_args()
 		if len(args["x-bin-cutoffs"]) < 3:
 			abort(400, "x-bin-cutoffs must have at least 3 cutoffs")
-		try:
-			cutoffs = [pd.Timestamp(cutoff * 1000000).value for cutoff in args["x-bin-cutoffs"]]
-			cutoffs.sort()
-		except Exception as e:
-			abort(400, "x-bin-cutoffs timestamps invalid: {}".format(e))
+
+		if args["x-var"] == "time":
+			try:
+				cutoffs = [pd.Timestamp(cutoff, unit="ms").value for cutoff in args["x-bin-cutoffs"]]
+				cutoffs.sort()
+			except Exception as e:
+				abort(400, "x-bin-cutoffs timestamps invalid: {}".format(e))
+		else:
+			cutoffs = args["x-bin-cutoffs"]
 
 		# Select bee records and filter
 		with db_session() as session:
