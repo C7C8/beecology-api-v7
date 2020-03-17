@@ -8,7 +8,6 @@ from flask_restx import Api
 
 import beecology_api.config as config
 from beecology_api import beecology_api, analysis_api
-from beecology_api.compat_bee_api.models import authorizations as bee_authorizations
 from beecology_api.db import init_database as main_db_init
 
 # Beecology API Server, Python edition!
@@ -25,7 +24,28 @@ from beecology_api.db import init_database as main_db_init
 
 app = Flask(__name__)
 jwt = JWTManager(app)
-
+authorizations = {
+    "user": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
+    "user-refresh": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
+    "admin": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    },
+    "firebase": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    }
+}
 
 def init_api():
 	config.load_config()
@@ -45,14 +65,12 @@ def init_api():
 	          contact_email="beecologyproject@wpi.edu",
 	          version="2.0.0",
 	          default_mediatype="application/json",
-	          authorizations=bee_authorizations,
+	          authorizations=authorizations,
 	          validate=True)
 	api.add_namespace(beecology_api.main_api)
 	api.add_namespace(beecology_api.reference_api, "/reference")
 	api.add_namespace(beecology_api.manage_api, "/management")
 	api.add_namespace(analysis_api.api, "/analysis")
-	# api.add_namespace(compat_analysis_api.api, "/compat/analysis")
-	# api.add_namespace(compat_bee_api.api, "/compat")
 
 	app.register_blueprint(blueprint)
 	jwt._set_error_handler_callbacks(api)  # hack: plz stop returning 500 Server Error
