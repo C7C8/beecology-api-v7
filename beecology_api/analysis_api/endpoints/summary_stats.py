@@ -13,7 +13,7 @@ class SummaryStats(Resource):
 	@api.response(400, "Invalid arguments")
 	@api.response(200, "Summary stats enclosed")
 	def get(self):
-		"""Summary stats, unimplemented at the moment"""
+		"""Summary stats"""
 		args = summary_stats_parser.parse_args()
 		with db_session() as session:
 			records = bee_records_filter(args, session)
