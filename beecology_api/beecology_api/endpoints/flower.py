@@ -88,8 +88,13 @@ class Flowers(Resource):
 
 			# Simple equality filtering
 			for attr in ["genus", "species", "shape"]:
-				if args[attr] is not None:
-					query = query.filter(FlowerSpecies.__dict__[attr] == args[attr].lower())
+				if args[attr] is None or (type(args[attr]) is list and len(args[attr]) == 0):
+					continue
+
+				if type(args[attr]) is not list:
+					query = query.filter(Flower.__dict__[attr] == args[attr])
+				else:
+					query = query.filter(Flower.__dict__[attr].in_(args[attr]))
 
 			# Months blooming filtering
 			if args["blooms-during"] is not None:

@@ -132,8 +132,13 @@ def bee_records_filter(args, session) -> List[BeeRecord]:
 	# Simple equality filtering
 	for attr in ["user_id", "bee_species_id", "flower_species_id", "head_coloration", "abdomen_coloration",
 	             "thorax_coloration", "closest_city", "gender", "behavior"]:
-		if args[attr] is not None:
+		if args[attr] is None or (type(args[attr]) is list and len(args[attr]) == 0):
+			continue
+
+		if type(args[attr]) is not list:
 			query = query.filter(BeeRecord.__dict__[attr] == args[attr])
+		else:
+			query = query.filter(BeeRecord.__dict__[attr].in_(args[attr]))
 
 	# Range or spatial -based filtering
 	if args["max-elevation"] is not None:

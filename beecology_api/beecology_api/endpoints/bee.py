@@ -88,9 +88,14 @@ class Bees(Resource):
 
 			# Simple equality filtering
 			for attr in ["tongue_length", "species"]:
-				if  args[attr] is not None:
-					args[attr] = args[attr].lower()
+				if args[attr] is None or (type(args[attr]) is list and len(args[attr]) == 0):
+					continue
+				args[attr] = args[attr].lower()
+
+				if type(args[attr]) is not list:
 					query = query.filter(BeeSpecies.__dict__[attr] == args[attr])
+				else:
+					query = query.filter(BeeSpecies.__dict__[attr].in_(args[attr]))
 
 			# Months active filtering
 			if args["active-during"] is not None:
