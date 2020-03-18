@@ -8,12 +8,13 @@ from flask_jwt_extended import get_jwt_identity
 from flask_restx import Resource, abort
 from geoalchemy2 import func
 from marshmallow.exceptions import ValidationError
+from sqlalchemy import extract
 
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.authentication import authenticate
 from beecology_api.common_parsers import bee_record_filter_parser
 from beecology_api.convert_dataframe import convert_dataframe
-from beecology_api.db import BeeRecord, User
+from beecology_api.db import BeeRecord, User, FlowerSpecies, months
 from beecology_api.db import db_session
 from beecology_api.db.serialization import bee_record_schema
 from beecology_api.beecology_api.swagger import bee_record
@@ -140,6 +141,8 @@ def bee_records_filter(args, session) -> List[BeeRecord]:
 			query = query.filter(BeeRecord.__dict__[attr].in_(args[attr]))
 
 	# Range or spatial -based filtering
+	if args["month"] is not None:
+		query = query.filter(extract("month", BeeRecord.time).in_(args["month"]))
 	if args["max-elevation"] is not None:
 		query = query.filter(BeeRecord.elevation <= args["max-elevation"])
 	if args["min-elevation"] is not None:
@@ -159,5 +162,15 @@ def bee_records_filter(args, session) -> List[BeeRecord]:
 
 		query = query.filter(func.ST_Within(BeeRecord.location, func.ST_GeomFromText(
 			"POLYGON(({0} {1}, {2} {1}, {2} {3}, {0} {3}, {0} {1}))".format(*coords))))
+
+	# NEXT: Filtering by flowers
+	# Simple equality checking
+	for attr in ["shape", "main_color"]:
+		if args[attr] is None or len(args[attr]) == 0:
+			continue
+		if type(args[attr]) is not list:
+			query = query.filter(BeeRecord.flower_species.has(**{attr: args[attr]}))
+		else:
+			query = query.join(FlowerSpecies, BeeRecord.flower_species).filter(FlowerSpecies.__dict__[attr].in_(args[attr]))
 
 	return query.all()

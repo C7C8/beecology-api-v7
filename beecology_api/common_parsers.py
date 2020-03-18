@@ -1,6 +1,4 @@
-from flask_restx import reqparse, inputs, fields
-
-from beecology_api.db import genders, beehaviors
+from flask_restx import reqparse, inputs
 
 bee_record_filter_parser = reqparse.RequestParser()
 bee_record_filter_parser.add_argument("user-id", type=str, help="User ID", required=False, dest="user_id")
@@ -9,6 +7,9 @@ bee_record_filter_parser.add_argument("flower-species", type=str, help="Flower s
 bee_record_filter_parser.add_argument("head", type=str, help="Head type", required=False, dest="head_coloration", action="split")
 bee_record_filter_parser.add_argument("abdomen", type=str, help="Abdomen type", required=False, dest="abdomen_coloration", action="split")
 bee_record_filter_parser.add_argument("thorax", type=str, help="Thorax type", required=False, dest="thorax_coloration", action="split")
+bee_record_filter_parser.add_argument("flower-color", type=str, help="Flower color", required=False, dest="main_color", action="split")
+bee_record_filter_parser.add_argument("flower-shape", type=str, help="Flower shape", required=False, dest="shape", action="split")
+bee_record_filter_parser.add_argument("month", type=int, help="Month that the bee record must've occurred in", required=False, action="split")
 bee_record_filter_parser.add_argument("time-start", type=inputs.date_from_iso8601, help="Time that records must fall at or after", required=False)
 bee_record_filter_parser.add_argument("time-end", type=inputs.date_from_iso8601, help="Time that records must fall at or before", required=False)
 bee_record_filter_parser.add_argument("city", type=str, help="City that records must be located in", required=False, dest="closest_city")
