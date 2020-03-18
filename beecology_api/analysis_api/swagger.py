@@ -23,7 +23,7 @@ df_columns = [
 	"flower_common_name",
 	"flower_shape",
 	"flower_bloom_start",
-	"flower_bloom_end"
+	"flower_bloom_end",
 	"flower_main_color"
 ]
 
