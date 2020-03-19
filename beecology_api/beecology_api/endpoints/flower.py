@@ -9,7 +9,7 @@ from beecology_api.beecology_api.api import reference_api as api
 from beecology_api.beecology_api.authentication import admin_required
 from beecology_api.beecology_api.endpoints.record import bee_records_filter
 from beecology_api.common_parsers import bee_record_filter_parser
-from beecology_api.db import db_session, FlowerSpecies
+from beecology_api.db import db_session, FlowerSpecies, BeeRecord
 from beecology_api.db.serialization import flower_species_schema
 from beecology_api.beecology_api.swagger import flower_species, flower_species_filter_parser, flower_distinct_values
 
@@ -113,23 +113,17 @@ class FlowerDistinctValues(Resource):
 		"""Returns lists of possible flower names, shapes, and colors, but only for those flowers that actually appear in bee records"""
 		with db_session() as session:
 			args = bee_record_filter_parser.parse_args()
-			records = bee_records_filter(args, session).all()
+			query = bee_records_filter(args, session)
 
-			flowers = set()
-			colors = set()
-			shapes = set()
-			for record in records:
-				if record.flower_species is None:
-					continue
-				flower = record.flower_species
-				flowers.add(flower)
-				colors.update(flower.colors)
-				shapes.add(flower.shape)
+			colors = list(sum(query.from_self(FlowerSpecies.main_color).distinct().all(), ()))
+			shapes = list(sum(query.from_self(FlowerSpecies.shape).distinct().all(), ()))
+			flower_ids = list(sum(query.from_self(BeeRecord.flower_species_id).distinct().all(), ()))
+			flowers = session.query(FlowerSpecies).filter(FlowerSpecies.id.in_(flower_ids)).all()
 
 			flowers = [flower_species_schema.dump(flower) for flower in flowers]
 			return {
-				"shapes": list(shapes),
-				"colors": list(colors),
+				"shapes": shapes,
+				"colors": colors,
 				"flowers": flowers
-			}
+			}, 200
 
