@@ -16,8 +16,8 @@ class RelativeFrequencies(Resource):
 	def get(self):
 		"""Conduct a relative frequencies analysis and return the resulting data"""
 		args = relative_frequencies_parser.parse_args()
-		if len(args["x-bin-cutoffs"]) < 3:
-			abort(400, "x-bin-cutoffs must have at least 3 cutoffs")
+		if len(args["x-bin-cutoffs"]) < 2:
+			abort(400, "x-bin-cutoffs must have at least 2 cutoffs")
 
 		if args["x-var"] == "time":
 			try:
