@@ -30,16 +30,15 @@ class RelativeFrequencies(Resource):
 
 		# Select bee records and filter
 		with db_session() as session:
-			df = convert_dataframe(bee_records_filter(args, session))
+			df = convert_dataframe(bee_records_filter(args, session).all())
 		if len(df) == 0:
 			abort(400, "No bee records matched filter parameters")
 
 		try:
-			results = relative_frequencies(df=df,
+			return relative_frequencies(df=df,
 		                               x_var=args["x-var"],
 		                               x_bin_cutoffs=cutoffs,
 		                               y_var=args["y-var"],
-		                               norm_mode=args["norm-mode"])
+		                               norm_mode=args["norm-mode"]), 200
 		except ValueError as e:
 			abort(400, "Binning error: {}".format(e))
-		return results["results"], 200

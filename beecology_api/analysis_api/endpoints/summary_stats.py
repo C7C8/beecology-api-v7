@@ -16,7 +16,7 @@ class SummaryStats(Resource):
 		"""Summary stats"""
 		args = summary_stats_parser.parse_args()
 		with db_session() as session:
-			records = bee_records_filter(args, session)
+			records = bee_records_filter(args, session).all()
 			df = convert_dataframe(records)
 			data = summary_stats.summary_statistics(df, args["how"])
 			return data

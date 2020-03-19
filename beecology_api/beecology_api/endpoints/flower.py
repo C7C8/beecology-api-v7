@@ -113,7 +113,7 @@ class FlowerDistinctValues(Resource):
 		"""Returns lists of possible flower names, shapes, and colors, but only for those flowers that actually appear in bee records"""
 		with db_session() as session:
 			args = bee_record_filter_parser.parse_args()
-			records = bee_records_filter(args, session)
+			records = bee_records_filter(args, session).all()
 
 			flowers = set()
 			colors = set()

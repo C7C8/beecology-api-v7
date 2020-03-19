@@ -1,6 +1,5 @@
 import io
 from logging import getLogger
-from typing import List
 from uuid import UUID, uuid4
 
 from flask import send_file
@@ -9,15 +8,16 @@ from flask_restx import Resource, abort
 from geoalchemy2 import func
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import extract
+from sqlalchemy.orm import Query
 
 from beecology_api.beecology_api.api import main_api as api
 from beecology_api.beecology_api.authentication import authenticate
+from beecology_api.beecology_api.swagger import bee_record
 from beecology_api.common_parsers import bee_record_filter_parser
 from beecology_api.convert_dataframe import convert_dataframe
-from beecology_api.db import BeeRecord, User, FlowerSpecies, months
+from beecology_api.db import BeeRecord, User, FlowerSpecies
 from beecology_api.db import db_session
 from beecology_api.db.serialization import bee_record_schema
-from beecology_api.beecology_api.swagger import bee_record
 
 log = getLogger()
 
@@ -106,7 +106,7 @@ class Records(Resource):
 		"""Get a list of records, filtered by any means"""
 		args = bee_record_filter_parser.parse_args()
 		with db_session() as session:
-			return [bee_record_schema.dump(record) for record in bee_records_filter(args, session)], 200
+			return [bee_record_schema.dump(record) for record in bee_records_filter(args, session).all()], 200
 
 
 class CSVRecords(Resource):
@@ -118,16 +118,16 @@ class CSVRecords(Resource):
 		"""Get a list of records, filtered by any means in CSV format."""
 		args = bee_record_filter_parser.parse_args()
 		with db_session() as session:
-			df = convert_dataframe(bee_records_filter(args, session), time_human_readable=True).apply(lambda x: x.fillna("Unknown") if x.dtype.kind not in 'biufc' else x)
+			df = convert_dataframe(bee_records_filter(args, session).all(), time_human_readable=True).apply(lambda x: x.fillna("Unknown") if x.dtype.kind not in 'biufc' else x)
 			out = io.BytesIO()
 			out.write(df.to_csv(header=True, index=False).replace('\\n', '\n').encode("utf-8"))
 			out.seek(0)
 			return send_file(out, mimetype="text/csv")
 
 
-def bee_records_filter(args, session) -> List[BeeRecord]:
+def bee_records_filter(args, session) -> Query:
 	"""Bee record filtering, encapsulated as a function so that the analysis API can use it"""
-	query = session.query(BeeRecord).order_by(BeeRecord.time.desc())
+	query: Query = session.query(BeeRecord).order_by(BeeRecord.time.desc())
 
 	# Simple equality filtering
 	for attr in ["user_id", "bee_species_id", "flower_species_id", "head_coloration", "abdomen_coloration",
@@ -173,4 +173,4 @@ def bee_records_filter(args, session) -> List[BeeRecord]:
 		else:
 			query = query.join(FlowerSpecies, BeeRecord.flower_species).filter(FlowerSpecies.__dict__[attr].in_(args[attr]))
 
-	return query.all()
+	return query
