@@ -31,14 +31,24 @@ df_columns = [
 # MODELS #
 ##########
 
-relative_frequencies_series_element = api.model("Relative frequencies analyis series element", {
+analysis_element = api.model("Generic analysis series element", {
 	"name": fields.String,
 	"value": fields.Float
 })
 
 relative_frequencies_result = api.model("Relative frequencies analysis results", {
 	"name": fields.String,
-	"series": fields.List(fields.Nested(relative_frequencies_series_element))
+	"series": fields.List(fields.Nested(analysis_element))
+})
+
+summary_statistics_series = api.model("Summary statistics series", {
+	"total": fields.Integer,
+	"results": fields.List(fields.Nested(analysis_element))
+})
+
+summary_statistics_results = api.model("Summary statistics analysis results", {
+	val: fields.Nested(summary_statistics_series) for val in ["decade", "species", "behavior", "tongue_length",
+	                                                          "flower_main_color", "flower_shape", "gender"]
 })
 
 ###########
