@@ -7,6 +7,12 @@ from shapely import geometry
 from beecology_api.db import BeeRecord
 
 
+def _convert_gender(gender: str) -> str:
+	"""Convert gender as stored in the database to gender as it should appear in the analysis and CSV files"""
+	if gender == "worker" or gender == "queen":
+		return "female"
+	return gender
+
 # TODO Do something marshmallow-y with this?
 def convert_dataframe(records: List[BeeRecord], time_human_readable=False) -> pd.DataFrame:
 	"""Convert a dataframe of serialized bee records into an analysis-script format dataframe"""
@@ -24,7 +30,7 @@ def convert_dataframe(records: List[BeeRecord], time_human_readable=False) -> pd
 			"elevation": record.elevation,
 			"species": None,
 			"behavior": record.behavior,
-			"gender": record.gender,
+			"gender": _convert_gender(record.gender),
 			"tongue_length": None,
 			"bee_active_start": None,
 			"bee_active_end": None,
