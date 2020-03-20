@@ -39,6 +39,6 @@ class RelativeFrequencies(Resource):
 		                               x_var=args["x-var"],
 		                               x_bin_cutoffs=cutoffs,
 		                               y_var=args["y-var"],
-		                               norm_mode=args["norm-mode"]), 200
+		                               norm_mode=args["norm-mode"])["results"], 200
 		except ValueError as e:
 			abort(400, "Binning error: {}".format(e))
