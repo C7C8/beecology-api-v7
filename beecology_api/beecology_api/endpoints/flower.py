@@ -122,8 +122,8 @@ class FlowerDistinctValues(Resource):
 
 			flowers = [flower_species_schema.dump(flower) for flower in flowers]
 			return {
-				"shapes": shapes,
-				"colors": colors,
-				"flowers": flowers
+				"shapes": filter(lambda shape: shape is not None, shapes),
+				"colors": filter(lambda color: color is not None, colors),
+				"flowers": filter(lambda flower: flower is not None, flowers)
 			}, 200
 
