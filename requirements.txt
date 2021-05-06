@@ -9,7 +9,7 @@ coverage==4.5.4
 cycler==0.10.0
 firebase-admin==3.2.1
 Flask==1.1.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 flask-restx==0.1.0
 google-api-core==1.15.0
 google-api-python-client==1.7.11
