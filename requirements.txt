@@ -10,7 +10,7 @@ cycler==0.10.0
 firebase-admin==3.2.1
 Flask==1.1.1
 Flask-Cors==3.0.8
-flask-restx==0.1.0
+flask-restx==0.5.1
 google-api-core==1.15.0
 google-api-python-client==1.7.11
 google-auth==1.10.0
